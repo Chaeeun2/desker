@@ -1,0 +1,96 @@
+/* Section 2 Styles */
+.section2 {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageSliderContainer {
+  width: 100%;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.imageSlider {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 2rem;
+  padding: 2rem 0;
+  width: max-content;
+  transform: translateX(0);
+  min-width: 100vw; /* 최소 너비를 뷰포트 너비로 설정 */
+}
+
+.imageWrapper {
+  flex-shrink: 0;
+  width: 20vw;
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.imageWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 하단 텍스트 스타일 */
+.textContent {
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+  margin-top: 8rem;
+}
+
+.koreanText {
+  font-size: var(--font-3xl);
+  color: var(--color-black);
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  margin-bottom: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.englishText {
+  font-size: var(--font-5xl);
+  font-family: var(--font-prox);
+  color: var(--color-primary);
+  padding-top: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  margin: 0;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .title {
+    font-size: var(--font-5xl);
+  }
+
+  .description {
+    font-size: var(--font-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--font-4xl);
+  }
+
+  .description {
+    font-size: var(--font-base);
+  }
+}

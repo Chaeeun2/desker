@@ -1,13 +1,189 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-size: 10px;
+
+  /* 메인 컬러 */
+  --color-primary: #336dff;
+  --color-secondary: #faf6eb;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* 폰트 패밀리 */
+  --font-prox: "proxima-nova", sans-serif, Pretendard, apple-system,
+    BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --font-pret: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+
+  /* 폰트 사이즈 */
+  --font-xs: 1.2rem;
+  --font-sm: 1.4rem;
+  --font-base: 1.6rem;
+  --font-lg: 1.8rem;
+  --font-xl: 2rem;
+  --font-2xl: 2.4rem;
+  --font-3xl: 3rem;
+  --font-4xl: 3.6rem;
+  --font-5xl: 4.8rem;
+  --font-6xl: 6rem;
+  --font-7xl: 7.2rem;
+  --font-8xl: 9.6rem;
+  --font-9xl: 12.8rem;
+
+  /* 간격 */
+  --spacing-91: -0.01em;
+  --spacing-92: -0.02em;
+  --spacing-00: 0em;
+  --spacing-01: 0.01em;
+  --spacing-02: 0.02em;
+
+  /* 그림자 */
+  --shadow: 0 0 20px 0 rgb(0 0 0 / 0.2);
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
+  font-family: var(--font-prox);
+  font-size: var(--font-base);
+  line-height: 1.6;
+  color: var(--color-black);
+  background-color: var(--color-white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+/* 폰트 패밀리 유틸리티 */
+.prox {
+  font-family: var(--font-prox);
+}
+
+.pret {
+  font-family: var(--font-pret);
+}
+
+/* 컬러 유틸리티 */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-white {
+  color: var(--color-white);
+}
+
+.text-black {
+  color: var(--color-black);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-white {
+  background-color: var(--color-white);
+}
+
+.bg-black {
+  background-color: var(--color-black);
+}
+
+/* 폰트 사이즈 유틸리티 */
+.text-xs {
+  font-size: var(--font-xs);
+}
+
+.text-sm {
+  font-size: var(--font-sm);
+}
+
+.text-base {
+  font-size: var(--font-base);
+}
+
+.text-lg {
+  font-size: var(--font-lg);
+}
+
+.text-xl {
+  font-size: var(--font-xl);
+}
+
+.text-2xl {
+  font-size: var(--font-2xl);
+}
+
+.text-3xl {
+  font-size: var(--font-3xl);
+}
+
+.text-4xl {
+  font-size: var(--font-4xl);
+}
+
+.text-5xl {
+  font-size: var(--font-5xl);
+}
+
+.text-6xl {
+  font-size: var(--font-6xl);
+}
+
+.text-7xl {
+  font-size: var(--font-7xl);
+}
+
+.text-8xl {
+  font-size: var(--font-8xl);
+}
+
+.text-9xl {
+  font-size: var(--font-9xl);
+}
+
+/* 간격 유틸리티 */
+.tracking-91 {
+  letter-spacing: var(--spacing-91);
+}
+
+.tracking-92 {
+  letter-spacing: var(--spacing-92);
+}
+
+.tracking-00 {
+  letter-spacing: var(--spacing-00);
+}
+
+.tracking-01 {
+  letter-spacing: var(--spacing-01);
+}
+
+.tracking-02 {
+  letter-spacing: var(--spacing-02);
+}
+
+/* 그림자 유틸리티 */
+.shadow {
+  box-shadow: var(--shadow);
 }

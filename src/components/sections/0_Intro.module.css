@@ -1,0 +1,69 @@
+/* Intro Section Styles */
+.introSection {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-primary);
+  position: fixed;
+  overflow: hidden;
+  transform: translateY(0);
+  will-change: transform;
+  z-index: 100;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.image1 {
+  z-index: 20;
+  width: 45vw;
+  height: auto;
+}
+
+.image2 {
+  z-index: 10;
+  width: 43vw;
+  height: auto;
+  padding-bottom: 5rem;
+}
+
+.overlay {
+  position: absolute;
+  z-index: 30;
+  width: 45vw;
+  height: 100vh;
+  background-color: var(--color-primary);
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .image1,
+  .image2,
+  .overlay {
+    width: 80vw;
+  }
+
+  .overlay {
+    height: 40vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .image1,
+  .image2,
+  .overlay {
+    width: 90vw;
+  }
+
+  .overlay {
+    height: 35vh;
+  }
+}
