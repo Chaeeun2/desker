@@ -10,22 +10,35 @@ const MobileFloatingMenu = () => {
   const hasReachedSection5Ref = useRef(false);
   const section5ReachTimeRef = useRef(0);
 
+  // 섹션 3 스페이서 상태 관리
+  const [section3SpacerActive, setSection3SpacerActive] = useState(true);
+
+  // 섹션 3 스페이서 상태 이벤트 수신
+  useEffect(() => {
+    const handleSection3SpacerChange = (event) => {
+      const { showSpacer } = event.detail;
+      setSection3SpacerActive(showSpacer);
+      console.log('Section 3 Spacer State Changed:', showSpacer);
+    };
+
+    window.addEventListener('section3SpacerChange', handleSection3SpacerChange);
+    
+    return () => {
+      window.removeEventListener('section3SpacerChange', handleSection3SpacerChange);
+    };
+  }, []);
+
   // PC와 동일한 스크롤 로직 적용
   useEffect(() => {
     const handleScroll = () => {
-      // 1단계: 섹션 3의 스페이서가 활성화되어 있는지 먼저 확인 (PC와 동일 + 모바일 고려)
-      const section3Spacer = document.querySelector('section:nth-child(4) div[style*="height: 1400vh"]');
-      const section3SpacerAlt = document.querySelector('div[style*="height: 1400vh"]');
-      const section3SpacerMobile = document.querySelector('section:nth-child(4) div[style*="height: 2000vh"]');
-      const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt || section3SpacerMobile);
-
-      // 2단계: 스페이서가 활성화되어 있으면 무조건 숨김
-      if (isSection3SpacerActive) {
+      // 1단계: 섹션 3의 스페이서 상태 체크 (이벤트 기반)
+      if (section3SpacerActive) {
+        console.log('Section 3 Spacer Active (Event) - Hiding menu');
         setIsVisible(false);
         return;
       }
 
-      // 3단계: 스페이서가 비활성화된 경우에만 스크롤 위치 확인
+      // 2단계: 스페이서가 비활성화된 경우에만 스크롤 위치 확인
       const appScrollTop = document.querySelector('.App')?.scrollTop || 0;
       const section5Threshold = window.innerHeight * 3.5;
 
@@ -82,7 +95,7 @@ const MobileFloatingMenu = () => {
       handleScroll();
       return () => appElement.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [section3SpacerActive]);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);

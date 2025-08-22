@@ -151,6 +151,15 @@ const Section3 = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // showSpacer 상태 변화 시 전역 이벤트 발생
+  useEffect(() => {
+    // 커스텀 이벤트로 showSpacer 상태 알림
+    const event = new CustomEvent('section3SpacerChange', { 
+      detail: { showSpacer } 
+    });
+    window.dispatchEvent(event);
+  }, [showSpacer]);
+
   // 모바일일 때 스크롤 거리 조정 (절반으로 줄임)
   const getScrollDistance = (desktopDistance) => {
     return isMobile ? desktopDistance / 2 : desktopDistance;
