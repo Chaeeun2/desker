@@ -1,10 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './MobileFloatingMenu.module.css';
 import SurveyModal from './SurveyModal';
 
 const MobileFloatingMenu = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const hasReachedSection5Ref = useRef(false);
+  const section5ReachTimeRef = useRef(0);
+
+  // PC와 동일한 스크롤 로직 적용
+  useEffect(() => {
+    const handleScroll = () => {
+      // 1단계: 섹션 3의 스페이서가 활성화되어 있는지 먼저 확인
+      const section3Spacer = document.querySelector('section:nth-child(4) div[style*="height: 1400vh"]');
+      const section3SpacerAlt = document.querySelector('div[style*="height: 1400vh"]');
+      const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt);
+
+      // 2단계: 스페이서가 활성화되어 있으면 무조건 숨김
+      if (isSection3SpacerActive) {
+        setIsVisible(false);
+        return;
+      }
+
+      // 3단계: 스페이서가 비활성화된 경우에만 스크롤 위치 확인
+      const appScrollTop = document.querySelector('.App')?.scrollTop || 0;
+      const section5Threshold = window.innerHeight * 3.5;
+
+      // 섹션 5에 도달했을 때만 메뉴 표시 여부 결정
+      if (appScrollTop >= section5Threshold) {
+        const currentScrollY = appScrollTop;
+        const lastScrollY = lastScrollYRef.current;
+        const currentTime = Date.now();
+        
+        // 섹션 5에 처음 도달했을 때는 무조건 메뉴 표시하고 시간 기록
+        if (!hasReachedSection5Ref.current) {
+          setIsVisible(true);
+          hasReachedSection5Ref.current = true;
+          section5ReachTimeRef.current = currentTime;
+        } else {
+          // 섹션 5 도달 후 5초가 지났는지 확인
+          const timeSinceReach = currentTime - section5ReachTimeRef.current;
+          const isAfter5Seconds = timeSinceReach >= 5000;
+          
+          if (isAfter5Seconds) {
+            // 5초 후부터는 스크롤 방향 감지
+            if (lastScrollY !== 0) {
+              const isScrollingDown = currentScrollY > lastScrollY;
+              
+              if (isScrollingDown) {
+                setIsVisible(false);
+              } else {
+                setIsVisible(true);
+              }
+            }
+          }
+        }
+        
+        lastScrollYRef.current = currentScrollY;
+      } else {
+        // 섹션 5 이전에는 메뉴 숨김
+        setIsVisible(false);
+        hasReachedSection5Ref.current = false;
+      }
+    };
+
+    const appElement = document.querySelector('.App');
+    if (appElement) {
+      appElement.addEventListener('scroll', handleScroll);
+      return () => appElement.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
@@ -18,6 +85,11 @@ const MobileFloatingMenu = () => {
       setIsExpanded(false); // 메뉴 접기
     }
   };
+
+  // 메뉴가 숨겨져 있으면 아무것도 렌더링하지 않음
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <>
