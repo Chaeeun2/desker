@@ -13,11 +13,10 @@ const MobileFloatingMenu = () => {
   // PC와 동일한 스크롤 로직 적용
   useEffect(() => {
     const handleScroll = () => {
-      // 1단계: 섹션 3의 스페이서가 활성화되어 있는지 먼저 확인
+      // 1단계: 섹션 3의 스페이서가 활성화되어 있는지 먼저 확인 (PC와 동일)
       const section3Spacer = document.querySelector('section:nth-child(4) div[style*="height: 1400vh"]');
       const section3SpacerAlt = document.querySelector('div[style*="height: 1400vh"]');
-      const section3SpacerMobile = document.querySelector('section:nth-child(4) div[style*="height: 700vh"]');
-      const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt || section3SpacerMobile);
+      const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt);
 
       // 2단계: 스페이서가 활성화되어 있으면 무조건 숨김
       if (isSection3SpacerActive) {
@@ -78,6 +77,8 @@ const MobileFloatingMenu = () => {
     const appElement = document.querySelector('.App');
     if (appElement) {
       appElement.addEventListener('scroll', handleScroll);
+      // 초기 상태 확인 (PC와 동일)
+      handleScroll();
       return () => appElement.removeEventListener('scroll', handleScroll);
     }
   }, []);
