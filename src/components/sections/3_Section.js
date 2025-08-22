@@ -315,8 +315,8 @@ const Section3 = () => {
           
 
           
-          // 먼저 텍스트2가 완료된 후 오버레이 애니메이션 계산 (150px마다 0.1씩)
-          const overlayStartPoint = getScrollDistance(1000); // 1000px → 모바일에서는 500px
+          // 텍스트2가 완료된 후 오버레이 애니메이션 계산 (150px마다 0.1씩)
+          const overlayStartPoint = getScrollDistance(2000); // 2000px → 모바일에서는 1000px (텍스트2 완료 후)
           let newOverlayOpacity = 0;
           
           if (scrollDiff >= overlayStartPoint) {
@@ -340,7 +340,7 @@ const Section3 = () => {
           }
           
           // 오버레이가 완료된 후 텍스트3 애니메이션 시작 (100px마다 0.1씩)
-          const text3StartPoint = getScrollDistance(2000); // 2000px → 모바일에서는 1000px
+          const text3StartPoint = getScrollDistance(3500); // 3500px → 모바일에서는 1750px (오버레이 완료 후)
           let newText3Opacity = 0;
           
           if (scrollDiff >= text3StartPoint) {
@@ -376,7 +376,7 @@ const Section3 = () => {
           
           if (newText3Opacity >= 1.0) {
             // 텍스트3 완성 후 사라지는 애니메이션
-            const text3FadeOutStart = getScrollDistance(3000); // 3000px → 모바일에서는 1500px
+            const text3FadeOutStart = getScrollDistance(4500); // 4500px → 모바일에서는 2250px
             const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000)); // 1000px에 걸쳐 사라짐 (모바일에서는 500px)
             finalText3Opacity = text3FadeOut;
             setText3Opacity(finalText3Opacity);
@@ -391,14 +391,14 @@ const Section3 = () => {
             
             // 텍스트3이 완전히 사라진 후 텍스트4 시작
             if (finalText3Opacity <= 0) {
-              const text4StartPoint = getScrollDistance(4000); // 4000px → 모바일에서는 2000px
+              const text4StartPoint = getScrollDistance(5500); // 5500px → 모바일에서는 2750px
               const text4Start = Math.min(1, (scrollDiff - text4StartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
               setText4Opacity(text4Start);
               
               // SVG 애니메이션: 텍스트4와 함께 시작 (더 빠르게)
               if (text4Start > 0) {
                 // svg1, svg2가 원래 자리로 이동 (텍스트4와 동시에)
-                const svgStartPoint = getScrollDistance(4000); // 4000px → 모바일에서는 2000px
+                const svgStartPoint = getScrollDistance(5500); // 5500px → 모바일에서는 2750px
                 const svgAnimation = Math.min(1, (scrollDiff - svgStartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
                 setSvg1TranslateX(-100 + (svgAnimation * 100)); // -100vw → 0vw
                 setSvg2TranslateX(100 - (svgAnimation * 100)); // 100vw → 0vw
@@ -406,7 +406,7 @@ const Section3 = () => {
                 
                 // line width 애니메이션: svg 애니메이션 완료 후 시작
                 if (svgAnimation >= 1.0) {
-                  const lineStartPoint = getScrollDistance(5000); // 5000px → 모바일에서는 2500px
+                  const lineStartPoint = getScrollDistance(6500); // 6500px → 모바일에서는 3250px
                   const lineAnimation = Math.min(1, (scrollDiff - lineStartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
                   const newLineWidth = lineAnimation * 40; // 0 → 40vw로 확장
                   setLineWidth(newLineWidth);
@@ -419,7 +419,7 @@ const Section3 = () => {
                   // 라인 애니메이션이 완료되면 새로운 애니메이션 시작
                   if (lineAnimation >= 1.0) {
                     // 텍스트4 페이드아웃 (새로운 요소들이 나타나면서)
-                    const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(6000)) / getScrollDistance(1000)); // 6000px → 모바일에서는 3000px, 1000px → 모바일에서는 500px
+                    const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1000)); // 7500px → 모바일에서는 3750px, 1000px → 모바일에서는 500px
                     setText4Opacity(text4FadeOut);
                     
                     // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
@@ -432,10 +432,10 @@ const Section3 = () => {
                     
 
                     
-                                        // 텍스트4가 완전히 사라진 후 텍스트5 시작 (7000px부터 1500px에 걸쳐)
+                                        // 텍스트4가 완전히 사라진 후 텍스트5 시작 (8500px부터 1500px에 걸쳐)
                     if (text4FadeOut <= 0) {
                       // 최종 애니메이션 (새로운 SVG들)
-                      const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(7000)) / getScrollDistance(1500)); // 7000px → 모바일에서는 3500px, 1500px → 모바일에서는 750px
+                      const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(8500)) / getScrollDistance(1500)); // 8500px → 모바일에서는 4250px, 1500px → 모바일에서는 750px
                       
                       // overlay 배경색을 primary로 변경
                       if (finalAnimation > 0) {
@@ -482,10 +482,10 @@ const Section3 = () => {
                       
 
                       
-                      // 텍스트5가 완료되면 텍스트6 시작 (9500px부터 1000px에 걸쳐)
+                      // 텍스트5가 완료되면 텍스트6 시작 (10000px부터 1000px에 걸쳐)
                       if (finalAnimation >= 1.0) {
-                        // 텍스트5 페이드아웃 (9500px부터 1000px에 걸쳐)
-                        const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(9500)) / getScrollDistance(1000)); // 9500px → 모바일에서는 4750px, 1000px → 모바일에서는 500px
+                        // 텍스트5 페이드아웃 (10000px부터 1000px에 걸쳐)
+                        const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(10000)) / getScrollDistance(1000)); // 10000px → 모바일에서는 5000px, 1000px → 모바일에서는 500px
                         setText5Opacity(text5FadeOut);
                         
                         // 텍스트5가 사라지면서 translateY 변화
@@ -496,7 +496,7 @@ const Section3 = () => {
                         
                         // 텍스트5가 완전히 사라진 후 텍스트6 시작
                         if (text5FadeOut <= 0) {
-                          const text6Animation = Math.min(1, (scrollDiff - getScrollDistance(10500)) / getScrollDistance(1000)); // 10500px → 모바일에서는 5250px, 1000px → 모바일에서는 500px
+                          const text6Animation = Math.min(1, (scrollDiff - getScrollDistance(11000)) / getScrollDistance(1000)); // 11000px → 모바일에서는 5500px, 1000px → 모바일에서는 500px
                           setText6Opacity(text6Animation);
                           
                           // 새로운 SVG들도 함께 나타남
