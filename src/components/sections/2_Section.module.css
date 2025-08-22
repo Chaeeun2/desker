@@ -99,6 +99,10 @@
   .textContent {
     margin-top: 6rem;
   }
+
+  .imageWrapper {
+    border-radius: 8px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -118,6 +122,6 @@
   }
 
   .imageSlider {
-    gap: 1.5rem;
+    gap: 1rem;
   }
 }

@@ -22,14 +22,61 @@ const SurveyModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      
+      // 모바일에서 키보드가 올라올 때 viewport 높이 변경 방지
+      const handleViewportChange = () => {
+        if (window.innerWidth <= 768) {
+          // 모바일에서 키보드가 올라올 때 모달 위치 고정
+          const modalContent = document.querySelector(`.${styles.modalContent}`);
+          if (modalContent) {
+            // dvh 값을 유지하면서 위치 고정
+            modalContent.style.position = 'fixed';
+            modalContent.style.top = '0';
+            modalContent.style.left = '0';
+            modalContent.style.right = '0';
+            modalContent.style.bottom = '0';
+            modalContent.style.height = '100dvh';
+            modalContent.style.transform = 'translateZ(0)';
+            
+            // 스크롤 위치 고정
+            if (modalContent.scrollTop > 0) {
+              modalContent.scrollTop = 0;
+            }
+          }
+        }
+      };
+
+      // viewport 높이 변경 감지
+      window.addEventListener('resize', handleViewportChange);
+      window.addEventListener('orientationchange', handleViewportChange);
+      
+      // 모바일에서 키보드 표시/숨김 감지
+      const handleVisualViewportChange = () => {
+        if (window.visualViewport && window.innerWidth <= 768) {
+          const modalContent = document.querySelector(`.${styles.modalContent}`);
+          if (modalContent) {
+            // visualViewport 변경 시 모달 위치 조정
+            const currentHeight = window.visualViewport.height;
+            modalContent.style.height = `${currentHeight}px`;
+          }
+        }
+      };
+      
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+      }
+      
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('resize', handleViewportChange);
+        window.removeEventListener('orientationchange', handleViewportChange);
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+        }
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
-
-    // 컴포넌트 언마운트 시 body 스크롤 복원
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   // 모달이 열릴 때 초기 상태로 리셋
@@ -69,6 +116,12 @@ const SurveyModal = ({ isOpen, onClose }) => {
   const handleNext = () => {
     // 다음 버튼을 누를 때마다 indicatorStep을 +1씩 증가
     setIndicatorStep(prev => prev + 1);
+    
+    // 모달 내 스크롤을 최상위로 이동
+    const modalBodyContainer = document.querySelector(`.${styles.modalBodyContainer}`);
+    if (modalBodyContainer) {
+      modalBodyContainer.scrollTop = 0;
+    }
     
     if (currentStep === 0) {
       setCurrentStep(1);

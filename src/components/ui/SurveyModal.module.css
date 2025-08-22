@@ -108,6 +108,7 @@
   font-family: var(--font-pret);
   letter-spacing: -0.01em;
   text-align: center;
+  word-break: keep-all;
 }
 
 .description {
@@ -223,6 +224,7 @@
   line-height: 1.4;
   font-family: var(--font-pret);
   letter-spacing: -0.01em;
+  word-break: keep-all;
 }
 
 /* 라디오 버튼 그룹 */
@@ -293,6 +295,7 @@
   line-height: 1.6;
   font-family: var(--font-pret);
   font-weight: 500;
+  word-break: keep-all;
 }
 
 .fileUploadButton {
@@ -544,20 +547,32 @@
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .modalContent {
-    padding: 30px 20px;
+    padding: 25px;
     margin: 0px;
-    height: 100dvh;
+    height: 100dvh; /* dvh 값 유지 */
     width: 100vw;
     border-radius: 0px;
+    position: fixed; /* 고정 위치로 설정 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateZ(0); /* 하드웨어 가속으로 위치 고정 */
+    will-change: transform; /* transform 변경 최적화 */
+  }
+
+  .modalHeader {
+    padding: 0 0 30px 0;
+    zoom: 0.8;
   }
 
   .title {
-    font-size: 1.8rem;
+    font-size: 2.6rem;
     margin-bottom: 25px;
   }
 
   .description {
-    font-size: 1rem;
+    font-size: 1.6rem;
     margin-bottom: 20px;
   }
 
@@ -568,6 +583,80 @@
 
   .nextButton {
     padding: 14px 28px;
-    font-size: 1rem;
+    font-size: 1.6rem;
+  }
+
+  .modalBodyContainer {
+    padding: 0;
+  }
+
+  /* Modal Footer - 하단 고정 */
+  .modalFooter {
+    padding: 0px;
+  }
+
+  .closeButton {
+    top: 0px;
+    right: 0px;
+    width: 25px;
+    height: 25px;
+  }
+
+  .formLabel {
+    font-size: 1.6rem;
+  }
+
+  .formInput,
+  .formTextarea {
+    font-size: 1.6rem;
+  }
+
+  .checkboxText {
+    font-size: 1.6rem;
+  }
+
+  /* 기타 입력 필드 */
+  .otherInput {
+    font-size: 1.6rem;
+  }
+  .radioText {
+    font-size: 1.6rem;
+  }
+
+  /* 텍스트 영역 */
+  .textArea {
+    font-size: 1.6rem;
+  }
+
+  .questionTitle {
+    font-size: 1.7rem;
+  }
+
+  .uploadInfo {
+    font-size: 1.3rem;
+  }
+
+  .uploadText {
+    font-size: 1.6rem;
+    font-weight: 600;
+    font-family: var(--font-pret);
+  }
+
+  .uploadIcon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .progressIndicator::before {
+    width: 220px;
+  }
+
+  .progressStep {
+    margin: 0 15px;
+  }
+  /* 브랜드 협업 폼 */
+  .formGrid {
+    grid-template-columns: 1fr;
+    margin-top: 10px;
   }
 }

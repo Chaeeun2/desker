@@ -17,7 +17,7 @@
 
 .imageContainer {
   transition: opacity 0.8s ease, transform 0.8s ease;
-  height: 88vh;
+  height: 900px;
   width: 100%;
   top: 0;
 }

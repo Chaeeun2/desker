@@ -42,7 +42,7 @@ const Main = () => {
             />
             <div className={styles.textOverlay}>
               {/* 모바일에서 세로로 표시될 모든 텍스트 */}
-              <div className="rolling_wrap" style={{width: '400px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
+              <div className="rolling_wrap" style={{width: '400px', height: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
                 <h2 style={{opacity: 0, visibility: 'hidden', height: 0, overflow: 'hidden'}}>WORK</h2>
                 <AnimatePresence mode="sync">
                   <motion.h2

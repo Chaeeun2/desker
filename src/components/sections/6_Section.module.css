@@ -210,4 +210,8 @@
   .videoContainer {
     border-radius: 0px;
   }
+
+  .campaignButton:hover {
+    color: white;
+  }
 }

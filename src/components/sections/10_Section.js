@@ -20,10 +20,71 @@ const Section10 = () => {
 
   // 아이템 클릭 핸들러
   const handleItemClick = (itemIndex) => {
-    setItemStates(prev => ({
-      ...prev,
-      [itemIndex]: { isExpanded: !prev[itemIndex].isExpanded }
-    }));
+    const currentState = itemStates[itemIndex].isExpanded;
+    
+    // Safari 감지
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    
+    if (!currentState) {
+      // 확장할 때: 즉시 확장
+      setItemStates(prev => ({
+        ...prev,
+        [itemIndex]: { isExpanded: true }
+      }));
+    } else {
+      // 축소할 때: 모든 변화 모니터링
+      
+      const textWrapper = document.querySelector(`[data-item="${itemIndex}"] .${styles.textWrapper}`);
+      const iconWrapper = document.querySelector(`[data-item="${itemIndex}"] .${styles.iconWrapper}`);
+      const gridItem = document.querySelector(`[data-item="${itemIndex}"]`);
+      
+      if (textWrapper && iconWrapper && gridItem) {
+        
+        // 상태 변경
+        setItemStates(prev => ({
+          ...prev,
+          [itemIndex]: { isExpanded: false }
+        }));
+        
+        // 실시간 모니터링 (모든 변화 추적)
+        let monitorCount = 0;
+        const fullMonitor = setInterval(() => {
+          const textStyles = window.getComputedStyle(textWrapper);
+          const iconStyles = window.getComputedStyle(iconWrapper);
+          const gridStyles = window.getComputedStyle(gridItem);
+          
+          // 실제 DOM 요소의 크기와 위치 측정
+          const textRect = textWrapper.getBoundingClientRect();
+          const iconRect = iconWrapper.getBoundingClientRect();
+          const gridRect = gridItem.getBoundingClientRect();
+        
+          
+          if (monitorCount > 30) { // 3초 후 모니터링 중단
+            clearInterval(fullMonitor);
+          }
+        }, 100);
+        
+        // 2초 후 최종 상태 확인
+        setTimeout(() => {
+
+          // 최종 DOM 실제 크기
+          const finalTextRect = textWrapper.getBoundingClientRect();
+          const finalIconRect = iconWrapper.getBoundingClientRect();
+          const finalGridRect = gridItem.getBoundingClientRect();
+        
+          
+          clearInterval(fullMonitor);
+        }, 2000);
+        
+      } else {
+        setItemStates(prev => ({
+          ...prev,
+          [itemIndex]: { isExpanded: false }
+        }));
+      }
+    }
+    
   };
 
   return (
@@ -49,7 +110,7 @@ const Section10 = () => {
         {/* 2x2 그리드 레이아웃 */}
         <div ref={gridRef} className={`${styles.gridContainer} ${gridHasIntersected ? styles.fadeIn : ''}`}>
           {/* 데스커 라운지 홍대 */}
-          <div className={`${styles.gridItem} ${itemStates[1].isExpanded ? styles.expanded : ''}`}>
+          <div className={`${styles.gridItem} ${itemStates[1].isExpanded ? styles.expanded : ''}`} data-item="1">
             <div className={styles.itemContent}>
               <div className={`${styles.textWrapper} ${itemStates[1].isExpanded ? styles.hidden : ''}`}>
                 <p className={styles.itemContentText1}>
@@ -70,10 +131,12 @@ const Section10 = () => {
                 일을 통해 성장하는 사람들이 함께 연결되어,
                 <br />
                 다양한 가능성을 찾아갈 수 있는 공간을 꿈꿉니다.
-              </p>
+                          </p>
+                          <a href="https://www.instagram.com/desker_lounge_hd/" target="_blank">
               <button className={`${styles.ctaButton} ${itemStates[1].isExpanded ? styles.visible : ''}`}>
                 데스커 라운지 홍대 보러가기 →
-              </button>
+                              </button>
+                              </a>
               <div 
                 className={`${styles.closeIcon} ${itemStates[1].isExpanded ? styles.visible : ''}`}
                 onClick={() => handleItemClick(1)}
@@ -92,7 +155,7 @@ const Section10 = () => {
           </div>
 
           {/* 데스커 라운지 대구 */}
-          <div className={`${styles.gridItem} ${itemStates[2].isExpanded ? styles.expanded : ''}`}>
+          <div className={`${styles.gridItem} ${itemStates[2].isExpanded ? styles.expanded : ''}`} data-item="2">
             <div className={styles.itemContent}>
               <div className={`${styles.textWrapper} ${itemStates[2].isExpanded ? styles.hidden : ''}`}>
                 <p className={styles.itemContentText1}>
@@ -112,7 +175,12 @@ const Section10 = () => {
               <p className={`${styles.itemContentText2} ${itemStates[2].isExpanded ? styles.visible : ''}`}>
                 새로운 시작과 성장으로 이어갈 수 있는
                 <br/>기회를 제공합니다.
-              </p>
+                          </p>
+                                                 <a href="https://www.instagram.com/desker_lounge_dg/" target="_blank">
+              <button className={`${styles.ctaButton} ${itemStates[2].isExpanded ? styles.visible : ''}`}>
+                데스커 라운지 대구 보러가기 →
+                              </button>
+                              </a>
               <div 
                 className={`${styles.closeIcon} ${itemStates[2].isExpanded ? styles.visible : ''}`}
                 onClick={() => handleItemClick(2)}
@@ -131,7 +199,7 @@ const Section10 = () => {
           </div>
 
           {/* 데스커 베이스캠프 with nonce */}
-          <div className={`${styles.gridItem} ${itemStates[3].isExpanded ? styles.expanded : ''}`}>
+          <div className={`${styles.gridItem} ${itemStates[3].isExpanded ? styles.expanded : ''}`} data-item="3">
             <div className={styles.itemContent}>
               <div className={`${styles.textWrapper} ${itemStates[3].isExpanded ? styles.hidden : ''}`}>
                 <p className={styles.itemContentText1}>
@@ -152,7 +220,12 @@ const Section10 = () => {
                 매년 150명의 창업 희망 학생을 선발해 
                 <br/>전문가 멘토링, 기술 워크샵, 네트워크 등 
                 <br/>다양한 프로그램을 통해 노하우를 전달하고 있습니다.
-              </p>
+                          </p>
+               <a href="https://www.instagram.com/desker_basecamp_with_nonce/" target="_blank">
+              <button className={`${styles.ctaButton} ${itemStates[3].isExpanded ? styles.visible : ''}`}>
+                데스커 베이스캠프 보러가기 →
+                              </button>
+                              </a>
               <div 
                 className={`${styles.closeIcon} ${itemStates[3].isExpanded ? styles.visible : ''}`}
                 onClick={() => handleItemClick(3)}
@@ -171,7 +244,7 @@ const Section10 = () => {
           </div>
 
           {/* differ */}
-          <div className={`${styles.gridItem} ${itemStates[4].isExpanded ? styles.expanded : ''}`}>
+          <div className={`${styles.gridItem} ${itemStates[4].isExpanded ? styles.expanded : ''}`} data-item="4">
             <div className={styles.itemContent}>
               <div className={`${styles.textWrapper} ${itemStates[4].isExpanded ? styles.hidden : ''}`}>
                 <p className={styles.itemContentText1}>
@@ -192,7 +265,12 @@ const Section10 = () => {
                 책상에서 시작된 가능성의 이야기를 조명하고,
                 <br/>그 앞에서 마주한 고민과 영감을 주고 받는
                 <br/>성장 커뮤니티입니다.
-              </p>
+                          </p>
+                                         <a href="https://differ.co.kr/" target="_blank">
+              <button className={`${styles.ctaButton} ${itemStates[4].isExpanded ? styles.visible : ''}`}>
+           differ 보러가기 →
+                              </button>
+                              </a>
               <div 
                 className={`${styles.closeIcon} ${itemStates[4].isExpanded ? styles.visible : ''}`}
                 onClick={() => handleItemClick(4)}

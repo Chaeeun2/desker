@@ -164,13 +164,30 @@
 .textWrapper,
 .iconWrapper {
   overflow: hidden;
-  transition: all 0.5s ease;
-  max-height: 100px; /* 충분한 높이 설정 */
+  transition: height 0.3s ease; /* 기본 트랜지션 */
+}
+
+.textWrapper {
+  height: 40px;
+}
+
+.iconWrapper {
+  height: 50px;
 }
 
 .textWrapper.hidden,
 .iconWrapper.hidden {
-  max-height: 0;
+  height: 0;
+}
+
+/* Safari 전용 height 트랜지션 수정 */
+@supports (-webkit-appearance: none) {
+  .textWrapper,
+  .iconWrapper {
+    transition: height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Safari 최적화된 이징 */
+    -webkit-transform: translateZ(0); /* Safari 하드웨어 가속 */
+    transform: translateZ(0);
+  }
 }
 
 /* 아이템 콘텐츠 */
@@ -228,7 +245,7 @@
   font-size: 2rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease; /* all 대신 구체적인 속성만 */
   font-family: var(--font-pret);
   letter-spacing: var(--spacing-91);
   margin-top: 2.5rem;
@@ -250,7 +267,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease; /* all 대신 구체적인 속성만 */
   font-family: var(--font-pret);
   line-height: 1;
   margin-top: 2rem;
@@ -356,9 +373,11 @@
 
 /* 반응형 디자인 */
 @media (max-width: 1080px) {
-  .textWrapper,
+  .textWrapper {
+    height: 30px;
+  }
   .iconWrapper {
-    max-height: 50px; /* 충분한 높이 설정 */
+    height: 50px;
   }
 
   .section10 {

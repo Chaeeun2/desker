@@ -289,7 +289,7 @@
   }
 
   .rightSide {
-    padding: 7rem 2rem;
+    padding: 6rem 2rem 7rem 2rem;
   }
 
   .panelTitle {
@@ -346,5 +346,6 @@
 
   .imageGrid {
     gap: 1rem;
+    width: 100%;
   }
 }
