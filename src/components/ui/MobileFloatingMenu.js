@@ -6,7 +6,6 @@ const MobileFloatingMenu = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [isForceHidden, setIsForceHidden] = useState(false);
   const lastScrollYRef = useRef(0);
   const hasReachedSection5Ref = useRef(false);
   const section5ReachTimeRef = useRef(0);
@@ -20,10 +19,9 @@ const MobileFloatingMenu = () => {
       const section3SpacerMobile = document.querySelector('section:nth-child(4) div[style*="height: 700vh"]');
       const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt || section3SpacerMobile);
 
-      // 2단계: 스페이서가 활성화되어 있으면 강력하게 숨김
+      // 2단계: 스페이서가 활성화되어 있으면 무조건 숨김
       if (isSection3SpacerActive) {
         setIsVisible(false);
-        setIsForceHidden(true);
         return;
       }
 
@@ -40,7 +38,6 @@ const MobileFloatingMenu = () => {
         // 섹션 5에 처음 도달했을 때는 무조건 메뉴 표시하고 시간 기록
         if (!hasReachedSection5Ref.current) {
           setIsVisible(true);
-          setIsForceHidden(false);
           hasReachedSection5Ref.current = true;
           section5ReachTimeRef.current = currentTime;
         } else {
@@ -54,22 +51,27 @@ const MobileFloatingMenu = () => {
               const isScrollingDown = currentScrollY > lastScrollY;
               
               if (isScrollingDown) {
+                // 아래로 스크롤할 때는 숨김
                 setIsVisible(false);
-                setIsForceHidden(false);
               } else {
+                // 위로 스크롤할 때는 표시
                 setIsVisible(true);
-                setIsForceHidden(false);
               }
             }
+          } else {
+            // 5초 전까지는 메뉴 계속 표시
+            setIsVisible(true);
           }
         }
         
         lastScrollYRef.current = currentScrollY;
+        
       } else {
         // 섹션 5 이전에는 메뉴 숨김
         setIsVisible(false);
-        setIsForceHidden(false);
+        // 섹션 5를 벗어나면 상태 초기화
         hasReachedSection5Ref.current = false;
+        section5ReachTimeRef.current = 0;
       }
     };
 
@@ -92,11 +94,6 @@ const MobileFloatingMenu = () => {
       setIsExpanded(false); // 메뉴 접기
     }
   };
-
-  // 메뉴가 완전히 숨겨져 있으면 아무것도 렌더링하지 않음
-  if (isForceHidden) {
-    return null;
-  }
 
   return (
     <>
