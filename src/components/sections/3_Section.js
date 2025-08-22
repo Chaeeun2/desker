@@ -85,7 +85,7 @@ const Section3 = () => {
   const [newSvgScale, setNewSvgScale] = useState(0); // 새로운 SVG scale (0 → 1)
   const [newSvg2Scale, setNewSvg2Scale] = useState(0); // 두 번째 새로운 SVG scale (0 → 1)
   const [newSvg3Scale, setNewSvg3Scale] = useState(0); // 세 번째 새로운 SVG scale (0 → 1, 오른쪽)
-  const [linePadding, setLinePadding] = useState(50); // line padding (50px → 0px)
+  const [linePadding, setLinePadding] = useState(30); // line padding (50px → 0px)
   const [lineWidth, setLineWidth] = useState(0); // 초기 width 0
   const [lineOpacity, setLineOpacity] = useState(0); // 라인 opacity (0에서 1로 증가)
   const [svgOpacity, setSvgOpacity] = useState(0); // SVG opacity (0에서 1로 증가)
@@ -104,6 +104,33 @@ const Section3 = () => {
     "그 고민 앞에서,",
     "일과 삶의 환기를 위한<br/>데스커 워케이션이 시작되었습니다."
   ];
+
+  // 모바일용 texts 배열 (줄바꿈 다르게)
+  const getMobileTexts = (text4Color) => [
+    "데스커가<br/>워케이션에<br/>주목하게 된 이유",
+    "일에 몰입하기<br/>위해선 꼭<br/>사무실이어야만 할까?",
+    "사무실에 출근하는<br/>반복적인 일상.",
+    `같은 공간, 책상에서<br/><span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>일</span>과 <span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
+    "그 고민 앞에서,",
+    "일과 삶의 환기를 위한<br/>데스커 워케이션이<br/>시작되었습니다."
+  ];
+
+  // 화면 크기에 따라 텍스트 선택
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 현재 사용할 텍스트 배열 선택
+  const currentTexts = isMobile ? getMobileTexts(text4Color) : getTexts(text4Color);
 
   // currentTextIndex 상태와 ref 동기화
   useEffect(() => {
@@ -159,7 +186,7 @@ const Section3 = () => {
         setLineWidth(0);
         setLineOpacity(0);
         setLineStrokeColor('black');
-        setLinePadding(50);
+        setLinePadding(30);
         setSvgOpacity(0);
         setNewSvgScale(0);
         setNewSvg2Scale(0);
@@ -239,8 +266,8 @@ const Section3 = () => {
                   // 텍스트3이 완성된 후 텍스트4 시작
           if (newText3Opacity >= 1.0) {
             // 텍스트3 완성 후 추가 스크롤이 필요함
-            const text3CompletePoint = 3500; // 텍스트3 완성 지점 (7000 → 3500으로 절반)
-            const text4StartPoint = text3CompletePoint + 500; // 텍스트4 시작 지점 (1000 → 500으로 절반)
+            const text3CompletePoint = isMobile ? 1750 : 3500; // 모바일에서는 더 짧게
+            const text4StartPoint = text3CompletePoint + (isMobile ? 250 : 500); // 모바일에서는 더 짧게
           
 
           
@@ -248,8 +275,8 @@ const Section3 = () => {
             const text4ScrollDiff = scrollDiff - text4StartPoint; // 텍스트4 시작 후 스크롤 거리
             if (text4ScrollDiff >= 0) { // 음수 방지
               // 더 세밀한 단계로 계산 (25px마다 0.05씩)
-              const text4Steps = Math.floor(text4ScrollDiff / 25); // 25px마다 1단계 (50px → 25px로 절반)
-              newText4Opacity = Math.max(0, Math.min(1, text4Steps * 0.05)); // 25px마다 0.05씩 증가
+              const text4Steps = Math.floor(text4ScrollDiff / (isMobile ? 12 : 25)); // 모바일에서는 더 빠르게
+              newText4Opacity = Math.max(0, Math.min(1, text4Steps * 0.05)); // 12px마다 0.05씩 증가 (모바일)
               
 
             }
@@ -358,7 +385,7 @@ const Section3 = () => {
                       // line width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
                       const fastLineAnimation = Math.min(1, finalAnimation * 2); // 2배 빠르게
                       lineWidthValue = 40 - (fastLineAnimation * 40); // 40vw → 0vw (더 빨리)
-                      const linePaddingValue = 50 - (finalAnimation * 50); // 50px → 0px
+                      const linePaddingValue = 30 - (finalAnimation * 30); // 50px → 0px
                       setLineTranslateY(lineTranslateYValue);
                       setLineWidth(lineWidthValue);
                       setLinePadding(linePaddingValue);
@@ -416,10 +443,17 @@ const Section3 = () => {
                           
                           // 4단계: sticky 해제 (isAnimationComplete가 true인 상태에서)
                           if (sectionRef.current) {
-                            // CSS 클래스만 재적용하여 sticky 완전 해제
+                            // CSS 클래스와 인라인 스타일을 모두 제거하여 sticky 완전 해제
                             sectionRef.current.classList.add(styles.animationComplete);
                             sectionRef.current.classList.remove(styles.sticky);
                             sectionRef.current.classList.remove(styles.scrollable);
+                            
+                            // 인라인 스타일도 직접 제거하여 모바일에서도 제대로 작동
+                            sectionRef.current.style.position = 'static';
+                            sectionRef.current.style.top = 'auto';
+                            sectionRef.current.style.zIndex = 'auto';
+                            sectionRef.current.style.transform = 'none';
+                            sectionRef.current.style.willChange = 'auto';
                           }
                           
                         }
@@ -453,7 +487,7 @@ const Section3 = () => {
                 setSvg1StrokeColor('black');
                 setSvg2StrokeColor('black');
                 setLineStrokeColor('black');
-                setLinePadding(50);
+                setLinePadding(30);
                 setLineWidth(0);
                 setLineOpacity(0); // 라인 opacity도 0으로 리셋
                 setSvgOpacity(0); // SVG opacity도 0으로 리셋
@@ -557,7 +591,7 @@ const Section3 = () => {
               transition: 'opacity 0.1s ease-out, transform 0.1s ease-out',
               fontSize: '8rem'
             }}
-            dangerouslySetInnerHTML={{ __html: getTexts(text4Color)[0] }}
+            dangerouslySetInnerHTML={{ __html: currentTexts[0] }}
           />
           
           {/* 텍스트 2 */}
@@ -572,7 +606,7 @@ const Section3 = () => {
               transition: 'opacity 0.1s ease-out',
               fontSize: '8rem'
             }}
-            dangerouslySetInnerHTML={{ __html: getTexts(text4Color)[1] }}
+            dangerouslySetInnerHTML={{ __html: currentTexts[1] }}
           />
         </div>
         
@@ -605,7 +639,7 @@ const Section3 = () => {
             zIndex: 10, // 오버레이보다 훨씬 위에 표시
             fontSize: '6rem'
           }}
-          dangerouslySetInnerHTML={{ __html: getTexts(text4Color)[2] }}
+          dangerouslySetInnerHTML={{ __html: currentTexts[2] }}
         />
         
         {/* 텍스트 4 - 검은색으로 표시 */}
@@ -622,43 +656,43 @@ const Section3 = () => {
             color: text4Color, // 동적 색상 적용
             fontSize: '6rem'
           }}
-          dangerouslySetInnerHTML={{ __html: getTexts(text4Color)[3] }}
+          dangerouslySetInnerHTML={{ __html: currentTexts[3] }}
         />
 
         
-        {/* 텍스트 5 - 흰색으로 표시 */}
-        <div
-          className={styles.centerText}
-          style={{ 
-            opacity: text5Opacity,
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: `translate(-50%, calc(-50% - ${text5TranslateY}px))`,
-            transition: 'opacity 0.1s ease-out, transform 0.1s ease-out',
-            zIndex: 12, // 텍스트4보다 위에 표시
-            color: 'white', // 흰색 텍스트
-            fontSize: '6rem'
-          }}
-          dangerouslySetInnerHTML={{ __html: getTexts(text4Color)[4] }}
-        />
-        
-        {/* 텍스트 6 - 흰색으로 표시 */}
-        <div
-          className={styles.centerText}
-          style={{ 
-            opacity: text6Opacity,
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            transition: 'opacity 0.1s ease-out',
-            zIndex: 13, // 텍스트5보다 위에 표시
-            color: 'white', // 흰색 텍스트
-            fontSize: '6rem'
-          }}
-          dangerouslySetInnerHTML={{ __html: getTexts(text4Color)[5] }}
-        />
+                  {/* 텍스트 5 - 흰색으로 표시 */}
+          <div
+            className={styles.centerTextWhite}
+            style={{ 
+              opacity: text5Opacity,
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: `translate(-50%, calc(-50% - ${text5TranslateY}px))`,
+              transition: 'opacity 0.1s ease-out, transform 0.1s ease-out',
+              zIndex: 12, // 텍스트4보다 위에 표시
+              color: 'white', // 흰색 텍스트
+              fontSize: '6rem'
+            }}
+            dangerouslySetInnerHTML={{ __html: currentTexts[4] }}
+          />
+          
+          {/* 텍스트 6 - 흰색으로 표시 */}
+          <div
+            className={styles.centerTextWhite}
+            style={{ 
+              opacity: text6Opacity,
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              transition: 'opacity 0.1s ease-out',
+              zIndex: 13, // 텍스트5보다 위에 표시
+              color: 'white', // 흰색 텍스트
+              fontSize: '6rem'
+            }}
+            dangerouslySetInnerHTML={{ __html: currentTexts[5] }}
+          />
         
         {/* 하단 SVG 요소들 - 텍스트4와 함께 나타남 */}
         <div

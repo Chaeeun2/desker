@@ -4,6 +4,7 @@ import styles from './9_Section.module.css';
 const Section9 = () => {
   const sectionRef = useRef(null);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   
   // 각 텍스트의 opacity 상태
   const [text1Opacity, setText1Opacity] = useState(0);
@@ -25,8 +26,31 @@ const Section9 = () => {
   const [isAnimationComplete, setIsAnimationComplete] = useState(false); // 애니메이션 완료 상태
   const isAnimationCompleteRef = useRef(false); // 즉시 반영을 위한 ref
 
+  // 모바일 감지 (768px 이하)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
+  // 모바일용과 데스크톱용 텍스트
+  const getMobileTexts = () => ({
+    text2: `일하는 방식이<br/>더욱 <span class="highlight">나</span>다울 수 있도록.`,
+    text3: `데스커는 앞으로도<br/>새로운 <span class="highlight">WORK-LIFE</span>의<br/>가능성을 상상합니다.`
+  });
 
+  const getDesktopTexts = () => ({
+    text2: `일하는 방식이<br/>더욱 <span class="highlight">나</span>다울 수 있도록.`,
+    text3: `데스커는 앞으로도<br/>새로운 <span class="highlight">WORK-LIFE</span>의 가능성을 상상합니다.`
+  });
+
+  const currentTexts = isMobile ? getMobileTexts() : getDesktopTexts();
+  
   useEffect(() => {
     const handleScroll = () => {
       
@@ -218,7 +242,7 @@ const Section9 = () => {
                 transform: `translate(-50%, calc(-50% - ${text1TranslateY}px))`
               }}
             >
-              <h2><img style={{width: '500px'}} src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker.png"/></h2>
+              <h2><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker.png"/></h2>
             </div>
             
             {/* 텍스트 2 - 사라질 때만 translateY 변화 */}
@@ -229,7 +253,7 @@ const Section9 = () => {
                 transform: `translate(-50%, calc(-50% - ${text2TranslateY}px))`
               }}
             >
-              <h2>일하는 방식이<br/>더욱 <span className={styles.highlight}>나</span>다울 수 있도록.</h2>
+              <h2 dangerouslySetInnerHTML={{ __html: currentTexts.text2 }} />
             </div>
             
             {/* 텍스트 3 - 가운데 고정 */}
@@ -240,7 +264,7 @@ const Section9 = () => {
                 transform: 'translate(-50%, -50%)'
               }}
             >
-              <h2>데스커는 앞으로도<br/>새로운 <span className={styles.highlight}>WORK-LIFE</span>의 가능성을<br/>상상합니다.</h2>
+              <h2 dangerouslySetInnerHTML={{ __html: currentTexts.text3 }} />
             </div>
             
           </div>

@@ -1,6 +1,6 @@
 .section4 {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,9 +29,9 @@
   pointer-events: none; /* iframe 내부 클릭도 방지 */
   /* 여백 완전 제거 - 화면 전체 덮기 */
   width: 120vw; /* 뷰포트보다 훨씬 크게 */
-  height: 120vh; /* 뷰포트보다 훨씬 크게 */
+  height: 120dvh; /* 뷰포트보다 훨씬 크게 */
   min-width: 142vw;
-  min-height: 120vh;
+  min-height: 120dvh;
   /* 화면 크기 변화에 대응 - 극단적 확대 */
   transform: scale(1.2); /* 40% 확대로 여백 완전 제거 */
 }
@@ -179,110 +179,74 @@
 }
 
 /* 반응형 디자인 */
-@media (max-width: 768px) {
+@media (max-width: 1500px) {
   .overlayContent {
-    flex-direction: column;
-    gap: 2rem;
-    padding: 0 2rem;
-    text-align: center;
-  }
-
-  .leftText {
-    text-align: center;
-    max-width: 100%;
-  }
-
-  .centerGif {
-    width: 300px;
-    height: 225px;
-  }
-
-  .rightText {
-    text-align: center;
-    max-width: 100%;
-  }
-
-  .leftText h3,
-  .rightText h3 {
-    font-size: 2rem;
-  }
-
-  .leftText p,
-  .rightText p {
-    font-size: 1rem;
-  }
-
-  .title {
-    font-size: 2.5rem;
-  }
-
-  .subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 3rem;
-  }
-
-  .surfImage {
-    width: 100%;
-    max-width: 400px;
-    height: 250px;
-  }
-
-  .imagePlaceholder {
-    font-size: 2rem;
-  }
-
-  .descriptionTitle {
-    font-size: 2rem;
-  }
-
-  .descriptionText {
-    font-size: 1.1rem;
-  }
-
-  .featuresGrid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .featureCard {
-    padding: 2rem 1.5rem;
+    grid-template-columns: 300px 1fr 480px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1300px) {
   .overlayContent {
-    gap: 1.5rem;
-    padding: 0 1rem;
-  }
-
-  .centerGif {
-    width: 250px;
-    height: 188px;
+    grid-template-columns: 250px 1fr 380px;
   }
 
   .leftText h3,
   .rightText h3 {
-    font-size: 1.5rem;
+    font-size: 4rem;
   }
 
-  .leftText p,
-  .rightText p {
-    font-size: 0.9rem;
+  .backgroundVideo iframe {
+    top: -10%;
+    left: -10%;
+    transform: scale(1.3); /* 40% 확대로 여백 완전 제거 */
+  }
+}
+
+@media (max-width: 1080px) {
+  .overlayContent {
+    display: flex;
+    flex-direction: column;
+    padding: 0 3rem;
+    gap: 90px;
   }
 
-  .title {
-    font-size: 2rem;
+  .centerGif {
+    width: 400px;
   }
 
-  .subtitle {
-    font-size: 1rem;
+  .leftText,
+  .rightText {
+    width: 100%;
   }
 
-  .descriptionTitle {
-    font-size: 1.5rem;
+  .backgroundVideo iframe {
+    transform: scale(1.5); /* 40% 확대로 여백 완전 제거 */
+  }
+}
+
+@media (max-width: 940px) {
+  .backgroundVideo iframe {
+    transform: scale(1.8); /* 40% 확대로 여백 완전 제거 */
+  }
+}
+
+@media (max-width: 768px) {
+  .backgroundVideo iframe {
+    transform: scale(2.5); /* 40% 확대로 여백 완전 제거 */
+  }
+}
+
+@media (max-width: 500px) {
+  .centerGif {
+    width: calc(100vw - 6rem);
   }
 
-  .descriptionText {
-    font-size: 1rem;
+  .leftText h3,
+  .rightText h3 {
+    font-size: 3rem;
+  }
+
+  .backgroundVideo iframe {
+    transform: scale(3.5); /* 40% 확대로 여백 완전 제거 */
   }
 }

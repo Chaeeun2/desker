@@ -41,7 +41,8 @@ const Main = () => {
               className={styles.video}
             />
             <div className={styles.textOverlay}>
-              <div className="rolling_wrap" style={{width: '400px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
+              {/* 모바일에서 세로로 표시될 모든 텍스트 */}
+              <div className="rolling_wrap" style={{width: '400px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
                 <h2 style={{opacity: 0, visibility: 'hidden', height: 0, overflow: 'hidden'}}>WORK</h2>
                 <AnimatePresence mode="sync">
                   <motion.h2
@@ -79,6 +80,10 @@ const Main = () => {
                   </motion.h2>
                 </AnimatePresence>
               </div>
+              
+              {/* 모바일에서 추가로 표시될 텍스트들 */}
+              <h2 className={styles.overlayText} style={{display: 'none'}}>ON THE</h2>
+              <h2 className={styles.overlayText} style={{display: 'none'}}>BEACH</h2>
             </div>
           </div>
         </div>

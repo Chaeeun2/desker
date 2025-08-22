@@ -34,7 +34,7 @@ const Section10 = () => {
           <h1>
             데스커가 제안하는
             <br />
-            새로운 WORK-LIFE
+            새로운 <span className={styles.highlight}>WORK-LIFE</span>
           </h1>
         </div>
         

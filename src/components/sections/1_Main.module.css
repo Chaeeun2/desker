@@ -1,7 +1,7 @@
 /* Main Section Styles */
 .mainSection {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   margin: 0;
   padding: 0;
   background-color: var(--color-white);
@@ -15,7 +15,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   margin: 0;
   padding: 0;
   display: flex;
@@ -102,6 +102,7 @@
   pointer-events: none;
   overflow: hidden;
   perspective: 800px; /* 3D 효과를 위한 원근감 */
+  line-height: 1;
 }
 
 /* 롤링 컨테이너 */
@@ -122,7 +123,7 @@
 /* rolling_wrap 스타일 */
 .rolling_wrap {
   width: 400px !important;
-  height: 120px !important;
+  height: 60px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -159,7 +160,27 @@
 }
 
 /* 반응형 디자인 */
-@media (max-width: 768px) {
+@media (max-width: 1400px) {
+  .video {
+    transform: scale(1.5); /* 모바일에서는 더 확대 */
+  }
+}
+
+@media (max-width: 1200px) {
+  .overlayText {
+    font-size: 5rem;
+  }
+
+  .video {
+    transform: scale(1.8); /* 모바일에서는 더 확대 */
+  }
+}
+
+@media (max-width: 1080px) {
+  .overlayText {
+    font-size: 6rem;
+  }
+
   .backgroundContainer {
     flex-direction: column;
   }
@@ -168,15 +189,34 @@
   .centerSection,
   .rightSection {
     flex: none;
-    height: 33.333vh;
+    height: 100dvh;
+  }
+
+  /* 첫 번째 섹션(왼쪽)만 보이게 하고 나머지는 숨김 */
+  .centerSection,
+  .rightSection {
+    display: none;
+  }
+
+  /* 모바일에서 텍스트를 세로로 배치 */
+  .textOverlay {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  /* 모바일에서 숨겨진 텍스트들을 표시 */
+  .textOverlay .overlayText[style*="display: none"] {
+    display: block !important;
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
   }
 
   .video {
     transform: scale(1.2); /* 모바일에서는 더 확대 */
-  }
-
-  .overlayText {
-    font-size: var(--font-5xl);
   }
 
   .content {
@@ -194,10 +234,6 @@
 }
 
 @media (max-width: 480px) {
-  .overlayText {
-    font-size: var(--font-4xl);
-  }
-
   .content {
     padding: 1rem;
     margin: 0.5rem;

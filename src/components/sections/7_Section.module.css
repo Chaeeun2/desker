@@ -15,7 +15,7 @@
 /* 각 패널 */
 .panel {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   position: sticky;
   top: 0;
@@ -33,6 +33,14 @@
   height: 100%;
   position: relative;
   overflow: hidden;
+}
+
+.highlight {
+  font-weight: 800;
+}
+
+.panel4des {
+  margin-top: 100px;
 }
 
 .backgroundImage {
@@ -155,6 +163,42 @@
   margin: 2rem 0;
 }
 
+/* 모바일용 이미지 나열 스타일 */
+.imageSlider {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.sliderTrack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sliderItem {
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.sliderItem.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sliderItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 기존 이미지 아이템 스타일 (데스크톱용) */
 .imageItem {
   aspect-ratio: 16 / 10;
   border-radius: 12px;
@@ -184,7 +228,7 @@
 .panel:nth-child(4) .leftSide {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   z-index: 10;
 }
 
@@ -199,12 +243,39 @@
 /* 패널 4번이 sticky 상태일 때 오른쪽 스크롤 활성화 */
 .panel:nth-child(4) .rightSide.stickyActive {
   overflow-y: auto;
-  height: 100vh;
+  height: 100dvh;
 }
 
 /* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .panelTitle {
+    font-size: 6rem !important;
+  }
+
+  .panelSubtitle {
+    font-size: 2rem;
+  }
+
+  .description p {
+    font-size: 1.8rem;
+  }
+
+  .rightSide {
+    padding: 10rem 4rem;
+  }
+}
+
 @media (max-width: 1024px) {
+  .panel {
+    width: 100%;
+    height: auto;
+    display: flex;
+    position: static;
+    top: 0;
+  }
+
   .panelContent {
+    display: flex;
     flex-direction: column;
   }
 
@@ -218,73 +289,62 @@
   }
 
   .rightSide {
-    height: 60vh;
-    padding: 2rem;
+    padding: 7rem 2rem;
   }
 
   .panelTitle {
-    font-size: 2.5rem;
+    font-size: 4rem !important;
+  }
+
+  .panelTitle img {
+    width: 250px !important;
   }
 
   .panelSubtitle {
-    font-size: 1.1rem;
-  }
-
-  .videoThumbnail {
-    aspect-ratio: 16/9;
-  }
-}
-
-@media (max-width: 768px) {
-  .leftSide {
-    height: 35vh;
-  }
-
-  .rightSide {
-    height: 65vh;
-    padding: 1.5rem;
-  }
-
-  .panelTitle {
-    font-size: 2rem;
-  }
-
-  .panelSubtitle {
-    font-size: 1rem;
-  }
-
-  .description p {
-    font-size: 1.1rem;
-  }
-
-  .videoThumbnail {
-    aspect-ratio: 16/9;
-  }
-}
-
-@media (max-width: 480px) {
-  .leftSide {
-    height: 30vh;
-  }
-
-  .rightSide {
-    height: 70vh;
-    padding: 1rem;
-  }
-
-  .panelTitle {
     font-size: 1.8rem;
-  }
-
-  .panelSubtitle {
-    font-size: 0.9rem;
+    margin-top: 2rem;
   }
 
   .description p {
-    font-size: 1rem;
+    font-size: 1.6rem;
+    text-align: center;
   }
 
-  .videoThumbnail {
-    aspect-ratio: 16/9;
+  .description {
+    margin-bottom: 4rem;
+  }
+
+  .videoThumbnail,
+  .imageItem,
+  .sliderItem {
+    border-radius: 8px;
+  }
+
+  /* 패널 4번 특별 스타일 */
+  .panel:nth-child(4) {
+    height: auto;
+  }
+
+  .panel:nth-child(4) .leftSide {
+    position: static;
+    height: 40vh;
+  }
+
+  .panel:nth-child(4) .panelTitle {
+    font-size: 3.8rem !important;
+  }
+
+  /* 패널 4번이 sticky 상태일 때 오른쪽 스크롤 활성화 */
+  .panel:nth-child(4) .rightSide.stickyActive {
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .panel4des {
+    margin-top: 60px;
+  }
+
+  .imageGrid {
+    gap: 1rem;
   }
 }

@@ -1,6 +1,5 @@
 .section6 {
   width: 100vw;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,6 +79,8 @@
   line-height: 1.35;
   font-family: var(--font-pret);
   letter-spacing: var(--spacing-91);
+  padding-right: 50px;
+  padding-bottom: 5px;
 }
 
 .englishTitle {
@@ -87,7 +88,8 @@
   font-weight: 600;
   color: var(--color-primary);
   letter-spacing: 0.18em;
-  line-height: 1.4;
+  line-height: 1.2;
+  padding-right: 50px;
 }
 
 /* 캠페인 설명 */
@@ -136,76 +138,76 @@
 }
 
 /* 반응형 디자인 */
-@media (max-width: 1024px) {
-  .beachWorkInfo {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+@media (max-width: 1200px) {
+  .campaignTitle h2 {
+    font-size: 3.2rem;
+    padding-right: 50px;
+  }
+
+  .englishTitle {
+    font-size: 3.6rem;
+    padding-right: 50px;
+  }
+
+  /* 캠페인 설명 */
+  .campaignDescription p,
+  .campaignButton {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 1080px) {
+  .section6 {
+    padding: 7rem 0em 8rem 0rem;
+    background: #f7f7f7;
+  }
+
+  .campaignContent {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    text-align: left;
+    width: 100%;
+  }
+
+  .campaignTitle h2 {
+    font-size: 2.2rem;
+    text-align: center;
+    padding-right: 0px;
   }
 
   .englishTitle {
     font-size: 3rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .section6 {
-    padding: 3rem 1.5rem;
-  }
-
-  .video {
-    height: 350px;
-  }
-
-  .campaignTitle h2 {
-    font-size: 2rem;
-  }
-
-  .englishTitle {
-    font-size: 2.5rem;
-  }
-
-  .campaignDescription p {
-    font-size: 1.1rem;
-  }
-
-  .brandMessage {
-    padding: 1.5rem 2rem;
-    flex-direction: column;
     text-align: center;
+    width: 100%;
+    padding-right: 0px;
+    margin-top: 10px;
+    margin-bottom: 50px;
   }
 
-  .brandText {
-    align-items: center;
-  }
-
-  .beachWorkInfo {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .video {
-    height: 250px;
-  }
-
-  .campaignTitle h2 {
-    font-size: 1.8rem;
-  }
-
-  .englishTitle {
-    font-size: 2rem;
+  /* 캠페인 설명 */
+  .campaignDescription {
+    margin-bottom: 3rem;
+    max-width: 1080px;
   }
 
   .campaignDescription p {
-    font-size: 1rem;
+    font-size: 1.6rem;
+    margin-bottom: 0rem;
+    text-align: center;
+    padding: 0 3rem;
   }
 
-  .brandMessage {
-    padding: 1rem 1.5rem;
+  .campaignButton {
+    background: var(--color-primary);
+    color: white;
+    padding: 16px 30px;
+    border-radius: 10px;
+    margin-top: 30px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-decoration: none;
   }
-
-  .brandName {
-    font-size: 1.5rem;
+  .videoContainer {
+    border-radius: 0px;
   }
 }

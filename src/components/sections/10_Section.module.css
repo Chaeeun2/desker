@@ -25,6 +25,7 @@
   font-family: "proxima-nova", Pretendard;
   letter-spacing: var(--spacing-91);
   line-height: 1.2;
+  word-break: keep-all;
 }
 
 .header p {
@@ -37,6 +38,7 @@
   max-width: 1080px;
   margin: 0 auto;
   text-align: left;
+  word-break: keep-all;
 }
 
 /* 2x2 그리드 컨테이너 */
@@ -185,6 +187,7 @@
   font-family: Pretendard;
   transition: font-size 0.5s ease;
   line-height: 1.2;
+  word-break: keep-all;
 }
 
 /* 확장 상태일 때 h3 크기 축소 */
@@ -199,6 +202,7 @@
   font-weight: 500;
   font-family: var(--font-pret);
   letter-spacing: var(--spacing-91);
+  word-break: keep-all;
 }
 
 .itemContent p.itemContentText1 {
@@ -347,88 +351,117 @@
   max-width: 1350px;
   margin: 0 auto;
   text-align: left;
+  word-break: keep-all;
 }
 
 /* 반응형 디자인 */
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
+  .textWrapper,
+  .iconWrapper {
+    max-height: 50px; /* 충분한 높이 설정 */
+  }
+
   .section10 {
-    padding: 6rem 2rem;
+    padding: 8rem 2rem;
   }
 
   .header h1 {
-    font-size: 3rem;
+    font-size: 5rem;
+    text-align: center;
   }
 
   .header p {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
+    text-align: center;
   }
 
   .gridContainer {
     gap: 1.5rem;
-    height: 60vh;
-  }
-
-  .itemContent h3 {
-    font-size: 1.6rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .section10 {
-    padding: 4rem 1rem;
-  }
-
-  .header h1 {
-    font-size: 2.5rem;
-  }
-
-  .header p {
-    font-size: 1.1rem;
-  }
-
-  .gridContainer {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
-    height: auto;
-    gap: 1rem;
   }
 
   .gridItem {
-    height: 300px;
+    padding: 3rem;
   }
 
   .itemContent h3 {
-    font-size: 1.4rem;
+    font-size: 2.4rem;
   }
 
-  .itemContent p {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .section10 {
-    padding: 3rem 1rem;
-  }
-
-  .header h1 {
+  /* 확장 상태일 때 h3 크기 축소 */
+  .gridItem.expanded .itemContent h3 {
     font-size: 2rem;
   }
 
+  .itemContent p {
+    font-size: 1.6rem;
+  }
+
+  .description {
+    margin-bottom: 7rem;
+    text-align: left;
+  }
+
+  .description p {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .ctaButton {
+    font-size: 1.6rem;
+  }
+
+  .highlight {
+    color: var(--color-primary);
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 3.6rem;
+    text-align: center;
+  }
+
   .header p {
-    font-size: 1rem;
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .gridContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    gap: 1.5rem;
   }
 
   .gridItem {
-    height: 250px;
-    padding: 1.5rem;
+    padding: 3rem;
   }
 
   .itemContent h3 {
-    font-size: 1.2rem;
+    font-size: 2.4rem;
+  }
+
+  /* 확장 상태일 때 h3 크기 축소 */
+  .gridItem.expanded .itemContent h3 {
+    font-size: 2rem;
   }
 
   .itemContent p {
-    font-size: 0.8rem;
+    font-size: 1.6rem;
+  }
+
+  .description {
+    margin-bottom: 5rem;
+    text-align: left;
+  }
+
+  .description p {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .ctaButton {
+    font-size: 1.6rem;
   }
 }

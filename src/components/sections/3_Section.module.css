@@ -1,7 +1,7 @@
 .section3 {
   position: sticky;
   top: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,7 +171,7 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -207,23 +207,54 @@
   transform: translate(-50%, -50%);
 }
 
+.centerTextWhite {
+  color: white;
+  font-size: 6rem;
+  font-weight: 800;
+  text-align: center;
+  font-family: var(--font-pret);
+  max-width: 100%;
+  width: 100%;
+  line-height: 1.3;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .highlight {
   color: var(--color-primary);
 }
 
 /* 반응형 디자인 */
-@media (max-width: 768px) {
-  .centerText,
-  .centerTextBlack {
-    font-size: 1.8rem;
-    max-width: 90%;
+@media (max-width: 1080px) {
+  .centerText {
+    font-size: 6rem !important;
+  }
+  .centerTextBlack,
+  .centerTextWhite {
+    font-size: 4rem !important;
+  }
+
+  svg {
+    zoom: 0.8;
   }
 }
 
 @media (max-width: 480px) {
-  .centerText,
-  .centerTextBlack {
-    font-size: 1.5rem;
-    max-width: 95%;
+  .centerText {
+    font-size: 3.6rem !important;
+  }
+  .centerTextBlack,
+  .centerTextWhite {
+    font-size: 3rem !important;
+  }
+
+  svg {
+    zoom: 0.5;
+  }
+
+  div:has(svg) {
+    bottom: 3% !important;
   }
 }
