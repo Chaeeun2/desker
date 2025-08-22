@@ -13,6 +13,24 @@ const Section4 = () => {
   const rightTextRef = useRef(null);
   const [gifPlayed, setGifPlayed] = useState(false);
   const [animationStep, setAnimationStep] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 모바일 감지 (768px 이하)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 모바일일 때 애니메이션 타이밍 조정
+  const getAnimationDelay = (desktopDelay) => {
+    return isMobile ? desktopDelay * 2 : desktopDelay; // 모바일에서는 2배 늦게 시작
+  };
 
   // 순차적 애니메이션 실행
   useEffect(() => {
@@ -24,7 +42,7 @@ const Section4 = () => {
             if (h3Element) {
               setTimeout(() => {
                 h3Element.style.opacity = '1';
-              }, 300);
+              }, getAnimationDelay(300)); // 모바일에서는 600ms
             
             // 텍스트1이 완전히 나타난 후 GIF 시작
             setTimeout(() => {
@@ -43,13 +61,13 @@ const Section4 = () => {
                     
                     setAnimationStep(3);
                   }
-                }, 2600); // GIF 애니메이션 완료 후 교체 (2.3초)
+                }, getAnimationDelay(2600)); // 모바일에서는 5200ms
               }
-            }, 300); // 텍스트1 완전 표시 후 1초 후 GIF 시작
+            }, getAnimationDelay(300)); // 모바일에서는 600ms
           }
         }
         setAnimationStep(1);
-      }, 300);
+      }, getAnimationDelay(300)); // 모바일에서는 600ms
 
       // 4단계: 오른쪽 텍스트 나타남 (PNG 교체와 동시에)
       setTimeout(() => {
@@ -60,11 +78,11 @@ const Section4 = () => {
           }
         }
         setAnimationStep(4);
-      }, 2600); // 0.3초 + 0.3초 + 2.3초 = 2.9초
+      }, getAnimationDelay(2600)); // 모바일에서는 5200ms
 
       setGifPlayed(true);
     }
-  }, [hasIntersected, gifPlayed]);
+  }, [hasIntersected, gifPlayed, isMobile]);
 
   return (
     <section ref={ref} className={styles.section4}>

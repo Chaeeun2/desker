@@ -113,29 +113,8 @@
   user-select: none;
   position: relative;
   z-index: 6;
-  /* 섹션 진입 시 한 번만 실행되는 애니메이션 */
-  animation: gifEntrance 3s ease-out forwards;
-  animation-play-state: paused; /* 초기에는 정지 */
-  /* 초기 상태 설정 - 완전히 숨김 */
   opacity: 0; /* 강제로 숨김 */
-  transform: scale(0.8) rotate(-5deg);
   visibility: hidden; /* 추가로 숨김 */
-}
-
-/* GIF 진입 애니메이션 */
-@keyframes gifEntrance {
-  0% {
-    transform: scale(0.8) rotate(-5deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1) rotate(2deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
 }
 
 /* GIF 이미지 스타일 */

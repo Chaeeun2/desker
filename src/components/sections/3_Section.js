@@ -870,7 +870,7 @@ const Section3 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: isMobile ? '700vh' : '1400vh', // 모바일에서는 절반으로 줄임 (700vh vs 1400vh)
+            height: isMobile ? '2000vh' : '1400vh', // 모바일에서는 절반으로 줄임 (700vh vs 1400vh)
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'
