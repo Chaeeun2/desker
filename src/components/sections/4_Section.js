@@ -91,10 +91,10 @@ const Section4 = () => {
       {/* 배경 YouTube 영상 - 처음부터 로드 */}
       <div className={styles.backgroundVideo}>
         <iframe
-          src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+          src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
           title="Background Video"
           frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       </div>

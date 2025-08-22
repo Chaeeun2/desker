@@ -136,7 +136,7 @@ const Section5 = () => {
           {videoLoaded && (
             <div className={styles.videoSection}>
               <iframe
-                src="https://www.youtube.com/embed/-ae3O7u2IZM?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-ae3O7u2IZM"
+                src="https://www.youtube.com/embed/-ae3O7u2IZM?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-ae3O7u2IZM&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
                 title="DESKER Section 5 Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -153,7 +153,7 @@ const Section5 = () => {
               <div className={styles.panelImage} data-panel-image>
                 <div className={styles.videoContainer}>
                   <iframe
-                    src="https://www.youtube.com/embed/-ae3O7u2IZM?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-ae3O7u2IZM"
+                    src="https://www.youtube.com/embed/-ae3O7u2IZM?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-ae3O7u2IZM&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
                     title="바다가 보이는 오피스"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

@@ -23,15 +23,10 @@ const Main = () => {
     return () => clearInterval(interval);
   }, [texts.length]);
 
-  // 화면에 보일 때만 동영상 로드
+  // 섹션 1 배경 영상은 항상 로드되어야 함 (모바일 자동재생 필수)
   useEffect(() => {
-    if (isIntersecting && !videosLoaded) {
-      setVideosLoaded(true);
-    } else if (!isIntersecting && videosLoaded) {
-      // 화면에서 벗어나면 동영상 언로드하여 메모리 절약
-      setVideosLoaded(false);
-    }
-  }, [isIntersecting, videosLoaded]);
+    setVideosLoaded(true);
+  }, []);
 
   return (
     <section 
@@ -43,17 +38,14 @@ const Main = () => {
         {/* 왼쪽 영역 - 쇼츠 */}
         <div className={styles.leftSection}>
           <div className={styles.videoContainer}>
-            {videosLoaded && (
-              <iframe
-                src="https://www.youtube.com/embed/oDBWmq6Gf_A?autoplay=1&mute=1&loop=1&playlist=oDBWmq6Gf_A&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
-                title="Left Shorts"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className={styles.video}
-                loading="lazy"
-              />
-            )}
+            <iframe
+              src="https://www.youtube.com/embed/oDBWmq6Gf_A?autoplay=1&mute=1&loop=1&playlist=oDBWmq6Gf_A&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
+              title="Left Shorts"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className={styles.video}
+            />
             <div className={styles.textOverlay}>
               {/* 모바일에서 세로로 표시될 모든 텍스트 */}
               <div className="rolling_wrap" style={{width: '400px', height: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
@@ -105,17 +97,14 @@ const Main = () => {
         {/* 중앙 영역 - 새로운 쇼츠 */}
         <div className={styles.centerSection}>
           <div className={styles.videoContainer}>
-            {videosLoaded && (
-              <iframe
-                src="https://www.youtube.com/embed/wYPBUV3V9j4?autoplay=1&mute=1&loop=1&playlist=wYPBUV3V9j4&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
-                title="Center Shorts - New Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className={styles.video}
-                loading="lazy"
-              />
-            )}
+            <iframe
+              src="https://www.youtube.com/embed/wYPBUV3V9j4?autoplay=1&mute=1&loop=1&playlist=wYPBUV3V9j4&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
+              title="Center Shorts - New Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className={styles.video}
+            />
             <div className={styles.textOverlay}>
               <h2 className={styles.overlayText}>ON THE</h2>
             </div>
@@ -125,17 +114,14 @@ const Main = () => {
         {/* 오른쪽 영역 - 새로운 쇼츠 */}
         <div className={styles.rightSection}>
           <div className={styles.videoContainer}>
-            {videosLoaded && (
-              <iframe
-                src="https://www.youtube.com/embed/n_R2ULPbLmM?autoplay=1&mute=1&loop=1&playlist=n_R2ULPbLmM&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
-                title="Right Shorts - New Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className={styles.video}
-                loading="lazy"
-              />
-            )}
+            <iframe
+              src="https://www.youtube.com/embed/n_R2ULPbLmM?autoplay=1&mute=1&loop=1&playlist=n_R2ULPbLmM&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
+              title="Right Shorts - New Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className={styles.video}
+            />
             <div className={styles.textOverlay}>
               <h2 className={styles.overlayText}>BEACH</h2>
             </div>
