@@ -51,6 +51,11 @@ const Section9 = () => {
 
   const currentTexts = isMobile ? getMobileTexts() : getDesktopTexts();
   
+  // 모바일일 때 스크롤 거리 조정 (절반으로 줄임)
+  const getScrollDistance = (desktopDistance) => {
+    return isMobile ? desktopDistance / 2 : desktopDistance;
+  };
+  
   useEffect(() => {
     const handleScroll = () => {
       
@@ -126,12 +131,12 @@ const Section9 = () => {
           if (triggerPointRef.current !== null && !isAnimationCompleteRef.current) {
             
             const scrollDiff = Math.max(0, scrollTop - triggerPointRef.current); // 음수 방지
-            const steps = Math.floor(scrollDiff / 100); // 100px마다 1단계
+            const steps = Math.floor(scrollDiff / getScrollDistance(100)); // 100px마다 1단계 (모바일에서는 50px)
             
             // 텍스트 1: 10~20단계에서만 사라짐 (1 → 0), 이후에는 0 유지
             let newText1Opacity = 1; // 기본값은 1
             if (steps > 10 && steps <= 20) {
-              newText1Opacity = Math.max(0, 1 - (steps - 10) * 0.1); // 1 → 0 (100px마다 0.1씩 감소)
+              newText1Opacity = Math.max(0, 1 - (steps - 10) * 0.1); // 1 → 0 (100px마다 0.1씩 감소, 모바일에서는 50px마다)
             } else if (steps > 20) {
               newText1Opacity = 0; // 20단계 이후에는 0으로 유지
             }
@@ -139,15 +144,15 @@ const Section9 = () => {
             // 텍스트 2: 20~30단계에서 나타나고 30~40단계에서 사라짐 (0 → 1 → 0)
             let newText2Opacity = 0;
             if (steps >= 20 && steps <= 30) {
-              newText2Opacity = (steps - 20) * 0.1; // 0 → 1 (100px마다 0.1씩 증가)
+              newText2Opacity = (steps - 20) * 0.1; // 0 → 1 (100px마다 0.1씩 증가, 모바일에서는 50px마다)
             } else if (steps > 30 && steps <= 40) {
-              newText2Opacity = Math.max(0, 1 - (steps - 30) * 0.1); // 1 → 0 (100px마다 0.1씩 감소)
+              newText2Opacity = Math.max(0, 1 - (steps - 30) * 0.1); // 1 → 0 (100px마다 0.1씩 감소, 모바일에서는 50px마다)
             }
             
             // 텍스트 3: 40~50단계에서 나타남 (0 → 1)
             let newText3Opacity = 0;
             if (steps >= 40) {
-              newText3Opacity = Math.min(1, (steps - 40) * 0.1); // 0 → 1 (100px마다 0.1씩 증가)
+              newText3Opacity = Math.min(1, (steps - 40) * 0.1); // 0 → 1 (100px마다 0.1씩 증가, 모바일에서는 50px마다)
             }
             
             // 섹션3과 동일한 translateY 로직: 사라질 때만 translateY 계산
