@@ -40,7 +40,7 @@ const Main = () => {
               allowFullScreen
               className={styles.video}
             />
-                        <div className={styles.textOverlay}>
+            <div className={styles.textOverlay}>
               <div className="rolling_wrap" style={{width: '400px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
                 <h2 style={{opacity: 0, visibility: 'hidden', height: 0, overflow: 'hidden'}}>WORK</h2>
                 <AnimatePresence mode="sync">

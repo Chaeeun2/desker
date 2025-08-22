@@ -42,6 +42,42 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* 호버 시 말풍선 */
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 20px;
+  background: white;
+  color: black;
+  padding: 12px 20px;
+  border-radius: 100px;
+  font-family: var(--font-pret);
+  font-size: 1.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 1001;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 25px;
+  border: 8px solid transparent;
+  border-top-color: white;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .rightBottomIcon {

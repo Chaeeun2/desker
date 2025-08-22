@@ -20,6 +20,7 @@
   padding: 0;
   display: flex;
   z-index: 1;
+  pointer-events: none;
 }
 
 /* 왼쪽 영역 */

@@ -10,6 +10,46 @@ const FloatingMenu = () => {
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+    
+    // 해당 섹션으로 스크롤 이동
+    const appElement = document.querySelector('.App');
+    if (appElement) {
+      let targetScrollTop = 0;
+      
+      switch (tab) {
+        case 'story':
+          // 섹션 5로 이동 (App.js에서 6번째 섹션)
+          const section5 = document.querySelector('section:nth-child(6)');
+          if (section5) {
+            targetScrollTop = section5.offsetTop;
+          }
+          break;
+        case 'series':
+          // 섹션 6으로 이동 (App.js에서 7번째 섹션)
+          const section6 = document.querySelector('section:nth-child(7)');
+          if (section6) {
+            targetScrollTop = section6.offsetTop;
+          }
+          break;
+        case 'activities':
+          // 섹션 7으로 이동 (App.js에서 8번째 섹션)
+          const section7 = document.querySelector('section:nth-child(8)');
+          if (section7) {
+            targetScrollTop = section7.offsetTop;
+          }
+          break;
+        default:
+          break;
+      }
+      
+      // 부드러운 스크롤로 이동
+      if (targetScrollTop > 0) {
+        appElement.scrollTo({
+          top: targetScrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -66,11 +106,37 @@ const FloatingMenu = () => {
         
         lastScrollYRef.current = currentScrollY;
         
+        // 현재 스크롤 위치에 따른 active 탭 설정
+        updateActiveTabBasedOnScroll(appScrollTop);
+        
       } else {
         setIsVisible(false);
         // 섹션 5를 벗어나면 상태 초기화
         hasReachedSection5Ref.current = false;
         section5ReachTimeRef.current = 0;
+      }
+    };
+
+    // 현재 스크롤 위치에 따른 active 탭을 업데이트하는 함수
+    const updateActiveTabBasedOnScroll = (scrollTop) => {
+      const section5 = document.querySelector('section:nth-child(6)');
+      const section6 = document.querySelector('section:nth-child(7)');
+      const section7 = document.querySelector('section:nth-child(8)');
+      
+      if (section5 && section6 && section7) {
+        const section5Top = section5.offsetTop;
+        const section6Top = section6.offsetTop;
+        const section7Top = section7.offsetTop;
+        const section7Bottom = section7Top + section7.offsetHeight;
+        
+        // 현재 스크롤 위치가 어느 섹션에 있는지 확인
+        if (scrollTop >= section5Top && scrollTop < section6Top) {
+          setActiveTab('story');
+        } else if (scrollTop >= section6Top && scrollTop < section7Top) {
+          setActiveTab('series');
+        } else if (scrollTop >= section7Top && scrollTop < section7Bottom) {
+          setActiveTab('activities');
+        }
       }
     };
 

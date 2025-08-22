@@ -1,7 +1,7 @@
 /* Intro Section Styles */
 .introSection {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--color-primary);
   position: fixed;
   overflow: hidden;
@@ -13,7 +13,7 @@
 .imageContainer {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -43,27 +43,38 @@
   pointer-events: none;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1080px) {
   .image1,
-  .image2,
   .overlay {
-    width: 80vw;
+    width: 60vw;
   }
 
+  .image2 {
+    width: 58vw;
+    padding-bottom: 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .image1,
   .overlay {
-    height: 40vh;
+    width: 70vw;
+  }
+
+  .image2 {
+    width: 68vw;
+    padding-bottom: 3rem;
   }
 }
 
 @media (max-width: 480px) {
   .image1,
-  .image2,
   .overlay {
-    width: 90vw;
+    width: 80vw;
   }
 
-  .overlay {
-    height: 35vh;
+  .image2 {
+    width: 78vw;
+    padding-bottom: 2rem;
   }
 }
