@@ -15,6 +15,18 @@ const Section4 = () => {
   const [gifPlayed, setGifPlayed] = useState(false);
   const [animationStep, setAnimationStep] = useState(0);
 
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  
+  // 화면에 보일 때만 동영상 로드
+  useEffect(() => {
+    if (isIntersecting && !videoLoaded) {
+      setVideoLoaded(true);
+    } else if (!isIntersecting && videoLoaded) {
+      // 화면에서 벗어나면 동영상 언로드하여 메모리 절약
+      setVideoLoaded(false);
+    }
+  }, [isIntersecting, videoLoaded]);
+
   // 강제 리셋 함수
   const forceReset = () => {
     
@@ -108,42 +120,48 @@ const Section4 = () => {
 
   return (
     <section ref={ref} className={styles.section4}>
-      {/* 배경 YouTube 영상 */}
-      <div className={styles.backgroundVideo}>
-        <iframe
-          src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
-          title="Background Video"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
-      </div>
-      
-      {/* 영상 위의 콘텐츠 */}
       <div className={styles.content}>
-        <div className={styles.overlayContent}>
-          {/* 왼쪽 텍스트1 - 첫 번째로 나타남 */}
-          <div ref={leftTextRef} className={styles.leftText}>
-            <h3>30만명이<br/>함께한 '데스커 워케이션'</h3>
-          </div>
+        <div className={styles.mainContent}>
+          {/* 배경 YouTube 영상 - 화면에 보일 때만 로드 */}
+          {videoLoaded && (
+            <div className={styles.videoBackground}>
+              <iframe
+                src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+                title="DESKER Section 4 Background Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className={styles.backgroundVideo}
+                loading="lazy"
+              />
+            </div>
+          )}
           
-          {/* 가운데 GIF - 두 번째로 실행 후 PNG로 교체 */}
-          <div className={styles.centerGif}>
-            <img 
-              ref={gifRef}
-              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/s6.gif"
-              alt="Center GIF" 
-              className={styles.gifImage}
-              style={{
-                animationPlayState: 'paused',
-                animationDuration: '2.3s'
-              }}
-            />
-          </div>
-          
-          {/* 오른쪽 텍스트2 - 마지막에 나타남 */}
-          <div ref={rightTextRef} className={styles.rightText}>
-            <h3>일의 몰입을 되찾기 위한​<br/>4년간의 여정을 소개합니다.​</h3>
+          {/* 영상 위의 콘텐츠 */}
+          <div className={styles.overlayContent}>
+            {/* 왼쪽 텍스트1 - 첫 번째로 나타남 */}
+            <div ref={leftTextRef} className={styles.leftText}>
+              <h3>30만명이<br/>함께한 '데스커 워케이션'</h3>
+            </div>
+            
+            {/* 가운데 GIF - 두 번째로 실행 후 PNG로 교체 */}
+            <div className={styles.centerGif}>
+              <img 
+                ref={gifRef}
+                src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/s6.gif"
+                alt="Center GIF" 
+                className={styles.gifImage}
+                style={{
+                  animationPlayState: 'paused',
+                  animationDuration: '2.3s'
+                }}
+              />
+            </div>
+            
+            {/* 오른쪽 텍스트2 - 마지막에 나타남 */}
+            <div ref={rightTextRef} className={styles.rightText}>
+              <h3>일의 몰입을 되찾기 위한​<br/>4년간의 여정을 소개합니다.​</h3>
+            </div>
           </div>
         </div>
       </div>
