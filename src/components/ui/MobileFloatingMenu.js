@@ -6,6 +6,7 @@ const MobileFloatingMenu = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isForceHidden, setIsForceHidden] = useState(false);
   const lastScrollYRef = useRef(0);
   const hasReachedSection5Ref = useRef(false);
   const section5ReachTimeRef = useRef(0);
@@ -16,11 +17,13 @@ const MobileFloatingMenu = () => {
       // 1단계: 섹션 3의 스페이서가 활성화되어 있는지 먼저 확인
       const section3Spacer = document.querySelector('section:nth-child(4) div[style*="height: 1400vh"]');
       const section3SpacerAlt = document.querySelector('div[style*="height: 1400vh"]');
-      const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt);
+      const section3SpacerMobile = document.querySelector('section:nth-child(4) div[style*="height: 700vh"]');
+      const isSection3SpacerActive = !!(section3Spacer || section3SpacerAlt || section3SpacerMobile);
 
-      // 2단계: 스페이서가 활성화되어 있으면 무조건 숨김
+      // 2단계: 스페이서가 활성화되어 있으면 강력하게 숨김
       if (isSection3SpacerActive) {
         setIsVisible(false);
+        setIsForceHidden(true);
         return;
       }
 
@@ -37,6 +40,7 @@ const MobileFloatingMenu = () => {
         // 섹션 5에 처음 도달했을 때는 무조건 메뉴 표시하고 시간 기록
         if (!hasReachedSection5Ref.current) {
           setIsVisible(true);
+          setIsForceHidden(false);
           hasReachedSection5Ref.current = true;
           section5ReachTimeRef.current = currentTime;
         } else {
@@ -51,8 +55,10 @@ const MobileFloatingMenu = () => {
               
               if (isScrollingDown) {
                 setIsVisible(false);
+                setIsForceHidden(false);
               } else {
                 setIsVisible(true);
+                setIsForceHidden(false);
               }
             }
           }
@@ -62,6 +68,7 @@ const MobileFloatingMenu = () => {
       } else {
         // 섹션 5 이전에는 메뉴 숨김
         setIsVisible(false);
+        setIsForceHidden(false);
         hasReachedSection5Ref.current = false;
       }
     };
@@ -86,14 +93,14 @@ const MobileFloatingMenu = () => {
     }
   };
 
-  // 메뉴가 숨겨져 있으면 아무것도 렌더링하지 않음
-  if (!isVisible) {
+  // 메뉴가 완전히 숨겨져 있으면 아무것도 렌더링하지 않음
+  if (isForceHidden) {
     return null;
   }
 
   return (
     <>
-      <div className={styles.mobileFloatingMenu}>
+      <div className={`${styles.mobileFloatingMenu} ${!isVisible ? styles.hidden : ''}`}>
         {/* 메뉴 버튼들 */}
         <div className={`${styles.menuButtons} ${isExpanded ? styles.expanded : ''}`}>
           {/* 뉴스 버튼 */}
