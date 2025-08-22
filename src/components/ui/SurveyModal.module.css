@@ -416,60 +416,6 @@
   }
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .modalContent {
-    padding: 30px 20px;
-    margin: 20px;
-  }
-
-  .title {
-    font-size: 1.8rem;
-    margin-bottom: 25px;
-  }
-
-  .description {
-    font-size: 1rem;
-    margin-bottom: 20px;
-  }
-
-  .benefits {
-    font-size: 0.9rem;
-    margin-bottom: 30px;
-  }
-
-  .nextButton {
-    padding: 14px 28px;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .modalContent {
-    padding: 25px 15px;
-  }
-
-  .title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-
-  .description {
-    font-size: 0.9rem;
-    margin-bottom: 18px;
-  }
-
-  .benefits {
-    font-size: 0.8rem;
-    margin-bottom: 25px;
-  }
-
-  .nextButton {
-    padding: 12px 24px;
-    font-size: 0.9rem;
-  }
-}
-
 /* 체크박스 그룹 */
 .checkboxGroup {
   display: flex;
@@ -593,4 +539,35 @@
 .formTextarea {
   resize: vertical;
   min-height: 100px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .modalContent {
+    padding: 30px 20px;
+    margin: 0px;
+    height: 100dvh;
+    width: 100vw;
+    border-radius: 0px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+  }
+
+  .description {
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  .benefits {
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+  }
+
+  .nextButton {
+    padding: 14px 28px;
+    font-size: 1rem;
+  }
 }

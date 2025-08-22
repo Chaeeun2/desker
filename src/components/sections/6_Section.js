@@ -15,28 +15,21 @@ const Section6 = () => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 1080;
       setIsMobile(mobile);
-      
-      // 모바일 상태가 변경되면 초기화 플래그 리셋
-      if (isInitialized) {
-        setIsInitialized(false);
-        // 잠시 후 다시 초기화
-        setTimeout(() => setIsInitialized(true), 100);
-      }
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
-  }, [isInitialized]);
+  }, []);
 
   useEffect(() => {
     // 초기화 완료 후 observer 설정
     if (!isInitialized) return;
     
     const observerOptions = {
-      threshold: 0.1, // 더 낮은 임계값으로 설정
-      rootMargin: '-20px' // 더 작은 마진으로 설정
+      threshold: 0.3, // 더 높은 임계값으로 설정하여 더 빨리 감지
+      rootMargin: '-50px' // 더 큰 마진으로 설정하여 더 빨리 감지
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -48,26 +41,17 @@ const Section6 = () => {
       });
     }, observerOptions);
 
-    // 모바일 상태가 변경될 때마다 observer 재설정
-    const setupObserver = () => {
-      // 기존 observer 해제
-      observer.disconnect();
-      
-      // 각 요소를 개별적으로 observer에 추가
-      if (videoSectionRef.current) observer.observe(videoSectionRef.current);
-      if (campaignTitleRef.current) observer.observe(campaignTitleRef.current);
-      if (campaignDescriptionRef.current) observer.observe(campaignDescriptionRef.current);
-      if (brandMessageRef.current) observer.observe(brandMessageRef.current);
-      if (beachWorkInfoRef.current) observer.observe(beachWorkInfoRef.current);
-    };
-
-    // 초기 설정
-    setupObserver();
+    // 각 요소를 개별적으로 observer에 추가
+    if (videoSectionRef.current) observer.observe(videoSectionRef.current);
+    if (campaignTitleRef.current) observer.observe(campaignTitleRef.current);
+    if (campaignDescriptionRef.current) observer.observe(campaignDescriptionRef.current);
+    if (brandMessageRef.current) observer.observe(brandMessageRef.current);
+    if (beachWorkInfoRef.current) observer.observe(beachWorkInfoRef.current);
 
     return () => {
       observer.disconnect();
     };
-  }, [isMobile, isInitialized]); // isMobile과 isInitialized 상태가 변경될 때마다 실행
+  }, [isInitialized]); // isInitialized만 의존성으로 설정
 
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {

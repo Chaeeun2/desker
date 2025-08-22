@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './FloatingMenu.module.css';
+import SurveyModal from './SurveyModal';
 
 const FloatingMenu = () => {
   const [activeTab, setActiveTab] = useState('story');
   const [isVisible, setIsVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const lastScrollYRef = useRef(0);
   const hasReachedSection5Ref = useRef(false);
   const section5ReachTimeRef = useRef(0);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+    
+    // news 탭 클릭 시 모달 열기
+    if (tab === 'news') {
+      setIsModalOpen(true);
+      return;
+    }
     
     // 해당 섹션으로 스크롤 이동
     const appElement = document.querySelector('.App');
@@ -157,45 +165,50 @@ const FloatingMenu = () => {
   }, []);
 
   return (
-    <div className={`${styles.floatingMenu} ${!isVisible ? styles.hidden : ''}`}>
-      <div className={styles.menuContainer}>
-        {/* 네비게이션 메뉴 */}
-        <div className={styles.navItems}>
-          <button
-            className={`${styles.navItem} ${activeTab === 'story' ? styles.active : ''}`}
-            onClick={() => handleTabClick('story')}
-          >
-            <span className={styles.navText}>워케이션 이야기</span>
-            {activeTab === 'story' && <span className={styles.dottedUnderline}></span>}
-          </button>
+    <>
+      <div className={`${styles.floatingMenu} ${!isVisible ? styles.hidden : ''}`}>
+        <div className={styles.menuContainer}>
+          {/* 네비게이션 메뉴 */}
+          <div className={styles.navItems}>
+            <button
+              className={`${styles.navItem} ${activeTab === 'story' ? styles.active : ''}`}
+              onClick={() => handleTabClick('story')}
+            >
+              <span className={styles.navText}>워케이션 이야기</span>
+              {activeTab === 'story' && <span className={styles.dottedUnderline}></span>}
+            </button>
 
-          <button
-            className={`${styles.navItem} ${activeTab === 'series' ? styles.active : ''}`}
-            onClick={() => handleTabClick('series')}
-          >
-            <span className={styles.navText}>DESKER × EO 시리즈</span>
-            {activeTab === 'series' && <span className={styles.dottedUnderline}></span>}
-          </button>
+            <button
+              className={`${styles.navItem} ${activeTab === 'series' ? styles.active : ''}`}
+              onClick={() => handleTabClick('series')}
+            >
+              <span className={styles.navText}>DESKER × EO 시리즈</span>
+              {activeTab === 'series' && <span className={styles.dottedUnderline}></span>}
+            </button>
 
-          <button
-            className={`${styles.navItem} ${activeTab === 'activities' ? styles.active : ''}`}
-            onClick={() => handleTabClick('activities')}
-          >
-            <span className={styles.navText}>워케이션 활동</span>
-            {activeTab === 'activities' && <span className={styles.dottedUnderline}></span>}
-          </button>
+            <button
+              className={`${styles.navItem} ${activeTab === 'activities' ? styles.active : ''}`}
+              onClick={() => handleTabClick('activities')}
+            >
+              <span className={styles.navText}>워케이션 활동</span>
+              {activeTab === 'activities' && <span className={styles.dottedUnderline}></span>}
+            </button>
 
-          <button
-            className={`${styles.navItem} ${activeTab === 'news' ? styles.active : ''}`}
-            onClick={() => handleTabClick('news')}
-          >
-            <span className={styles.navText}>워크라이프 소식 받아보기</span>
-            <span className={styles.blueDot}></span>
-            {activeTab === 'news' && <span className={styles.dottedUnderline}></span>}
-          </button>
+            <button
+              className={`${styles.navItem} ${activeTab === 'news' ? styles.active : ''}`}
+              onClick={() => handleTabClick('news')}
+            >
+              <span className={styles.navText}>워크라이프 소식 받아보기</span>
+              <span className={styles.blueDot}></span>
+              {activeTab === 'news' && <span className={styles.dottedUnderline}></span>}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* 설문 모달 */}
+      <SurveyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </>
   );
 };
 

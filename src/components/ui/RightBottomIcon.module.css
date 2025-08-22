@@ -82,7 +82,7 @@
 @media (max-width: 768px) {
   .rightBottomIcon {
     bottom: 1.5rem;
-    right: 1.5rem;
+    right: 2rem;
   }
 
   .characterIcon {
@@ -94,27 +94,7 @@
   .notificationBadge {
     width: 20px;
     height: 20px;
-    font-size: 0.7rem;
-    border-width: 2px;
-  }
-}
-
-@media (max-width: 480px) {
-  .rightBottomIcon {
-    bottom: 1rem;
-    right: 1rem;
-  }
-
-  .characterIcon {
-    width: 45px;
-    height: 45px;
-    border-radius: 10px;
-  }
-
-  .notificationBadge {
-    width: 18px;
-    height: 18px;
-    font-size: 0.6rem;
-    border-width: 2px;
+    font-size: 1rem;
+    border-width: 1px;
   }
 }
