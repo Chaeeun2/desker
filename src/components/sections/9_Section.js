@@ -7,7 +7,7 @@ const Section9 = () => {
   const [isMobile, setIsMobile] = useState(false);
   
   // 각 텍스트의 opacity 상태
-  const [text1Opacity, setText1Opacity] = useState(0);
+  const [text1Opacity, setText1Opacity] = useState(1); // 텍스트1은 1에서 시작
   const [text2Opacity, setText2Opacity] = useState(0);
   const [text3Opacity, setText3Opacity] = useState(0);
   
@@ -99,7 +99,7 @@ const Section9 = () => {
           setIsAnimationComplete(false);
           isAnimationCompleteRef.current = false;
           setShowSpacer(true);
-          setText1Opacity(0);
+          setText1Opacity(1); // 텍스트1은 1로 리셋
           setText2Opacity(0);
           setText3Opacity(0);
           setText1TranslateY(0);
@@ -128,12 +128,12 @@ const Section9 = () => {
             const scrollDiff = Math.max(0, scrollTop - triggerPointRef.current); // 음수 방지
             const steps = Math.floor(scrollDiff / 100); // 100px마다 1단계
             
-            // 텍스트 1: 0~10단계에서 나타나고 10~20단계에서 사라짐 (0 → 1 → 0)
-            let newText1Opacity = 0;
-            if (steps <= 10) {
-              newText1Opacity = steps * 0.1; // 0 → 1 (100px마다 0.1씩 증가)
-            } else if (steps <= 20) {
+            // 텍스트 1: 10~20단계에서만 사라짐 (1 → 0), 이후에는 0 유지
+            let newText1Opacity = 1; // 기본값은 1
+            if (steps > 10 && steps <= 20) {
               newText1Opacity = Math.max(0, 1 - (steps - 10) * 0.1); // 1 → 0 (100px마다 0.1씩 감소)
+            } else if (steps > 20) {
+              newText1Opacity = 0; // 20단계 이후에는 0으로 유지
             }
             
             // 텍스트 2: 20~30단계에서 나타나고 30~40단계에서 사라짐 (0 → 1 → 0)
@@ -178,17 +178,17 @@ const Section9 = () => {
               
               // 최종 상태 고정 (섹션 3처럼)
               fixFinalState();
-            }
-            
-            setText1Opacity(newText1Opacity);
-            setText2Opacity(newText2Opacity);
-            setText3Opacity(newText3Opacity);
+            } else if (!isAnimationCompleteRef.current) {
+              // 애니메이션이 완료되지 않은 경우에만 opacity 변경
+              setText1Opacity(newText1Opacity);
+              setText2Opacity(newText2Opacity);
+              setText3Opacity(newText3Opacity);
+            } 
           } 
           // 애니메이션 완료 후에는 텍스트 상태를 변경하지 않음 (fixFinalState에서 이미 설정됨)
         } else {
           // 섹션 9 밖에서는 애니메이션이 완료되지 않은 경우에만 초기 상태로 설정
           if (!isAnimationCompleteRef.current) {
-            setText1Opacity(0);
             setText2Opacity(0);
             setText3Opacity(0);
           }
@@ -210,8 +210,8 @@ const Section9 = () => {
     // 1. 스페이서 해제
     setShowSpacer(false);
     
-    // 2. 텍스트 상태 고정 (텍스트 3을 1.0으로 유지)
-    setText1Opacity(0);
+    // 2. 텍스트 상태 고정 (텍스트 1은 0.0으로 숨김, 텍스트 3을 1.0으로 유지)
+    setText1Opacity(0); // 텍스트1은 0으로 숨김
     setText2Opacity(0);
     setText3Opacity(1); // 텍스트 3을 완성된 상태로 고정
     
@@ -238,7 +238,7 @@ const Section9 = () => {
             <div 
               className={styles.textContainer}
               style={{ 
-                opacity: text1Opacity,
+                opacity: text1Opacity, // 텍스트1의 opacity를 1에서 시작하도록 수정
                 transform: `translate(-50%, calc(-50% - ${text1TranslateY}px))`
               }}
             >

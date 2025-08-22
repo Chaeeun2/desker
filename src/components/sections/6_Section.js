@@ -10,28 +10,7 @@ const Section6 = () => {
   const beachWorkInfoRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
   
-  // 화면에 보일 때만 동영상 로드
-  useEffect(() => {
-    const checkVideoVisibility = () => {
-      if (videoSectionRef.current) {
-        const rect = videoSectionRef.current.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-        if (isVisible && !videoLoaded) {
-          setVideoLoaded(true);
-        } else if (!isVisible && videoLoaded) {
-          // 화면에서 벗어나면 동영상 언로드하여 메모리 절약
-          setVideoLoaded(false);
-        }
-      }
-    };
-    
-    checkVideoVisibility();
-    window.addEventListener('scroll', checkVideoVisibility);
-    return () => window.removeEventListener('scroll', checkVideoVisibility);
-  }, [videoLoaded]);
-
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 1080;
@@ -96,19 +75,18 @@ const Section6 = () => {
 
               {/* 모바일 순서: 영상 두 번째 */}
               <div ref={videoSectionRef} className={styles.videoSection}>
-                {videoLoaded && (
-                  <div className={styles.videoContainer}>
-                    <iframe
-                      src="https://www.youtube.com/embed/-fdnYORFIzo?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-fdnYORFIzo"
-                      title="DESKER WORKATION - WORK ON THE BEACH"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                      className={styles.video}
-                      loading="lazy"
-                    />
-                  </div>
-                )}
+                {/* 비디오 로드 로직 제거 */}
+                <div className={styles.videoContainer}>
+                  <iframe
+                    src="https://www.youtube.com/embed/-fdnYORFIzo?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-fdnYORFIzo"
+                    title="DESKER WORKATION - WORK ON THE BEACH"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className={styles.video}
+                    loading="lazy"
+                  />
+                </div>
               </div>
 
               {/* 모바일 순서: 캠페인 설명 마지막 */}
@@ -127,19 +105,18 @@ const Section6 = () => {
             <>
               {/* 데스크톱 순서: 비디오 먼저 */}
               <div ref={videoSectionRef} className={styles.videoSection}>
-                {videoLoaded && (
-                  <div className={styles.videoContainer}>
-                    <iframe
-                      src="https://www.youtube.com/embed/-fdnYORFIzo?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-fdnYORFIzo"
-                      title="DESKER WORKATION - WORK ON THE BEACH"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                      className={styles.video}
-                      loading="lazy"
-                    />
-                  </div>
-                )}
+                {/* 비디오 로드 로직 제거 */}
+                <div className={styles.videoContainer}>
+                  <iframe
+                    src="https://www.youtube.com/embed/-fdnYORFIzo?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-fdnYORFIzo"
+                    title="DESKER WORKATION - WORK ON THE BEACH"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className={styles.video}
+                    loading="lazy"
+                  />
+                </div>
               </div>
 
               {/* 데스크톱 순서: 텍스트 나중에 */}

@@ -13,17 +13,25 @@ const Section3 = () => {
   const [text2Opacity, setText2Opacity] = useState(0);
   const [text3Opacity, setText3Opacity] = useState(0); // 텍스트3 opacity
   const [text4Opacity, setText4Opacity] = useState(0); // 텍스트4 opacity
+  const [text1TranslateY, setText1TranslateY] = useState(0); // 텍스트1 translateY
+  const [text2TranslateY, setText2TranslateY] = useState(0); // 텍스트2 translateY
   const [text3TranslateY, setText3TranslateY] = useState(0); // 텍스트3 translateY
   const [text4TranslateY, setText4TranslateY] = useState(0); // 텍스트4 translateY
+  const [text1Color, setText1Color] = useState('black'); // 텍스트1 색상
+  const [text2Color, setText2Color] = useState('black'); // 텍스트2 색상
+  const [text3Color, setText3Color] = useState('black'); // 텍스트3 색상
   const [text4Color, setText4Color] = useState('black'); // 텍스트4 색상 (black → white)
+  const [text5Color, setText5Color] = useState('black'); // 텍스트5 색상
+  const [text6Color, setText6Color] = useState('white'); // 텍스트6 색상
   const [overlayOpacity, setOverlayOpacity] = useState(0); // 흰색 오버레이 opacity
   const [showSpacer, setShowSpacer] = useState(true); // 스페이서 표시 상태
   const [isAnimationComplete, setIsAnimationComplete] = useState(false); // 애니메이션 완료 상태
   const isAnimationCompleteRef = useRef(false); // 즉시 반영을 위한 ref
+  const triggerPointRef = useRef(null);
   
   // 애니메이션 완료 상태를 한번 true로 설정하면 다시 false로 되돌리지 않음
   const setAnimationComplete = (value) => {
-    if (value === true || !isAnimationComplete) {
+    if (value === true || !isAnimationCompleteRef.current) {
       setIsAnimationComplete(value);
       isAnimationCompleteRef.current = value; // ref도 동시에 업데이트
       
@@ -36,42 +44,55 @@ const Section3 = () => {
 
   // 최종 상태 고정 함수 - 애니메이션 완료 시 호출
   const fixFinalState = () => {
-    // 텍스트 상태 고정
+    // 1. 모든 텍스트와 SVG를 최종 상태로 고정
     setText1Opacity(0);
     setText2Opacity(0);
     setText3Opacity(0);
-    setText4Opacity(1);
-    setText4Color('white');
+    setText4Opacity(0); // 텍스트4는 완성된 상태로 유지
     setText5Opacity(0);
-    setText6Opacity(1);
+    setText6Opacity(1); // 텍스트6은 완성된 상태로 유지
     
-    // Overlay 고정 (파란색)
-    setOverlayColor('#336DFF');
-    setOverlayOpacity(1);
-    
-    // SVG 상태 고정
+    // 2. SVG와 라인을 최종 상태로 고정
     setSvg1TranslateX(0);
     setSvg1TranslateY(0);
     setSvg1StrokeColor('white');
+    setSvg2TranslateX(0);
     setSvg2TranslateY(500);
     setSvg2Width(0);
     setSvg2StrokeColor('white');
-    setSvgOpacity(1);
-    
-    // Line 상태 고정
     setLineTranslateY(500);
     setLineWidth(0);
-    setLineOpacity(0);
     setLineStrokeColor('white');
     setLinePadding(0);
     
-    // 새로운 SVG들 고정
+    // 3. 새로운 SVG들을 최종 상태로 고정
     setNewSvgScale(1);
     setNewSvg2Scale(1);
     setNewSvg3Scale(1);
     
-    // 스페이서 제거
+    
     setShowSpacer(false);
+    // 4. Overlay를 최종 상태로 고정
+    setOverlayColor('#336DFF');
+    setOverlayOpacity(1);
+    
+    // 5. .App의 scrollTop을 뷰포트*2 위치로 자동스크롤
+    const appElement = document.querySelector('.App');
+    if (appElement && triggerPointRef.current !== null) {
+      const viewportHeight = window.innerHeight;
+      const targetScrollTop = viewportHeight * 2;
+      appElement.scrollTop = targetScrollTop;
+    }
+    
+    // 6. sticky 해제 (자유스크롤)
+    if (sectionRef.current) {
+      sectionRef.current.style.position = 'relative';
+      sectionRef.current.style.top = 'auto';
+      sectionRef.current.style.zIndex = 'auto';
+      sectionRef.current.style.transform = 'none';
+      sectionRef.current.style.willChange = 'auto';
+      sectionRef.current.classList.add(styles.scrollable);
+    }
   };
   const [svg1TranslateX, setSvg1TranslateX] = useState(-0); // 왼쪽 화면밖 (vw 단위)
   const [svg2TranslateX, setSvg2TranslateX] = useState(0); // 오른쪽 화면밖 (vw 단위)
@@ -118,6 +139,7 @@ const Section3 = () => {
   // 화면 크기에 따라 텍스트 선택
   const [isMobile, setIsMobile] = useState(false);
 
+  // 모바일 감지 (768px 이하)
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -128,6 +150,11 @@ const Section3 = () => {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // 모바일일 때 스크롤 거리 조정 (절반으로 줄임)
+  const getScrollDistance = (desktopDistance) => {
+    return isMobile ? desktopDistance / 2 : desktopDistance;
+  };
 
   // 현재 사용할 텍스트 배열 선택
   const currentTexts = isMobile ? getMobileTexts(text4Color) : getTexts(text4Color);
@@ -145,326 +172,338 @@ const Section3 = () => {
     let lastLoggedScroll = 0;
     
     const handleScroll = () => {
-      // .App 요소의 scrollTop 사용 (실제 스크롤 컨테이너)
       const appElement = document.querySelector('.App');
       const scrollTop = appElement ? appElement.scrollTop : 0;
       
-      
-      const viewportHeight = window.innerHeight;
-      const triggerPoint = viewportHeight * 2; // 섹션 3 애니메이션 시작점
-      
-      // 리셋 관련 디버깅만 남김
-      if (Math.abs(scrollTop - lastLoggedScroll) >= 200) {
-        lastLoggedScroll = scrollTop;
-      }
-      
-      // 스크롤이 뷰포트 높이보다 작아지면 리셋 (애니메이션 완료 여부와 상관없이)
-      const resetThreshold = viewportHeight;
-      
-      if (scrollTop < resetThreshold) {
-        
-        // 1단계: 상태 완전 리셋
-        setIsAnimationComplete(false);
-        isAnimationCompleteRef.current = false; // ref도 동시에 리셋
-        setShowSpacer(true);
-        setOverlayColor('white');
-        setOverlayOpacity(0);
-        setText1Opacity(1);
-        setText2Opacity(0);
-        setText3Opacity(0);
-        setText4Opacity(0);
-        setText5Opacity(0);
-        setText6Opacity(0);
-        setText4Color('black');
-        setSvg1TranslateX(-100);
-        setSvg1TranslateY(0);
-        setSvg1StrokeColor('black');
-        setSvg2TranslateY(0);
-        setSvg2Width(199);
-        setSvg2StrokeColor('black');
-        setLineTranslateY(0);
-        setLineWidth(0);
-        setLineOpacity(0);
-        setLineStrokeColor('black');
-        setLinePadding(30);
-        setSvgOpacity(0);
-        setNewSvgScale(0);
-        setNewSvg2Scale(0);
-        setNewSvg3Scale(0);
-        
-        // 2단계: sticky 상태로 복원
-        if (sectionRef.current) {
-          sectionRef.current.classList.remove(styles.animationComplete);
-          sectionRef.current.classList.add(styles.sticky);
-        }
-        return; // 리셋 후 함수 종료
-      }
-      
-      // 애니메이션이 완료된 상태라면 애니메이션 로직만 무시
-      if (isAnimationCompleteRef.current) {
-        return;
-      }
-      
-      // triggerPoint에 도달하면 애니메이션 시작
-      if (scrollTop >= triggerPoint) {
-        const scrollDiff = scrollTop - triggerPoint; // triggerPoint 기준으로 계산
-        const steps = Math.floor(scrollDiff / 100); // 100px마다 1단계 (200px → 100px로 절반)
-        
-        const newText1Opacity = Math.max(0, Math.min(1, 1 - (steps * 0.1)));
-        const newText2Opacity = Math.max(0, Math.min(1, steps * 0.1 - 1));
-        
+      // 섹션 3이 화면에 보일 때 triggerPoint 설정
+      if (sectionRef.current) {
+        const sectionTop = sectionRef.current.offsetTop;
+        const sectionBottom = sectionTop + sectionRef.current.offsetHeight;
 
-        
-        // 먼저 텍스트2가 완료된 후 오버레이 애니메이션 계산 (150px마다 0.1씩)
-        let newOverlayOpacity = 0;
-        if (newText2Opacity >= 1.0) {
-          // 텍스트2 완료 후 추가 스크롤에 따라 오버레이 애니메이션
-          const overlayScrollDiff = scrollDiff - 1000; // 텍스트2 완료 후 추가 스크롤 거리 (2000 → 1000으로 절반)
-          
-
-          
-          if (overlayScrollDiff >= 0) { // 음수 방지
-            const overlaySteps = Math.floor(overlayScrollDiff / 150); // 150px마다 1단계 (300px → 150px로 절반)
-            newOverlayOpacity = Math.max(0, Math.min(1, overlaySteps * 0.1)); // 150px마다 0.1씩 증가
-            
-
-                  }
+        // 섹션 3의 top이 처음 0에 도달했을 때 triggerPoint 설정
+        if (!triggerPointRef.current && scrollTop >= sectionTop) {
+          const sectionTopPosition = sectionTop;
+          triggerPointRef.current = sectionTopPosition;
         }
         
-        // 오버레이가 한번 완료되면 계속 1.0으로 유지
-        const finalOverlayOpacity = Math.max(newOverlayOpacity, overlayOpacity);
+        // 리셋 후 재시작을 위한 triggerPoint 재설정 (섹션 3 근처에 도달했을 때)
+        if (triggerPointRef.current === null && scrollTop >= sectionTop - window.innerHeight) {
+          const sectionTopPosition = sectionTop;
+          triggerPointRef.current = sectionTopPosition;
+        }
         
-        // 오버레이가 완료되면 텍스트1,2를 완전히 숨김
-        if (finalOverlayOpacity >= 1.0) {
+        // 애니메이션 리셋 조건: 트리거포인트-뷰포트 높이만큼 올라가면 리셋
+        if (triggerPointRef.current !== null && scrollTop < triggerPointRef.current - window.innerHeight) {
+          // 상태 완전 리셋
+          setIsAnimationComplete(false);
+          isAnimationCompleteRef.current = false;
+          triggerPointRef.current = null;
+          
+          // 모든 상태 초기화
           setText1Opacity(0);
           setText2Opacity(0);
-        } else {
-          setText1Opacity(newText1Opacity);
-          setText2Opacity(newText2Opacity);
+          setText3Opacity(0);
+          setText4Opacity(0);
+          setText5Opacity(0);
+          setText6Opacity(0);
+          setText1TranslateY(0);
+          setText2TranslateY(0);
+          setText3TranslateY(0);
+          setText4TranslateY(0);
+          setText5TranslateY(0);
+          setText1Color('black');
+          setText2Color('black');
+          setText3Color('black');
+          setText4Color('black');
+          setText5Color('black');
+          setText6Color('white');
+          setOverlayColor('white');
+          setOverlayOpacity(0);
+          setSvg1TranslateX(-100);
+          setSvg2TranslateX(100);
+          setSvg1TranslateY(0);
+          setSvg2TranslateY(0);
+          setSvg2Width(199);
+          setLineTranslateY(0);
+          setSvg1StrokeColor('black');
+          setSvg2StrokeColor('black');
+          setLineStrokeColor('black');
+          setLinePadding(30);
+          setLineWidth(0);
+          setLineOpacity(0);
+          setSvgOpacity(0);
+          setNewSvgScale(0);
+          setNewSvg2Scale(0);
+          setNewSvg3Scale(0);
+          setShowSpacer(true);
         }
         
-        // 오버레이가 완료된 후 텍스트3 애니메이션 시작 (100px마다 0.1씩)
-        let newText3Opacity = 0;
-        if (finalOverlayOpacity >= 1.0) {
-          // 오버레이 완료 후 추가 스크롤에 따라 텍스트3 애니메이션
-          const text3StartPoint = 2500; // 오버레이 완료 지점 (5000 → 2500으로 절반)
+        // 스크롤 위치 계산
+        const scrollDiff = scrollTop - (triggerPointRef.current || sectionTop);
+        
+        const viewportHeight = window.innerHeight;
+        const triggerPoint = viewportHeight * 2; // 섹션 3 애니메이션 시작점
+        
+        // 리셋 관련 디버깅만 남김
+        if (Math.abs(scrollTop - lastLoggedScroll) >= 200) {
+          lastLoggedScroll = scrollTop;
+        }
+        
+        // 스크롤이 뷰포트 높이보다 작아지면 리셋 (애니메이션 완료 여부와 상관없이)
+        const resetThreshold = viewportHeight;
+        
+        if (scrollTop < resetThreshold) {
+          
+          // 1단계: 상태 완전 리셋
+          setIsAnimationComplete(false);
+          isAnimationCompleteRef.current = false; // ref도 동시에 리셋
+          setShowSpacer(true);
+          setOverlayColor('white');
+          setOverlayOpacity(0);
+          setText1Opacity(1);
+          setText2Opacity(0);
+          setText3Opacity(0);
+          setText4Opacity(0);
+          setText5Opacity(0);
+          setText6Opacity(0);
+          setText4Color('black');
+          setSvg1TranslateX(-100);
+          setSvg1TranslateY(0);
+          setSvg1StrokeColor('black');
+          setSvg2TranslateY(0);
+          setSvg2Width(199);
+          setSvg2StrokeColor('black');
+          setLineTranslateY(0);
+          setLineWidth(0);
+          setLineOpacity(0);
+          setLineStrokeColor('black');
+          setLinePadding(30);
+          setSvgOpacity(0);
+          setNewSvgScale(0);
+          setNewSvg2Scale(0);
+          setNewSvg3Scale(0);
+          
+          // 2단계: sticky 상태로 복원
+          if (sectionRef.current) {
+            sectionRef.current.classList.remove(styles.animationComplete);
+            sectionRef.current.classList.add(styles.sticky);
+          }
+          return; // 리셋 후 함수 종료
+        }
+        
+        // 애니메이션이 완료된 상태라면 애니메이션 로직만 무시
+        if (isAnimationCompleteRef.current) {
+          return;
+        }
+        
+        // triggerPoint에 도달하면 애니메이션 시작
+        if (scrollTop >= triggerPoint) {
+          const scrollDiff = scrollTop - triggerPoint; // triggerPoint 기준으로 계산
+          const steps = Math.floor(scrollDiff / 100); // 100px마다 1단계 (200px → 100px로 절반)
+          
+          const newText1Opacity = Math.max(0, Math.min(1, 1 - (steps * 0.1)));
+          const newText2Opacity = Math.max(0, Math.min(1, steps * 0.1 - 1));
+          
+
+          
+          // 먼저 텍스트2가 완료된 후 오버레이 애니메이션 계산 (150px마다 0.1씩)
+          const overlayStartPoint = getScrollDistance(1000); // 1000px → 모바일에서는 500px
+          let newOverlayOpacity = 0;
+          
+          if (scrollDiff >= overlayStartPoint) {
+            const overlayScrollDiff = scrollDiff - overlayStartPoint; // 텍스트2 완료 후 추가 스크롤 거리
+            if (overlayScrollDiff >= 0) { // 음수 방지
+              const overlaySteps = Math.floor(overlayScrollDiff / getScrollDistance(150)); // 150px마다 1단계 (모바일에서는 75px)
+              newOverlayOpacity = Math.max(0, Math.min(1, overlaySteps * 0.1)); // 75px마다 0.1씩 증가 (모바일)
+            }
+          }
+          
+          // 오버레이가 한번 완료되면 계속 1.0으로 유지
+          const finalOverlayOpacity = Math.max(newOverlayOpacity, overlayOpacity);
+          
+          // 오버레이가 완료되면 텍스트1,2를 완전히 숨김
+          if (finalOverlayOpacity >= 1.0) {
+            setText1Opacity(0);
+            setText2Opacity(0);
+          } else {
+            setText1Opacity(newText1Opacity);
+            setText2Opacity(newText2Opacity);
+          }
+          
+          // 오버레이가 완료된 후 텍스트3 애니메이션 시작 (100px마다 0.1씩)
+          const text3StartPoint = getScrollDistance(2000); // 2000px → 모바일에서는 1000px
+          let newText3Opacity = 0;
+          
           if (scrollDiff >= text3StartPoint) {
             const text3ScrollDiff = scrollDiff - text3StartPoint; // 오버레이 완료 후 추가 스크롤 거리
             if (text3ScrollDiff >= 0) { // 음수 방지
-              const text3Steps = Math.floor(text3ScrollDiff / 100); // 100px마다 1단계 (200px → 100px로 절반)
-              newText3Opacity = Math.max(0, Math.min(1, text3Steps * 0.1)); // 100px마다 0.1씩 증가
+              const text3Steps = Math.floor(text3ScrollDiff / getScrollDistance(100)); // 100px마다 1단계 (모바일에서는 50px)
+              newText3Opacity = Math.max(0, Math.min(1, text3Steps * 0.1)); // 50px마다 0.1씩 증가 (모바일)
             }
           }
-        }
-        
-        setOverlayOpacity(finalOverlayOpacity);
-        setText3Opacity(newText3Opacity);
-        
-        // 텍스트4 애니메이션 (텍스트3 완성 후)
-        let newText4Opacity = 0;
-        
-                  // 텍스트3이 완성된 후 텍스트4 시작
-          if (newText3Opacity >= 1.0) {
-            // 텍스트3 완성 후 추가 스크롤이 필요함
-            const text3CompletePoint = isMobile ? 1750 : 3500; // 모바일에서는 더 짧게
-            const text4StartPoint = text3CompletePoint + (isMobile ? 250 : 500); // 모바일에서는 더 짧게
           
-
+          setOverlayOpacity(finalOverlayOpacity);
+          setText3Opacity(newText3Opacity);
+          
+          // 텍스트4 애니메이션 (텍스트3 완성 후)
+          const text4StartPoint = getScrollDistance(4000); // 4000px → 모바일에서는 2000px
+          let newText4Opacity = 0;
           
           if (scrollDiff >= text4StartPoint) {
             const text4ScrollDiff = scrollDiff - text4StartPoint; // 텍스트4 시작 후 스크롤 거리
             if (text4ScrollDiff >= 0) { // 음수 방지
-              // 더 세밀한 단계로 계산 (25px마다 0.05씩)
               const text4Steps = Math.floor(text4ScrollDiff / (isMobile ? 12 : 25)); // 모바일에서는 더 빠르게
               newText4Opacity = Math.max(0, Math.min(1, text4Steps * 0.05)); // 12px마다 0.05씩 증가 (모바일)
-              
-
             }
           }
-        }
-        
-        // 텍스트3과 텍스트4를 텍스트1-2와 같은 방식으로 처리
-        // 텍스트3이 사라질 때만 translateY 애니메이션
-        let finalText3Opacity = newText3Opacity;
-        let finalText4Opacity = newText4Opacity; // newText4Opacity 값을 직접 사용
-        
-        // 텍스트3: opacity 0 → 1 → 0 (사라질 때 translateY 30px 위로)
-        // 텍스트4: opacity 0 → 1 → 0
-        
-        if (newText3Opacity >= 1.0) {
-          // 텍스트3 완성 후 사라지는 애니메이션
-          const text3FadeOut = Math.max(0, 1 - (scrollDiff - 3000) / 1000); // 1000px에 걸쳐 사라짐 (6000 → 3000, 2000 → 1000으로 절반)
-          finalText3Opacity = text3FadeOut;
-          setText3Opacity(finalText3Opacity);
           
-          // 텍스트3이 사라질 때 translateY 30px 위로
-          if (finalText3Opacity < 1.0) {
-            const translateY = (1.0 - finalText3Opacity) * 30;
-            setText3TranslateY(translateY);
-          } else {
-            setText3TranslateY(0);
-          }
+          // 텍스트3과 텍스트4를 텍스트1-2와 같은 방식으로 처리
+          // 텍스트3이 사라질 때만 translateY 애니메이션
+          let finalText3Opacity = newText3Opacity;
+          let finalText4Opacity = newText4Opacity; // newText4Opacity 값을 직접 사용
           
-          // 텍스트3이 완전히 사라진 후 텍스트4 시작
-          if (finalText3Opacity <= 0) {
-            const text4Start = Math.min(1, (scrollDiff - 4000) / 1000); // 1000px에 걸쳐 나타남 (8000 → 4000, 2000 → 1000으로 절반)
-            setText4Opacity(text4Start);
+          // 텍스트3: opacity 0 → 1 → 0 (사라질 때 translateY 30px 위로)
+          // 텍스트4: opacity 0 → 1 → 0
+          
+          if (newText3Opacity >= 1.0) {
+            // 텍스트3 완성 후 사라지는 애니메이션
+            const text3FadeOutStart = getScrollDistance(3000); // 3000px → 모바일에서는 1500px
+            const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000)); // 1000px에 걸쳐 사라짐 (모바일에서는 500px)
+            finalText3Opacity = text3FadeOut;
+            setText3Opacity(finalText3Opacity);
             
-            // SVG 애니메이션: 텍스트4와 함께 시작 (더 빠르게)
-            if (text4Start > 0) {
-              // svg1, svg2가 원래 자리로 이동 (텍스트4와 동시에)
-              const svgAnimation = Math.min(1, (scrollDiff - 4000) / 1000); // 1000px에 걸쳐 나타남 (4000 → 1000으로 절반)
-              setSvg1TranslateX(-100 + (svgAnimation * 100)); // -100vw → 0vw
-              setSvg2TranslateX(100 - (svgAnimation * 100)); // 100vw → 0vw
-              setSvgOpacity(svgAnimation); // SVG opacity도 0에서 1로 증가
+            // 텍스트3이 사라질 때 translateY 30px 위로
+            if (finalText3Opacity < 1.0) {
+              const translateY = (1.0 - finalText3Opacity) * 30;
+              setText3TranslateY(translateY);
+            } else {
+              setText3TranslateY(0);
+            }
+            
+            // 텍스트3이 완전히 사라진 후 텍스트4 시작
+            if (finalText3Opacity <= 0) {
+              const text4StartPoint = getScrollDistance(4000); // 4000px → 모바일에서는 2000px
+              const text4Start = Math.min(1, (scrollDiff - text4StartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
+              setText4Opacity(text4Start);
               
-              // line width 애니메이션: svg 애니메이션 완료 후 시작
-              if (svgAnimation >= 1.0) {
-                const lineAnimation = Math.min(1, (scrollDiff - 5000) / 1000); // 5000px부터 시작, 1000px에 걸쳐 (10000 → 5000, 2000 → 1000으로 절반)
-                const newLineWidth = lineAnimation * 40; // 0 → 40vw로 확장
-                setLineWidth(newLineWidth);
-                setLineOpacity(lineAnimation); // 라인 opacity도 0에서 1로 증가
+              // SVG 애니메이션: 텍스트4와 함께 시작 (더 빠르게)
+              if (text4Start > 0) {
+                // svg1, svg2가 원래 자리로 이동 (텍스트4와 동시에)
+                const svgStartPoint = getScrollDistance(4000); // 4000px → 모바일에서는 2000px
+                const svgAnimation = Math.min(1, (scrollDiff - svgStartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
+                setSvg1TranslateX(-100 + (svgAnimation * 100)); // -100vw → 0vw
+                setSvg2TranslateX(100 - (svgAnimation * 100)); // 100vw → 0vw
+                setSvgOpacity(svgAnimation); // SVG opacity도 0에서 1로 증가
                 
-
-                
-                // lineHeight와 strokeWidth는 항상 3px로 고정
-                
-                // 라인 애니메이션이 완료되면 새로운 애니메이션 시작
-                if (lineAnimation >= 1.0) {
-                  // 텍스트4 페이드아웃 (6000px부터 1000px에 걸쳐)
-                  const text4FadeOut = Math.max(0, 1 - (scrollDiff - 6000) / 1000); // 12000 → 6000, 2000 → 1000으로 절반
-                  setText4Opacity(text4FadeOut);
-                  
-                  // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
-                  if (text4FadeOut < 1.0) {
-                    const translateY = (1.0 - text4FadeOut) * 30;
-                    setText4TranslateY(translateY);
-                  } else {
-                    setText4TranslateY(0);
-                  }
+                // line width 애니메이션: svg 애니메이션 완료 후 시작
+                if (svgAnimation >= 1.0) {
+                  const lineStartPoint = getScrollDistance(5000); // 5000px → 모바일에서는 2500px
+                  const lineAnimation = Math.min(1, (scrollDiff - lineStartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
+                  const newLineWidth = lineAnimation * 40; // 0 → 40vw로 확장
+                  setLineWidth(newLineWidth);
+                  setLineOpacity(lineAnimation); // 라인 opacity도 0에서 1로 증가
                   
 
                   
-                                    // 텍스트4가 완전히 사라진 후 텍스트5 시작 (7000px부터 1500px에 걸쳐)
-                  if (text4FadeOut <= 0) {
-                    const finalAnimation = Math.min(1, (scrollDiff - 7000) / 1500); // 14000 → 7000, 3000 → 1500으로 절반
+                  // lineHeight와 strokeWidth는 항상 3px로 고정
+                  
+                  // 라인 애니메이션이 완료되면 새로운 애니메이션 시작
+                  if (lineAnimation >= 1.0) {
+                    // 텍스트4 페이드아웃 (새로운 요소들이 나타나면서)
+                    const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(6000)) / getScrollDistance(1000)); // 6000px → 모바일에서는 3000px, 1000px → 모바일에서는 500px
+                    setText4Opacity(text4FadeOut);
                     
-                    // overlay 배경색을 primary로 변경
-                    if (finalAnimation > 0) {
-                      setOverlayColor('#336DFF'); // primary 색상
-                      setText4Color('white'); // 텍스트4 색상을 흰색으로 변경
-                    }
-                    
-                    // 텍스트5 애니메이션
-                    setText5Opacity(finalAnimation);
-                    
-                    // SVG와 라인 애니메이션 변수들 선언
-                    let svg2TranslateYValue = 0;
-                    let svg2WidthValue = 199;
-                    let lineTranslateYValue = 0;
-                    let lineWidthValue = 40;
-                    
-                    // SVG와 라인 애니메이션: 스크롤에 따라 점진적으로 변화
-                    if (finalAnimation > 0) {
-                      // svg1: 가운데로 이동하면서 stroke 색상을 흰색으로 변경
-                      setSvg1TranslateX(0); // 가운데로
-                      setSvg1TranslateY(0); // 가운데 유지
-                      setSvg1StrokeColor('white'); // 흰색으로 변경
-                      
-                      // svg2: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
-                      svg2TranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
-                      // svg2 width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
-                      const fastSvg2Animation = Math.min(1, finalAnimation * 2); // 2배 빠르게
-                      svg2WidthValue = 199 - (fastSvg2Animation * 199); // 199 → 0px (더 빨리)
-                      setSvg2TranslateY(svg2TranslateYValue);
-                      setSvg2Width(svg2WidthValue);
-                      setSvg2StrokeColor('white'); // 흰색으로 변경
-                      
-                      // line: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
-                      lineTranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
-                      // line width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
-                      const fastLineAnimation = Math.min(1, finalAnimation * 2); // 2배 빠르게
-                      lineWidthValue = 40 - (fastLineAnimation * 40); // 40vw → 0vw (더 빨리)
-                      const linePaddingValue = 30 - (finalAnimation * 30); // 50px → 0px
-                      setLineTranslateY(lineTranslateYValue);
-                      setLineWidth(lineWidthValue);
-                      setLinePadding(linePaddingValue);
-                      setLineStrokeColor('white'); // 흰색으로 변경
+                    // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
+                    if (text4FadeOut < 1.0) {
+                      const translateY = (1.0 - text4FadeOut) * 30;
+                      setText4TranslateY(translateY);
+                    } else {
+                      setText4TranslateY(0);
                     }
                     
 
                     
-                    // 텍스트5가 완료되면 텍스트6 시작 (9500px부터 1000px에 걸쳐)
-                    if (finalAnimation >= 1.0) {
-                      // 텍스트5 페이드아웃 (위로 올라가면서)
-                      const text5FadeOut = Math.max(0, 1 - (scrollDiff - 9500) / 1000); // 19000 → 9500, 2000 → 1000으로 절반
-                      setText5Opacity(text5FadeOut);
+                                        // 텍스트4가 완전히 사라진 후 텍스트5 시작 (7000px부터 1500px에 걸쳐)
+                    if (text4FadeOut <= 0) {
+                      // 최종 애니메이션 (새로운 SVG들)
+                      const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(7000)) / getScrollDistance(1500)); // 7000px → 모바일에서는 3500px, 1500px → 모바일에서는 750px
                       
-                      // 텍스트5가 사라질 때 translateY 30px 위로 (텍스트3,4와 동일한 방식)
-                      if (text5FadeOut < 1.0) {
-                        const translateY = (1.0 - text5FadeOut) * 30;
-                        setText5TranslateY(translateY);
-                      } else {
-                        setText5TranslateY(0);
+                      // overlay 배경색을 primary로 변경
+                      if (finalAnimation > 0) {
+                        setOverlayColor('#336DFF'); // primary 색상
+                        setText4Color('white'); // 텍스트4 색상을 흰색으로 변경
                       }
                       
-                      // 텍스트5가 완전히 사라진 후에만 텍스트6 시작
-                      if (text5FadeOut <= 0) {
-                        const text6Animation = Math.min(1, (scrollDiff - 10500) / 1000); // 21000 → 10500, 2000 → 1000으로 절반
-                        setText6Opacity(text6Animation);
+                      // 텍스트5 애니메이션
+                      setText5Opacity(finalAnimation);
+                      
+                      // SVG와 라인 애니메이션 변수들 선언
+                      let svg2TranslateYValue = 0;
+                      let svg2WidthValue = 199;
+                      let lineTranslateYValue = 0;
+                      let lineWidthValue = 40;
+                      
+                      // SVG와 라인 애니메이션: 스크롤에 따라 점진적으로 변화
+                      if (finalAnimation > 0) {
+                        // svg1: 가운데로 이동하면서 stroke 색상을 흰색으로 변경
+                        setSvg1TranslateX(0); // 가운데로
+                        setSvg1TranslateY(0); // 가운데 유지
+                        setSvg1StrokeColor('white'); // 흰색으로 변경
                         
-                        // 새로운 SVG들도 텍스트6과 함께 나타남 (scale 0 → 1)
-                                                setNewSvgScale(text6Animation);
-                        setNewSvg2Scale(text6Animation);
-                        setNewSvg3Scale(text6Animation);
+                        // svg2: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
+                        svg2TranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
+                        // svg2 width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
+                        const fastSvg2Animation = Math.min(1, finalAnimation * 2); // 2배 빠르게
+                        svg2WidthValue = 199 - (fastSvg2Animation * 199); // 199 → 0px (더 빨리)
+                        setSvg2TranslateY(svg2TranslateYValue);
+                        setSvg2Width(svg2WidthValue);
+                        setSvg2StrokeColor('white'); // 흰색으로 변경
                         
-                        // 애니메이션이 완료된 후에만 실행 (스크롤 위치 기반)
-                        const animationCompleteThreshold = 11500; // 애니메이션 완료 임계값
-                        if (scrollDiff >= animationCompleteThreshold && !isAnimationCompleteRef.current) {
-                          
-                          // 1단계: spacer 해제 (즉시 실행)
-                          setShowSpacer(false);
-                          
-                          // 2단계: 스크롤 위치를 즉시 뷰포트*2 위치로 이동 (순간이동 방지)
-                          // sticky 상태일 때만 강제이동 실행
-                          if (sectionRef.current && sectionRef.current.classList.contains(styles.sticky)) {
-                            const appElement = document.querySelector('.App');
-                            if (appElement) {
-                              const viewportHeight = window.innerHeight;
-                              const targetScrollPosition = viewportHeight * 2;
-                              // 즉시 이동하여 순간이동 효과 방지
-                              appElement.scrollTop = targetScrollPosition;
-                            }
-                          }
-                          
-                          // 3단계: isAnimationComplete를 먼저 true로 설정
-                          setIsAnimationComplete(true);
-                          isAnimationCompleteRef.current = true; // ref도 즉시 업데이트
-                          
-                          // 4단계: sticky 해제 (isAnimationComplete가 true인 상태에서)
-                          if (sectionRef.current) {
-                            // CSS 클래스와 인라인 스타일을 모두 제거하여 sticky 완전 해제
-                            sectionRef.current.classList.add(styles.animationComplete);
-                            sectionRef.current.classList.remove(styles.sticky);
-                            sectionRef.current.classList.remove(styles.scrollable);
-                            
-                            // 인라인 스타일도 직접 제거하여 모바일에서도 제대로 작동
-                            sectionRef.current.style.position = 'static';
-                            sectionRef.current.style.top = 'auto';
-                            sectionRef.current.style.zIndex = 'auto';
-                            sectionRef.current.style.transform = 'none';
-                            sectionRef.current.style.willChange = 'auto';
-                          }
-                          
+                        // line: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
+                        lineTranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
+                        // line width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
+                        const fastLineAnimation = Math.min(1, finalAnimation * 2); // 2배 빠르게
+                        lineWidthValue = 40 - (fastLineAnimation * 40); // 40vw → 0vw (더 빨리)
+                        const linePaddingValue = 30 - (finalAnimation * 30); // 50px → 0px
+                        setLineTranslateY(lineTranslateYValue);
+                        setLineWidth(lineWidthValue);
+                        setLinePadding(linePaddingValue);
+                        setLineStrokeColor('white'); // 흰색으로 변경
+                      }
+                      
+
+                      
+                      // 텍스트5가 완료되면 텍스트6 시작 (9500px부터 1000px에 걸쳐)
+                      if (finalAnimation >= 1.0) {
+                        // 텍스트5 페이드아웃 (9500px부터 1000px에 걸쳐)
+                        const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(9500)) / getScrollDistance(1000)); // 9500px → 모바일에서는 4750px, 1000px → 모바일에서는 500px
+                        setText5Opacity(text5FadeOut);
+                        
+                        // 텍스트5가 사라지면서 translateY 변화
+                        if (text5FadeOut < 1.0) {
+                          const translateY = (1.0 - text5FadeOut) * 30;
+                          setText5TranslateY(translateY);
                         }
                         
-                        
-                      } else {
-                        // 텍스트5가 아직 사라지는 중이면 텍스트6과 새로운 SVG들 숨김
-                        setText6Opacity(0);
-                        setNewSvgScale(0);
-                        setNewSvg2Scale(0);
-                        setNewSvg3Scale(0);
+                        // 텍스트5가 완전히 사라진 후 텍스트6 시작
+                        if (text5FadeOut <= 0) {
+                          const text6Animation = Math.min(1, (scrollDiff - getScrollDistance(10500)) / getScrollDistance(1000)); // 10500px → 모바일에서는 5250px, 1000px → 모바일에서는 500px
+                          setText6Opacity(text6Animation);
+                          
+                          // 새로운 SVG들도 함께 나타남
+                          setNewSvgScale(text6Animation);
+                          setNewSvg2Scale(text6Animation);
+                          setNewSvg3Scale(text6Animation);
+                          
+                          // 애니메이션 완료 체크 (텍스트 6이 완성되면)
+                          if (text6Animation >= 1.0 && !isAnimationCompleteRef.current) {
+                            setIsAnimationComplete(true);
+                            isAnimationCompleteRef.current = true; // ref도 동시에 업데이트
+                            
+                            // 최종 상태 고정 (섹션 9처럼)
+                            fixFinalState();
+                          }
+                        }
                       }
                     }
                   }
@@ -506,8 +545,7 @@ const Section3 = () => {
           }
         } else {
           // 텍스트3이 나타나는 중
-          finalText3Opacity = newText3Opacity;
-          setText3Opacity(finalText3Opacity);
+          setText3Opacity(0);
           setText3TranslateY(0);
           setText4Opacity(0);
         }
@@ -518,21 +556,13 @@ const Section3 = () => {
         
 
         
-        // 텍스트4가 완성된 후에만 섹션 4 활성화 (텍스트3 완성 시점이 아님)
-        if (newText4Opacity >= 1.0) {
-          const appElement = document.querySelector('.App');
-          if (appElement) {
-            // 섹션 4 활성화 신호 전송
-            const section3CompleteEvent = new CustomEvent('section3Complete');
-            window.dispatchEvent(section3CompleteEvent);
-          }
-        }
+
         
         // 애니메이션 완료 여부에 따라 sticky 설정/해제
         if (sectionRef.current) {
-          if (isAnimationComplete) {
+          if (isAnimationCompleteRef.current) {
             // 애니메이션 완료 시 sticky 해제
-            sectionRef.current.style.position = 'static';
+            sectionRef.current.style.position = 'relative';
             sectionRef.current.style.top = 'auto';
             sectionRef.current.style.zIndex = 'auto';
             sectionRef.current.style.transform = 'none';
@@ -840,7 +870,7 @@ const Section3 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: '1400vh', // 애니메이션 완료 지점에 맞춤 (11500px + 기준점 2588px = 14088px ≈ 1400vh)
+            height: isMobile ? '700vh' : '1400vh', // 모바일에서는 절반으로 줄임 (700vh vs 1400vh)
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'

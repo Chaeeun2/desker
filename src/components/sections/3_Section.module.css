@@ -80,81 +80,6 @@
   visibility: visible !important;
 }
 
-/* 텍스트2가 완전히 나타나면 sticky 해제하고 자유 스크롤 (기존 호환성용) */
-.section3.scrollable {
-  position: relative !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  min-height: auto !important;
-  z-index: 1 !important;
-  height: auto !important;
-  transform: none !important;
-  will-change: auto !important;
-  overflow: visible !important;
-  display: block !important;
-  align-items: unset !important;
-  justify-content: unset !important;
-}
-
-/* 강제적으로 sticky 해제하는 추가 규칙 */
-.scrollable {
-  position: relative !important;
-  top: auto !important;
-  bottom: auto !important;
-}
-
-/* Section3의 sticky를 완전히 무력화하는 최종 규칙 */
-.section3.scrollable {
-  position: relative !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  min-height: auto !important;
-  z-index: 1 !important;
-  height: auto !important;
-  transform: none !important;
-  will-change: auto !important;
-  overflow: visible !important;
-  display: block !important;
-  align-items: unset !important;
-  justify-content: unset !important;
-  box-sizing: border-box !important;
-}
-
-/* 추가로 sticky 속성을 완전히 무효화 */
-.section3.scrollable * {
-  position: static !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-}
-
-/* 최종 무력화 규칙 - 모든 sticky 관련 속성 차단 */
-.section3.scrollable,
-.section3.scrollable *,
-.section3.scrollable::before,
-.section3.scrollable::after {
-  position: relative !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  z-index: 1 !important;
-}
-
-/* 추가로 sticky 속성을 완전히 무효화 */
-.section3.scrollable * {
-  position: static !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-}
-
 .backgroundImage {
   position: absolute;
   top: 0;
@@ -229,7 +154,7 @@
 /* 반응형 디자인 */
 @media (max-width: 1080px) {
   .centerText {
-    font-size: 6rem !important;
+    font-size: 5rem !important;
   }
   .centerTextBlack,
   .centerTextWhite {

@@ -28,7 +28,7 @@ const Intro = () => {
       setAnimationComplete(true);
       // 애니메이션 완료 후 스크롤 허용
       document.body.style.overflow = 'unset';
-    }, 2600); // overlay(1.5초) + image2(1초) + 0.1초 여유
+    }, 3100); // 0.5초 지연 + overlay(1.5초) + image2(1초) + 0.1초 여유
 
     return () => clearTimeout(timer);
   }, []);
@@ -40,7 +40,7 @@ const Intro = () => {
       animate={animationComplete ? { y: '-100%' } : { y: 0 }}
       transition={{ 
         duration: 1, 
-        delay: 0.5, // 0.5초 딜레이 후 시작
+        delay: 1, // 0.5초 딜레이 후 시작
         ease: "easeInOut" 
       }}
     >
@@ -52,7 +52,7 @@ const Intro = () => {
           animate={{ y: '0%' }}
           transition={{ 
             duration: 1, 
-            delay: 1.6, // overlay 애니메이션 완료 후 시작
+            delay: 2.6, // 0.5초 지연 + overlay 애니메이션 완료 후 시작
             ease: "easeOut" 
           }}
         >
@@ -75,7 +75,11 @@ const Intro = () => {
           className={styles.overlay}
           initial={{ x: 0 }}
           animate={{ x: '100%' }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ 
+            duration: 1.5, 
+            delay: 1, // 0.5초 지연 추가
+            ease: "easeInOut" 
+          }}
         />
       </div>
     </motion.section>
