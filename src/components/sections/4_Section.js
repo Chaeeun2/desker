@@ -47,8 +47,10 @@ const Section4 = () => {
             // 텍스트1이 완전히 나타난 후 GIF 시작
             setTimeout(() => {
               if (gifRef.current) {
-                gifRef.current.style.visibility = 'visible'; // visibility 표시
-                gifRef.current.style.opacity = '1'; // GIF 표시
+                // GIF를 동적으로 로드하고 재생
+                gifRef.current.src = "https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/s6.gif";
+                gifRef.current.style.visibility = 'visible';
+                gifRef.current.style.opacity = '1';
                 gifRef.current.style.animationPlayState = 'running';
                 setAnimationStep(2);
                 
@@ -109,12 +111,13 @@ const Section4 = () => {
           <div className={styles.centerGif}>
             <img 
               ref={gifRef}
-              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/s6.gif"
               alt="Center GIF" 
               className={styles.gifImage}
               style={{
                 animationPlayState: 'paused',
-                animationDuration: '2.3s'
+                animationDuration: '2.3s',
+                opacity: 0,
+                visibility: 'hidden'
               }}
             />
             {/* PNG 이미지 - GIF 완료 후 표시 */}
