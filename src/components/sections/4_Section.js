@@ -29,7 +29,7 @@ const Section4 = () => {
 
   // 모바일일 때 애니메이션 타이밍 조정
   const getAnimationDelay = (desktopDelay) => {
-    return isMobile ? desktopDelay * 2 : desktopDelay; // 모바일에서는 2배 늦게 시작
+    return isMobile ? desktopDelay : desktopDelay; // 모바일에서는 2배 늦게 시작
   };
 
   // 순차적 애니메이션 실행

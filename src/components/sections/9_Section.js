@@ -280,7 +280,7 @@ const Section9 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: '550vh', // 5000px 애니메이션에 맞춤 (50단계 * 100px)
+            height: '800vh', // 5000px 애니메이션에 맞춤 (50단계 * 100px)
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'
