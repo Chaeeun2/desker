@@ -26,6 +26,8 @@ const Intro = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimationComplete(true);
+      // 애니메이션 완료 후 스크롤 허용
+      document.body.style.overflow = 'unset';
     }, 2600); // overlay(1.5초) + image2(1초) + 0.1초 여유
 
     return () => clearTimeout(timer);
@@ -56,7 +58,6 @@ const Intro = () => {
         >
           <img 
             src={introImage2} 
-            alt="Intro Image 2" 
             style={{ width: '100%', height: 'auto' }}
           />
         </motion.div>
@@ -65,7 +66,6 @@ const Intro = () => {
         <div className={styles.image1}>
           <img 
             src={introImage1} 
-            alt="Intro Image 1" 
             style={{ width: '100%', height: 'auto' }}
           />
         </div>

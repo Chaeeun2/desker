@@ -1,0 +1,434 @@
+/* Section 10 Styles */
+.section10 {
+  width: 100vw;
+  min-height: 100vh;
+  background: #f7f7f7;
+  padding: 15rem 5rem;
+  box-sizing: border-box;
+}
+
+.content {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* 헤더 스타일 */
+.header {
+  text-align: left;
+}
+
+.header h1 {
+  font-size: 6rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  font-family: "proxima-nova", Pretendard;
+  letter-spacing: var(--spacing-91);
+  line-height: 1.2;
+}
+
+.header p {
+  font-size: 2.2rem;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.6;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  font-weight: 500;
+  max-width: 1080px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* 2x2 그리드 컨테이너 */
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2rem;
+}
+
+/* 그리드 아이템 기본 스타일 */
+.gridItem {
+  border-radius: 12px;
+  aspect-ratio: 1/1;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* 그리드 아이템 1: 데스커 라운지 홍대 */
+.gridItem:nth-child(1) {
+  background-color: #f8f4e8;
+}
+
+/* 그리드 아이템 2: 데스커 라운지 대구 */
+.gridItem:nth-child(2) {
+  background-color: #f5f5f5;
+}
+
+/* 그리드 아이템 3: 데스커 베이스캠프 with nonce */
+.gridItem:nth-child(3) {
+  background-color: #f0f4f8;
+}
+
+/* 그리드 아이템 4: differ */
+.gridItem:nth-child(4) {
+  background-color: #f8f0f4;
+}
+
+/* 그라디언트 오버레이 - 기본 */
+.gridItem::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* backdrop filter blur 오버레이 */
+.gridItem::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* backdrop filter blur 오버레이 - 확장 상태 */
+.gridItem.expanded::after {
+  opacity: 1;
+}
+
+/* 그리드 아이템 1: 데스커 라운지 홍대 - 따뜻한 베이지 그라디언트 */
+.gridItem:nth-child(1)::before {
+  background: linear-gradient(
+    0deg,
+    rgba(227, 216, 200, 0) 0%,
+    rgba(227, 216, 200, 1) 50%,
+    rgba(227, 216, 200, 1) 100%
+  );
+  height: 40%;
+}
+
+/* 그리드 아이템 2: 데스커 라운지 대구 - 차가운 그레이 그라디언트 */
+.gridItem:nth-child(2)::before {
+  background: linear-gradient(
+    0deg,
+    rgba(210, 211, 218, 0) 0%,
+    rgba(210, 211, 218, 1) 50%,
+    rgba(210, 211, 218, 1) 100%
+  );
+  height: 40%;
+}
+
+/* 그리드 아이템 3: 데스커 베이스캠프 with nonce - 블루 그레이 그라디언트 */
+.gridItem:nth-child(3)::before {
+  background: linear-gradient(
+    0deg,
+    rgba(210, 211, 218, 0) 0%,
+    rgba(210, 211, 218, 1) 50%,
+    rgba(210, 211, 218, 1) 100%
+  );
+  height: 40%;
+}
+
+/* 그리드 아이템 4: differ - 핑크 라벤더 그라디언트 */
+.gridItem:nth-child(4)::before {
+  background: linear-gradient(
+    0deg,
+    rgba(210, 211, 218, 0) 0%,
+    rgba(210, 211, 218, 1) 50%,
+    rgba(210, 211, 218, 1) 100%
+  );
+  height: 40%;
+}
+
+/* 텍스트와 아이콘을 감싸는 wrapper */
+.textWrapper,
+.iconWrapper {
+  overflow: hidden;
+  transition: all 0.5s ease;
+  max-height: 100px; /* 충분한 높이 설정 */
+}
+
+.textWrapper.hidden,
+.iconWrapper.hidden {
+  max-height: 0;
+}
+
+/* 아이템 콘텐츠 */
+.itemContent {
+  z-index: 4;
+  position: relative;
+  height: 100%;
+}
+
+.itemContent h3 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: black;
+  font-family: Pretendard;
+  transition: font-size 0.5s ease;
+  line-height: 1.2;
+}
+
+/* 확장 상태일 때 h3 크기 축소 */
+.gridItem.expanded .itemContent h3 {
+  font-size: 3rem;
+}
+
+.itemContent p {
+  font-size: 2rem;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.5;
+  font-weight: 500;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+}
+
+.itemContent p.itemContentText1 {
+  margin-bottom: 0.5rem;
+}
+
+.itemContent p.itemContentText2 {
+  margin-top: 2rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.itemContent p.itemContentText2.visible {
+  opacity: 1;
+}
+
+/* CTA 버튼  */
+.ctaButton {
+  background: transparent;
+  border: 1px solid black;
+  color: black;
+  padding: 1.2rem 2.5rem;
+  font-size: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  margin-top: 2.5rem;
+  opacity: 0;
+}
+
+.ctaButton.visible {
+  opacity: 1;
+}
+
+/* CTA 아이콘 (다른 아이템용) */
+.plusIcon,
+.closeIcon {
+  width: 27px;
+  height: 27px;
+  border: 1.5px solid black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  font-family: var(--font-pret);
+  line-height: 1;
+  margin-top: 2rem;
+}
+
+.plusIcon {
+  width: 27px;
+  height: 27px;
+  border: 1.5px solid black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  font-family: var(--font-pret);
+  line-height: 1;
+  margin-top: 2rem;
+}
+
+.plusIcon.hidden {
+  height: 0;
+  margin-top: 0;
+}
+
+.closeIcon {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.closeIcon.visible {
+  opacity: 1;
+}
+
+.plusIcon span {
+  font-size: 2rem;
+  font-weight: 500;
+  color: black;
+  margin-top: -2px;
+}
+
+.closeIcon span {
+  font-size: 2rem;
+  font-weight: 500;
+  color: black;
+  margin-top: -3px;
+}
+
+/* 아이템 이미지 */
+.itemImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+/* fade in 애니메이션 */
+.header,
+.description,
+.gridContainer {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.header.fadeIn,
+.description.fadeIn,
+.gridContainer.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 설명 섹션 스타일 */
+.description {
+  margin-bottom: 7rem;
+  text-align: left;
+}
+
+.description p {
+  font-size: 2.2rem;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.6;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  font-weight: 500;
+  max-width: 1350px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .section10 {
+    padding: 6rem 2rem;
+  }
+
+  .header h1 {
+    font-size: 3rem;
+  }
+
+  .header p {
+    font-size: 1.2rem;
+  }
+
+  .gridContainer {
+    gap: 1.5rem;
+    height: 60vh;
+  }
+
+  .itemContent h3 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .section10 {
+    padding: 4rem 1rem;
+  }
+
+  .header h1 {
+    font-size: 2.5rem;
+  }
+
+  .header p {
+    font-size: 1.1rem;
+  }
+
+  .gridContainer {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    height: auto;
+    gap: 1rem;
+  }
+
+  .gridItem {
+    height: 300px;
+  }
+
+  .itemContent h3 {
+    font-size: 1.4rem;
+  }
+
+  .itemContent p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section10 {
+    padding: 3rem 1rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .header p {
+    font-size: 1rem;
+  }
+
+  .gridItem {
+    height: 250px;
+    padding: 1.5rem;
+  }
+
+  .itemContent h3 {
+    font-size: 1.2rem;
+  }
+
+  .itemContent p {
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,290 @@
+/* Section 7 Styles */
+.section7 {
+  width: 100vw;
+  height: auto; /* 4개 패널을 위한 높이 */
+  position: relative;
+  background: #ffffff;
+  z-index: 0;
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+}
+
+/* 각 패널 */
+.panel {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  position: sticky;
+  top: 0;
+}
+
+.panelContent {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* 왼쪽: 배경 이미지와 텍스트 오버레이 */
+.leftSide {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.backgroundImage {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.textOverlay {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  max-width: 100%;
+  padding: 5rem;
+}
+
+.panelTitle {
+  font-size: 8rem;
+  font-weight: 800;
+  line-height: 1;
+  font-family: "proxima-nova", Pretendard;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.panelSubtitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.6;
+  font-family: var(--font-pret);
+  margin-top: 4rem;
+}
+
+.panel:nth-child(odd) .rightSide {
+  background: #faf6eb;
+}
+
+/* 오른쪽: 설명 텍스트와 비디오 썸네일 */
+.rightSide {
+  height: 100%;
+  width: 50vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rem 7rem;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.contentWrapper {
+  width: 100%;
+}
+
+.description {
+  margin-bottom: 6rem;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.description.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.videoThumbnail {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.videoThumbnail.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.imageGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.description p {
+  font-size: 2rem;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.8;
+  letter-spacing: var(--spacing-91);
+  font-weight: 500;
+  margin: 0;
+  text-align: left;
+  word-break: keep-all;
+  font-family: var(--font-pret);
+}
+
+.videoThumbnail {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.videoThumbnail iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 이미지 그리드 스타일 */
+.imageGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.imageItem {
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.imageItem.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.imageItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 패널 4번 특별 스타일 */
+.panel:nth-child(4) {
+  height: auto; /* 패널 4번만 더 큰 높이 설정 */
+}
+
+.panel:nth-child(4) .leftSide {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 10;
+}
+
+.panel:nth-child(4) .rightSide {
+  overflow-y: hidden; /* 기본적으로는 스크롤 비활성화 */
+}
+
+.panel:nth-child(4) .scrollableContent {
+  box-sizing: border-box;
+}
+
+/* 패널 4번이 sticky 상태일 때 오른쪽 스크롤 활성화 */
+.panel:nth-child(4) .rightSide.stickyActive {
+  overflow-y: auto;
+  height: 100vh;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .panelContent {
+    flex-direction: column;
+  }
+
+  .leftSide,
+  .rightSide {
+    width: 100%;
+  }
+
+  .leftSide {
+    height: 40vh;
+  }
+
+  .rightSide {
+    height: 60vh;
+    padding: 2rem;
+  }
+
+  .panelTitle {
+    font-size: 2.5rem;
+  }
+
+  .panelSubtitle {
+    font-size: 1.1rem;
+  }
+
+  .videoThumbnail {
+    aspect-ratio: 16/9;
+  }
+}
+
+@media (max-width: 768px) {
+  .leftSide {
+    height: 35vh;
+  }
+
+  .rightSide {
+    height: 65vh;
+    padding: 1.5rem;
+  }
+
+  .panelTitle {
+    font-size: 2rem;
+  }
+
+  .panelSubtitle {
+    font-size: 1rem;
+  }
+
+  .description p {
+    font-size: 1.1rem;
+  }
+
+  .videoThumbnail {
+    aspect-ratio: 16/9;
+  }
+}
+
+@media (max-width: 480px) {
+  .leftSide {
+    height: 30vh;
+  }
+
+  .rightSide {
+    height: 70vh;
+    padding: 1rem;
+  }
+
+  .panelTitle {
+    font-size: 1.8rem;
+  }
+
+  .panelSubtitle {
+    font-size: 0.9rem;
+  }
+
+  .description p {
+    font-size: 1rem;
+  }
+
+  .videoThumbnail {
+    aspect-ratio: 16/9;
+  }
+}

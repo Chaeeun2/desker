@@ -1,8 +1,15 @@
-export { default as Intro } from './0_Intro';
-export { default as Main } from './1_Main';
+export { default as Section0 } from './0_Intro';
+export { default as Section1 } from './1_Main';
 export { default as Section2 } from './2_Section';
 export { default as Section3 } from './3_Section';
 export { default as Section4 } from './4_Section';
+export { default as Section5 } from './5_Section';
+export { default as Section6 } from './6_Section';
+export { default as Section7 } from './7_Section';
+export { default as Section8 } from './8_Section';
+export { default as Section9 } from './9_Section';
+export { default as Section10 } from './10_Section';
+export { default as Section11 } from './11_Section';
 // 추후 다른 섹션들도 여기에 추가
 // export { default as Photos } from './2_Photos';
 // export { default as Why } from './3_Why';

@@ -1,3 +1,34 @@
+# Desker - React 웹 애플리케이션
+
+이 프로젝트는 React로 구축된 현대적인 웹 애플리케이션입니다.
+
+## 주요 기능
+
+- **섹션 4**: 배경 영상이 포함된 인터랙티브 섹션
+- 반응형 디자인
+- 모던한 UI/UX
+
+## 배경 영상 설정
+
+### 1. 영상 파일 추가
+
+`public/videos/` 폴더에 다음 파일들을 추가하세요:
+
+- `background.mp4` (MP4 형식)
+- `background.webm` (WebM 형식, 선택사항)
+
+### 2. 지원되는 영상 형식
+
+- **MP4**: 대부분의 브라우저에서 지원
+- **WebM**: 더 나은 압축률과 품질 (선택사항)
+
+### 3. 영상 권장사항
+
+- 해상도: 최소 1920x1080 (Full HD)
+- 길이: 10-30초 (루프 재생)
+- 파일 크기: 웹 최적화 (5MB 이하 권장)
+- 코덱: H.264 (MP4), VP9 (WebM)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

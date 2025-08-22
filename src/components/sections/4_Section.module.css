@@ -1,48 +1,288 @@
 .section4 {
   position: relative;
-  min-height: 500vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0; /* 모든 여백 제거 */
   overflow: hidden;
+  margin: 0; /* 모든 여백 제거 */
+  clear: both; /* float 해제 */
 }
 
-.backgroundImage {
+/* 배경 영상 스타일 */
+.backgroundVideo {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  /* 배경 이미지가 들어갈 자리 - background-image 속성으로 설정 */
-  /* background-image: url('여기에 이미지 경로'); */
+  z-index: 1;
+  pointer-events: none; /* 영상 클릭 방지 */
 }
 
-.centerText {
-  position: relative;
+.backgroundVideo iframe {
+  position: absolute;
+  top: -20%; /* 위쪽 여백 완전 제거 */
+  left: -20%; /* 왼쪽 여백 완전 제거 */
+  border: none;
+  pointer-events: none; /* iframe 내부 클릭도 방지 */
+  /* 여백 완전 제거 - 화면 전체 덮기 */
+  width: 120vw; /* 뷰포트보다 훨씬 크게 */
+  height: 120vh; /* 뷰포트보다 훨씬 크게 */
+  min-width: 142vw;
+  min-height: 120vh;
+  /* 화면 크기 변화에 대응 - 극단적 확대 */
+  transform: scale(1.2); /* 40% 확대로 여백 완전 제거 */
+}
+
+/* 영상 위의 콘텐츠를 위한 오버레이 */
+.section4::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2); /* 어두운 오버레이로 텍스트 가독성 향상 */
   z-index: 2;
-  color: white;
-  font-size: 8rem;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1650px;
+}
+
+/* 영상 위 오버레이 콘텐츠 */
+.overlayContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: grid;
+  grid-template-columns: 470px 1fr 540px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5rem;
+  z-index: 4;
+  gap: 50px;
+}
+
+/* 왼쪽 텍스트 */
+.leftText {
+  text-align: left;
+  color: #ffffff;
+}
+
+.leftText h3 {
+  font-size: 5rem;
   font-weight: 800;
-  text-align: center;
+  margin-bottom: 1rem;
+  text-shadow: var(--shadow);
   font-family: var(--font-pret);
-  max-width: 80%;
-  line-height: 1.3;
+  letter-spacing: var(--spacing-91);
+  line-height: 1.4;
+  /* 초기 상태 */
+  opacity: 0;
+  /* 애니메이션을 위한 추가 속성 */
+  will-change: opacity;
+  transition: opacity 0.5s ease;
+  word-break: keep-all;
+}
+
+/* 가운데 GIF */
+.centerGif {
+  flex-shrink: 0;
+  height: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 5;
+}
+
+.centerGif img {
+  width: 100%;
+  object-fit: cover;
+  pointer-events: none; /* GIF 클릭 방지 */
+  user-select: none;
+  position: relative;
+  z-index: 6;
+  /* 섹션 진입 시 한 번만 실행되는 애니메이션 */
+  animation: gifEntrance 3s ease-out forwards;
+  animation-play-state: paused; /* 초기에는 정지 */
+  /* 초기 상태 설정 - 완전히 숨김 */
+  opacity: 0; /* 강제로 숨김 */
+  transform: scale(0.8) rotate(-5deg);
+  visibility: hidden; /* 추가로 숨김 */
+}
+
+/* GIF 진입 애니메이션 */
+@keyframes gifEntrance {
+  0% {
+    transform: scale(0.8) rotate(-5deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(2deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* GIF 이미지 스타일 */
+.gifImage {
+  background: transparent;
+  /* 부드러운 전환을 위한 스타일 */
+  will-change: transform, opacity;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* 이미지 전환을 위한 부드러운 효과 */
+  transition: all 0.3s ease;
+}
+
+/* 오른쪽 텍스트 */
+.rightText {
+  text-align: right;
+  color: #ffffff;
+}
+
+.rightText h3 {
+  font-size: 5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-shadow: var(--shadow);
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  line-height: 1.4;
+  /* 초기 상태 */
+  opacity: 0;
+  /* 애니메이션을 위한 추가 속성 */
+  will-change: opacity;
+  transition: opacity 0.5s ease;
+  word-break: keep-all;
+}
+
+.container {
+  position: relative;
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+  z-index: 2;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  .centerText {
-    font-size: 1.8rem;
-    max-width: 90%;
+  .overlayContent {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0 2rem;
+    text-align: center;
+  }
+
+  .leftText {
+    text-align: center;
+    max-width: 100%;
+  }
+
+  .centerGif {
+    width: 300px;
+    height: 225px;
+  }
+
+  .rightText {
+    text-align: center;
+    max-width: 100%;
+  }
+
+  .leftText h3,
+  .rightText h3 {
+    font-size: 2rem;
+  }
+
+  .leftText p,
+  .rightText p {
+    font-size: 1rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+  }
+
+  .surfImage {
+    width: 100%;
+    max-width: 400px;
+    height: 250px;
+  }
+
+  .imagePlaceholder {
+    font-size: 2rem;
+  }
+
+  .descriptionTitle {
+    font-size: 2rem;
+  }
+
+  .descriptionText {
+    font-size: 1.1rem;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .featureCard {
+    padding: 2rem 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  .centerText {
+  .overlayContent {
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .centerGif {
+    width: 250px;
+    height: 188px;
+  }
+
+  .leftText h3,
+  .rightText h3 {
     font-size: 1.5rem;
-    max-width: 95%;
+  }
+
+  .leftText p,
+  .rightText p {
+    font-size: 0.9rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .descriptionTitle {
+    font-size: 1.5rem;
+  }
+
+  .descriptionText {
+    font-size: 1rem;
   }
 }

@@ -1,0 +1,211 @@
+.section6 {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0rem 5rem 20rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  width: 100%;
+  max-width: 1350px;
+  z-index: 2;
+  position: relative;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* 메인 비디오 섹션 */
+.videoSection {
+  margin-bottom: 5rem;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  width: 100%;
+}
+
+.videoSection.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  transform: scale(1.005);
+}
+
+.campaignContent {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  text-align: left;
+  width: 100%;
+}
+
+/* 캠페인 제목 */
+.campaignTitle {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+}
+
+.campaignTitle.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.campaignTitle h2 {
+  font-size: 3.6rem;
+  font-weight: 500;
+  line-height: 1.35;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+}
+
+.englishTitle {
+  font-size: 4rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+}
+
+/* 캠페인 설명 */
+.campaignDescription {
+  margin-bottom: 4rem;
+  max-width: 800px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+}
+
+.campaignDescription.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.campaignDescription p {
+  font-size: 2rem;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.8;
+  margin-bottom: 4.5rem;
+  word-break: keep-all;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  font-weight: 500;
+}
+
+.campaignButton {
+  background: none;
+  color: rgba(0, 0, 0, 0.7);
+  border: none;
+  padding: 0;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-pret);
+  letter-spacing: var(--spacing-91);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+
+.campaignButton:hover {
+  color: rgba(0, 0, 0, 1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .beachWorkInfo {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .englishTitle {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .section6 {
+    padding: 3rem 1.5rem;
+  }
+
+  .video {
+    height: 350px;
+  }
+
+  .campaignTitle h2 {
+    font-size: 2rem;
+  }
+
+  .englishTitle {
+    font-size: 2.5rem;
+  }
+
+  .campaignDescription p {
+    font-size: 1.1rem;
+  }
+
+  .brandMessage {
+    padding: 1.5rem 2rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .brandText {
+    align-items: center;
+  }
+
+  .beachWorkInfo {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .video {
+    height: 250px;
+  }
+
+  .campaignTitle h2 {
+    font-size: 1.8rem;
+  }
+
+  .englishTitle {
+    font-size: 2rem;
+  }
+
+  .campaignDescription p {
+    font-size: 1rem;
+  }
+
+  .brandMessage {
+    padding: 1rem 1.5rem;
+  }
+
+  .brandName {
+    font-size: 1.5rem;
+  }
+}

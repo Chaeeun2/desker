@@ -5,15 +5,14 @@ src/
 │ │ ├── 1_Main.js
 │ │ ├── 2_Photos.js
 │ │ ├── 3_Why.js
-│ │ ├── 4_Blue.js
-│ │ ├── 5_Surf.js
-│ │ ├── 6_Story.js
-│ │ ├── 7_EO.js
-│ │ ├── 8_Workation.js
-│ │ ├── 9_Partner.js
-│ │ ├── 10_White.js
-│ │ ├── 11_After.js
-│ │ ├── 12_Thanks.js
+│ │ ├── 4_Surf.js
+│ │ ├── 5_Story.js
+│ │ ├── 6_EO.js
+│ │ ├── 7_Workation.js
+│ │ ├── 8_Partner.js
+│ │ ├── 9_White.js
+│ │ ├── 10_After.js
+│ │ ├── 11_Thanks.js
 │ │ ├── 99_Modal.js
 │ │ └── index.js # 섹션들 export
 │ ├── common/

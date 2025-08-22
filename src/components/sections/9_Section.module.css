@@ -1,0 +1,111 @@
+/* Section 9 Styles */
+.section9 {
+  width: 100vw;
+  height: 100vh;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10rem 5rem;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.content {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.mainContent {
+  text-align: center;
+  color: #333;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
+/* 텍스트 컨테이너 */
+.textContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  transition: opacity 0.3s ease, transform 0.5s ease;
+  width: 100%;
+}
+
+.textContainer.no-transition {
+  transition: none;
+}
+
+.textContainer h2 {
+  font-size: 8rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: black;
+  line-height: 1.3;
+  font-family: "proxima-nova", Pretendard;
+}
+
+.highlight {
+  color: var(--color-primary);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .section9 {
+    padding: 8rem 2rem;
+  }
+
+  .title h2 {
+    font-size: 3rem;
+  }
+
+  .title p {
+    font-size: 1.3rem;
+  }
+
+  .contentSection p {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .section9 {
+    padding: 6rem 1rem;
+  }
+
+  .title h2 {
+    font-size: 2.5rem;
+  }
+
+  .title p {
+    font-size: 1.1rem;
+  }
+
+  .contentSection p {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section9 {
+    padding: 4rem 1rem;
+  }
+
+  .title h2 {
+    font-size: 2rem;
+  }
+
+  .title p {
+    font-size: 1rem;
+  }
+
+  .contentSection p {
+    font-size: 1.2rem;
+  }
+}

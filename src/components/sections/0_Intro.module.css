@@ -7,7 +7,7 @@
   overflow: hidden;
   transform: translateY(0);
   will-change: transform;
-  z-index: 100;
+  z-index: 1001;
 }
 
 .imageContainer {

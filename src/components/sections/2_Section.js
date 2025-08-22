@@ -51,28 +51,50 @@ const Section2 = () => {
     const slider = sliderRef.current;
     
     if (slider) {
-      // CSS transition 추가 - 더 부드럽고 천천히
-      slider.style.transition = 'transform 210s linear';
+      let animationId = null;
       
-      // 왼쪽에서 오른쪽으로 이동
-      const moveRight = () => {
+      // 무한 스크롤 함수
+      const startInfiniteScroll = () => {
+        // 이전 애니메이션 정리
+        if (animationId) {
+          clearTimeout(animationId);
+        }
+        
         // 슬라이더의 실제 너비에서 뷰포트 너비를 뺀 값만큼 이동
         const sliderWidth = slider.scrollWidth;
         const viewportWidth = window.innerWidth;
         const translateValue = -(sliderWidth - viewportWidth);
         
+        
+        // CSS transition 설정
+        slider.style.transition = 'transform 180s linear';
+        
+        // 슬라이더 이동
         slider.style.transform = `translateX(${translateValue}px)`;
+        
+        // 180초 후에 원점으로 이동하고 재시작
+        animationId = setTimeout(() => {
+          
+          // transition 제거하고 원점으로 즉시 이동
+          slider.style.transition = 'none';
+          slider.style.transform = 'translateX(0)';
+          
+          // 약간의 지연 후 다시 시작
+          setTimeout(() => {
+            startInfiniteScroll(); // 재귀적으로 다시 시작
+          }, 200); // 200ms 지연
+          
+        }, 180000); // 정확히 180초
       };
       
-      // 즉시 시작하고 30초마다 반복
-      moveRight(); // 즉시 첫 번째 이동 시작
-      
-      const interval = setInterval(() => {
-        moveRight();
-      }, 210000);
+      // 무한 스크롤 시작
+      startInfiniteScroll();
       
       return () => {
-        clearInterval(interval);
+        // cleanup - 모든 타이머 정리
+        if (animationId) {
+          clearTimeout(animationId);
+        }
       };
     }
   }, [extendedImages]); // extendedImages가 변경될 때마다 실행
@@ -97,8 +119,8 @@ const Section2 = () => {
         <motion.p
           className={styles.koreanText}
           initial={{ opacity: 0, y: 30 }}
-          animate={isIntersecting ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 1, ease: "easeInOut" }}
+          animate={hasIntersected ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.5, delay: 0.4, ease: "easeInOut" }}
         >
           푸른 바다를 마주하며,
 <br/>
@@ -107,8 +129,8 @@ const Section2 = () => {
         <motion.h2
           className={styles.englishText}
           initial={{ opacity: 0, y: 30 }}
-          animate={isIntersecting ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 1.5, ease: "easeInOut" }}
+          animate={hasIntersected ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.5, delay: 0.8, ease: "easeInOut" }}
         >
           DESKER WORKATION
         </motion.h2>
