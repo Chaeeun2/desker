@@ -161,7 +161,7 @@
     font-size: 4rem !important;
   }
 
-  svg {
+  .section3 svg {
     zoom: 0.8;
   }
 }
@@ -175,11 +175,11 @@
     font-size: 3rem !important;
   }
 
-  svg {
+  .section3 svg {
     zoom: 0.5;
   }
 
-  div:has(svg) {
+  .section3 div:has(svg) {
     bottom: 3% !important;
   }
 }

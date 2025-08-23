@@ -308,6 +308,7 @@
   .description p {
     font-size: 1.6rem;
     text-align: center;
+    line-height: 1.7;
   }
 
   .description {

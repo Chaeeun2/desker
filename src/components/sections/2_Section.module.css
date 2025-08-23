@@ -14,31 +14,54 @@
 }
 
 .imageSliderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  height: auto;
+  overflow: hidden;
+  position: relative;
+  height: calc(100vh - 615px);
+}
+
+.sliderWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   position: relative;
   overflow: hidden;
+  height: 100%;
 }
 
 .imageSlider {
+  position: absolute;
   display: flex;
+  gap: 2rem;
+  white-space: nowrap;
+  left: 0;
   align-items: center;
   height: 100%;
-  gap: 2rem;
-  padding: 2rem 0;
   width: max-content;
-  transform: translateX(0);
-  min-width: 100vw; /* 최소 너비를 뷰포트 너비로 설정 */
+  min-width: 100vw;
+}
+
+#marqueeClone {
+  padding-left: 2rem;
 }
 
 .imageWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   flex-shrink: 0;
-  height: calc(100dvh - 615px);
+  height: 100%;
   aspect-ratio: 3/4;
   border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease;
   pointer-events: none; /* 이미지 클릭 방지 */
+  white-space: nowrap;
 }
 
 .imageWrapper img {
@@ -48,6 +71,8 @@
   pointer-events: none; /* 이미지 클릭 방지 */
   user-select: none; /* 이미지 선택 방지 */
   -webkit-user-drag: none; /* 드래그 방지 */
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 /* 하단 텍스트 스타일 */
@@ -92,8 +117,8 @@
     font-size: 3.5rem;
   }
 
-  .imageWrapper {
-    height: calc(100dvh - 515px);
+  .imageSliderContainer {
+    height: calc(100vh - 515px);
   }
 
   .textContent {
@@ -114,14 +139,19 @@
     font-size: 3.5rem;
   }
 
-  .imageWrapper {
-    height: calc(100dvh - 455px);
+  .imageSliderContainer {
+    height: calc(100vh - 515px);
   }
+
   .textContent {
-    margin-top: 4rem;
+    margin-top: 5rem;
   }
 
   .imageSlider {
     gap: 1rem;
+  }
+
+  #marqueeClone {
+    padding-left: 1rem;
   }
 }

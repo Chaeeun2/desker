@@ -15,6 +15,36 @@ const Section4 = () => {
   const [animationStep, setAnimationStep] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [showFallbackImage, setShowFallbackImage] = useState(false);
+  
+  // 비디오 재생 상태 모니터링
+  const [videoPlayState, setVideoPlayState] = useState({
+    isPlaying: false,
+    hasError: false,
+    hasStarted: false
+  });
+
+  // 비디오 재생 상태 체크 및 fallback 처리
+  useEffect(() => {
+    // 콘솔에 비디오 재생 상태 출력
+    const videoElement = document.querySelector('[data-section="section4"]');
+    console.log('Section 4 - video state:', {
+      isPlaying: videoPlayState.isPlaying,
+      hasError: videoPlayState.hasError,
+      hasStarted: videoPlayState.hasStarted,
+      currentTime: videoElement?.currentTime || 'N/A',
+      readyState: videoElement?.readyState || 'N/A',
+      paused: videoElement?.paused || 'N/A',
+      autoplay: videoElement?.autoplay || 'N/A'
+    });
+    
+    if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
+      console.log('Section 4 - showing fallback image');
+      setShowFallbackImage(true);
+    }
+  }, [videoPlayState]);
+  
+  // 비디오 소스 URL (mp4 파일로 교체 필요)
+  const videoSource = 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/210810_wsb_desker_Main_%E1%84%8F%E1%85%A5%E1%86%BA%E1%84%91%E1%85%A7%E1%86%AB%E1%84%8C%E1%85%B5%E1%86%B8.mp4';
 
   // 모바일 감지 (768px 이하)
   useEffect(() => {
@@ -33,23 +63,52 @@ const Section4 = () => {
     return isMobile ? desktopDelay : desktopDelay; // 모바일에서는 2배 늦게 시작
   };
 
-  // 배경 영상 자동재생 실패 감지
-  useEffect(() => {
-    const checkAutoplaySupport = () => {
-      // 3초 후에 자동재생이 실행되지 않으면 대체 이미지로 전환
-      const timeout = setTimeout(() => {
-        // 모바일에서는 자동재생 정책상 대부분 실패하므로 모바일 감지
-        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-        
-        if (isMobileDevice) {
-          setShowFallbackImage(true);
-        }
-      }, 3000);
+  // 자동재생 강제 시도 함수
+  const attemptAutoplay = () => {
+    const videoElement = document.querySelector('[data-section="section4"]');
+    if (videoElement) {
+      console.log('Section 4: Attempting to autoplay video');
+      videoElement.play().then(() => {
+        console.log('Section 4: Video autoplay successful');
+        setVideoPlayState(prev => ({ ...prev, isPlaying: true }));
+      }).catch((error) => {
+        console.log('Section 4: Video autoplay failed:', error);
+        setVideoPlayState(prev => ({ ...prev, hasError: true }));
+      });
+    }
+  };
 
-      return () => clearTimeout(timeout);
+  // 비디오 로드 완료 후 자동재생 시도
+  useEffect(() => {
+    const handleVideoLoad = () => {
+      // 비디오가 로드된 후 자동재생 시도
+      setTimeout(() => {
+        attemptAutoplay();
+      }, 1000); // 1초 후 시도
     };
 
-    checkAutoplaySupport();
+    handleVideoLoad();
+  }, []);
+
+  // 사용자 상호작용 후 자동재생 시도
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      console.log('Section 4: User interaction detected, attempting autoplay');
+      setTimeout(() => {
+        attemptAutoplay();
+      }, 100);
+    };
+
+    // 클릭, 터치, 키보드 입력 등 사용자 상호작용 감지
+    document.addEventListener('click', handleUserInteraction, { once: true });
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('keydown', handleUserInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
   }, []);
 
   // 순차적 애니메이션 실행
@@ -108,19 +167,43 @@ const Section4 = () => {
 
   return (
     <section ref={ref} className={styles.section4}>
-      {/* 배경 YouTube 영상 또는 대체 이미지 */}
+      {/* 배경 비디오 또는 대체 이미지 */}
       <div className={styles.backgroundVideo}>
         {!showFallbackImage ? (
-          <iframe
-            src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
-            title="Background Video"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
+          <video
+            data-section="section4"
+            className={styles.backgroundVideoElement}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onError={() => {
+              console.log('Section 4 - video error');
+              setVideoPlayState(prev => ({ ...prev, hasError: true }));
+            }}
+            onCanPlay={() => {
+              console.log('Section 4 - video can play');
+              setVideoPlayState(prev => ({ ...prev, hasStarted: true }));
+            }}
+            onPlay={() => {
+              console.log('Section 4 - video started playing');
+              setVideoPlayState(prev => ({ ...prev, isPlaying: true }));
+            }}
+            onPause={() => {
+              console.log('Section 4 - video paused');
+              setVideoPlayState(prev => ({ ...prev, isPlaying: false }));
+            }}
+            onStalled={() => {
+              console.log('Section 4 - video stalled');
+              setVideoPlayState(prev => ({ ...prev, isPlaying: false }));
+            }}
+          >
+            <source src={videoSource} type="video/mp4" />
+          </video>
         ) : (
           <img 
-            src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/section4-fallback.jpg" 
+            src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S4.jpg" 
             alt="Section 4 Background"
             className={styles.fallbackImage}
           />

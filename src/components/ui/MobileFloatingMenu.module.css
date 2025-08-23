@@ -1,219 +1,88 @@
-.mobileFloatingMenu {
+/* 메뉴 컨테이너 */
+.menuContainer {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 8rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  background: rgba(252, 242, 218, 0.75);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
 }
 
-.mobileFloatingMenu.hidden {
-  opacity: 0;
-  transform: translateY(20px);
+.menuContainer button {
+  color: black !important;
+}
+
+.menuContainer.hidden {
+  bottom: 2.2rem;
   pointer-events: none;
 }
 
-.menuButtons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s ease;
-  pointer-events: none;
+/* 펼쳐진 상태 */
+.menuContainer.expanded {
+  width: 200px;
+  height: 210px;
 }
-
-.menuButtons.expanded {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: all;
-}
-
-.menuButton {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  border-radius: 50px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
-  min-width: 48px;
-  height: 48px;
-}
-
-.menuButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-}
-
-.menuButton:active {
-  transform: translateY(0);
-}
-
-.buttonIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.octopusIcon,
-.settingsIcon,
-.helpIcon {
-  font-size: 20px;
-  line-height: 1;
-}
-
-.menuLabel {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.3s ease 0.1s;
-}
-
-.menuButtons.expanded .menuLabel {
-  opacity: 1;
-  transform: translateX(0);
-}
-
+/* + 버튼 */
 .toggleButton {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: absolute;
+  top: auto;
+  left: auto;
+  bottom: 12.5px;
+  right: 12.5px;
+  width: 25px;
+  height: 25px;
+  background: none;
   border: none;
-  border-radius: 50%;
   cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s ease;
-  z-index: 1001;
+  z-index: 10;
 }
 
-.toggleButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-}
-
-.toggleButton:active {
-  transform: scale(0.95);
-}
-
-.toggleButton.expanded {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
-}
-
-.plusIcon {
-  color: white;
-  font-size: 24px;
-  font-weight: 300;
-  transition: transform 0.3s ease;
-}
-
-.toggleButton.expanded .plusIcon {
+/* 펼쳐진 상태에서 + 버튼 위치 (우하단으로 이동) */
+.toggleButton.rotated {
   transform: rotate(45deg);
 }
 
-/* 모바일 최적화 */
-@media (max-width: 768px) {
-  .mobileFloatingMenu {
-    bottom: 16px;
-    right: 16px;
-    gap: 10px;
-  }
-  
-  .menuButtons {
-    gap: 10px;
-  }
-  
-  .menuButton {
-    padding: 10px 14px;
-    min-width: 44px;
-    height: 44px;
-    gap: 10px;
-  }
-  
-  .buttonIcon {
-    width: 22px;
-    height: 22px;
-  }
-  
-  .octopusIcon,
-  .settingsIcon,
-  .helpIcon {
-    font-size: 18px;
-  }
-  
-  .menuLabel {
-    font-size: 13px;
-  }
-  
-  .toggleButton {
-    width: 52px;
-    height: 52px;
-  }
-  
-  .plusIcon {
-    font-size: 22px;
-  }
+.plusIcon {
+  width: 30px;
+  height: 30px;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 작은 모바일 화면 */
-@media (max-width: 480px) {
-  .mobileFloatingMenu {
-    bottom: 12px;
-    right: 12px;
-    gap: 8px;
-  }
-  
-  .menuButtons {
-    gap: 8px;
-  }
-  
-  .menuButton {
-    padding: 8px 12px;
-    min-width: 40px;
-    height: 40px;
-    gap: 8px;
-  }
-  
-  .buttonIcon {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .octopusIcon,
-  .settingsIcon,
-  .helpIcon {
-    font-size: 16px;
-  }
-  
-  .menuLabel {
-    font-size: 12px;
-  }
-  
-  .toggleButton {
-    width: 48px;
-    height: 48px;
-  }
-  
-  .plusIcon {
-    font-size: 20px;
-  }
+/* 메뉴 아이템들 */
+.menuItems {
+  padding: 25px 20px 50px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  height: 100%;
+  box-sizing: border-box;
+  width: 190px;
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.menuItem {
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  text-align: left;
+  font-family: "Pretendard";
+  letter-spacing: -0.01em;
+}
+
+.menuContainer.expanded .menuItems {
+  opacity: 1;
 }

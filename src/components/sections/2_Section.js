@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import styles from './2_Section.module.css';
@@ -9,8 +9,9 @@ const Section2 = () => {
     rootMargin: '-50px'
   });
 
-  const imagesRef = useRef([]);
-  const sliderRef = useRef(null);
+  const marqueeRef = useRef(null);
+  const cloneRef = useRef(null);
+  const containerRef = useRef(null);
 
   // 원본 이미지 데이터
   const originalImages = [
@@ -22,95 +23,64 @@ const Section2 = () => {
     'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-6.jpg'
   ];
 
-  // 이미지를 엄청 많이 복제해서 무한 스크롤 효과
-  const extendedImages = [
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages,
-    ...originalImages
-  ];
-
-  // 초기 이미지 배열 설정
+  // RunningMessage 스타일의 부드러운 무한 스크롤 애니메이션
   useEffect(() => {
-    imagesRef.current = extendedImages;
+    let animationId;
+    let pos = 0;
+    const speed = 1; // 스크롤 속도
+    const direction = 1; // 방향 (1: 왼쪽으로, -1: 오른쪽으로)
+
+    const animate = () => {
+      let adjustedSpeed = speed * direction;
+
+      pos -= adjustedSpeed;
+
+      if (marqueeRef.current && cloneRef.current) {
+        marqueeRef.current.style.left = `${pos}px`;
+        cloneRef.current.style.left = `${pos + marqueeRef.current.offsetWidth}px`;
+
+        if (direction === 1 && pos <= -marqueeRef.current.offsetWidth) {
+          pos = 0;
+        } else if (direction === -1 && pos >= 0) {
+          pos = -marqueeRef.current.offsetWidth;
+        }
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
-  // CSS transition으로 부드러운 무한 스크롤
-  useEffect(() => {
-    // imagesRef가 설정될 때까지 기다림
-    if (!imagesRef.current || imagesRef.current.length === 0) {
-      return;
-    }
-    
-    const slider = sliderRef.current;
-    
-    if (slider) {
-      let animationId = null;
-      
-      // 무한 스크롤 함수
-      const startInfiniteScroll = () => {
-        // 이전 애니메이션 정리
-        if (animationId) {
-          clearTimeout(animationId);
-        }
-        
-        // 슬라이더의 실제 너비에서 뷰포트 너비를 뺀 값만큼 이동
-        const sliderWidth = slider.scrollWidth;
-        const viewportWidth = window.innerWidth;
-        const translateValue = -(sliderWidth - viewportWidth);
-        
-        
-        // CSS transition 설정
-        slider.style.transition = 'transform 180s linear';
-        
-        // 슬라이더 이동
-        slider.style.transform = `translateX(${translateValue}px)`;
-        
-        // 180초 후에 원점으로 이동하고 재시작
-        animationId = setTimeout(() => {
-          
-          // transition 제거하고 원점으로 즉시 이동
-          slider.style.transition = 'none';
-          slider.style.transform = 'translateX(0)';
-          
-          // 약간의 지연 후 다시 시작
-          setTimeout(() => {
-            startInfiniteScroll(); // 재귀적으로 다시 시작
-          }, 200); // 200ms 지연
-          
-        }, 180000); // 정확히 180초
-      };
-      
-      // 무한 스크롤 시작
-      startInfiniteScroll();
-      
-      return () => {
-        // cleanup - 모든 타이머 정리
-        if (animationId) {
-          clearTimeout(animationId);
-        }
-      };
-    }
-  }, [extendedImages]); // extendedImages가 변경될 때마다 실행
+  const renderImages = () =>
+    originalImages.map((image, index) => (
+      <div key={index} className={styles.imageWrapper}>
+        <img src={image} alt={`Slide ${index + 1}`} />
+      </div>
+    ));
 
   return (
     <section
       ref={ref}
       className={styles.section2}
     >
-      <div className={styles.imageSliderContainer}>
-        <div ref={sliderRef} className={styles.imageSlider}>
-          {imagesRef.current.map((image, index) => (
-            <div key={`${index}-${image}`} className={styles.imageWrapper}>
-              <img src={image} alt={`Slide ${index + 1}`} />
-            </div>
-          ))}
+      <div 
+        className={styles.imageSliderContainer}
+        ref={containerRef}
+      >
+        <div className={styles.sliderWrapper}>
+          <div ref={marqueeRef} className={styles.imageSlider}>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <React.Fragment key={i}>{renderImages()}</React.Fragment>
+            ))}
+          </div>
+          <div ref={cloneRef} className={styles.imageSlider} id="marqueeClone">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <React.Fragment key={`clone-${i}`}>{renderImages()}</React.Fragment>
+            ))}
+          </div>
         </div>
       </div>
       

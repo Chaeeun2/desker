@@ -14,12 +14,133 @@ const Main = () => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [videosLoaded, setVideosLoaded] = useState(false);
   
-  // 자동재생 실패 감지 상태
+  // 비디오 자동재생 감지 상태
   const [videoFallbacks, setVideoFallbacks] = useState({
     left: false,
     center: false,
     right: false
   });
+
+  // 비디오 재생 상태 모니터링
+  const [videoPlayStates, setVideoPlayStates] = useState({
+    left: { isPlaying: false, hasError: false, hasStarted: false },
+    center: { isPlaying: false, hasError: false, hasStarted: false },
+    right: { isPlaying: false, hasError: false, hasStarted: false }
+  });
+
+  // 비디오 재생 상태 체크 및 fallback 처리
+  useEffect(() => {
+    const checkVideoPlayback = () => {
+      const newFallbacks = { ...videoFallbacks };
+      let hasChanges = false;
+      
+      Object.keys(videoPlayStates).forEach(key => {
+        const state = videoPlayStates[key];
+        const shouldFallback = state.hasError || (state.hasStarted && !state.isPlaying);
+        
+        // 콘솔에 비디오 재생 상태 출력
+        console.log(`Section 1 - ${key} video state:`, {
+          isPlaying: state.isPlaying,
+          hasError: state.hasError,
+          hasStarted: state.hasStarted,
+          shouldFallback,
+          currentTime: document.querySelector(`[data-section="${key}"]`)?.currentTime || 'N/A',
+          readyState: document.querySelector(`[data-section="${key}"]`)?.readyState || 'N/A',
+          paused: document.querySelector(`[data-section="${key}"]`)?.paused || 'N/A'
+        });
+        
+        if (shouldFallback && !newFallbacks[key]) {
+          newFallbacks[key] = true;
+          hasChanges = true;
+        }
+      });
+      
+      // 변경사항이 있을 때만 상태 업데이트
+      if (hasChanges) {
+        setVideoFallbacks(newFallbacks);
+      }
+    };
+
+    checkVideoPlayback();
+  }, [videoPlayStates]); // videoFallbacks 의존성 제거
+
+
+
+  // 비디오 재생 상태 업데이트 함수
+  const updateVideoPlayState = (section, updates) => {
+    setVideoPlayStates(prev => ({
+      ...prev,
+      [section]: { ...prev[section], ...updates }
+    }));
+  };
+
+  // 자동재생 강제 시도 함수
+  const attemptAutoplay = (section) => {
+    const videoElement = document.querySelector(`[data-section="${section}"]`);
+    if (videoElement) {
+      console.log(`Attempting to autoplay ${section} video`);
+      videoElement.play().then(() => {
+        console.log(`${section} video autoplay successful`);
+        updateVideoPlayState(section, { isPlaying: true });
+      }).catch((error) => {
+        console.log(`${section} video autoplay failed:`, error);
+        updateVideoPlayState(section, { hasError: true });
+      });
+    }
+  };
+
+  // 비디오 로드 완료 후 자동재생 시도
+  useEffect(() => {
+    const handleVideoLoad = () => {
+      // 모든 비디오가 로드된 후 자동재생 시도
+      setTimeout(() => {
+        attemptAutoplay('left');
+        attemptAutoplay('center');
+        attemptAutoplay('right');
+      }, 1000); // 1초 후 시도
+    };
+
+    if (videosLoaded) {
+      handleVideoLoad();
+    }
+  }, [videosLoaded]);
+
+  // 사용자 상호작용 후 자동재생 시도
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      console.log('User interaction detected, attempting autoplay');
+      setTimeout(() => {
+        attemptAutoplay('left');
+        attemptAutoplay('center');
+        attemptAutoplay('right');
+      }, 100);
+    };
+
+    // 클릭, 터치, 키보드 입력 등 사용자 상호작용 감지
+    document.addEventListener('click', handleUserInteraction, { once: true });
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('keydown', handleUserInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+  }, []);
+
+  // 섹션 1 배경 영상은 항상 로드되어야 함
+  useEffect(() => {
+    setVideosLoaded(true);
+  }, []);
+
+  // 비디오 재생 상태 업데이트 함수
+
+  // 비디오 소스 URL들 (mp4 파일로 교체 필요)
+  const videoSources = {
+    left: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_1_FINAL.mp4', // 실제 mp4 URL로 교체
+    center: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_2_FINAL.mp4', // 실제 mp4 URL로 교체
+    right: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_3_FINAL.mp4' // 실제 mp4 URL로 교체
+  };
 
   // 5초마다 텍스트 변경
   useEffect(() => {
@@ -30,49 +151,9 @@ const Main = () => {
     return () => clearInterval(interval);
   }, [texts.length]);
 
-  // 섹션 1 배경 영상은 항상 로드되어야 함 (모바일 자동재생 필수)
-  useEffect(() => {
-    setVideosLoaded(true);
-  }, []);
 
-  // 자동재생 실패 감지 로직
-  useEffect(() => {
-    const checkAutoplaySupport = async () => {
-      // 3초 후에 자동재생이 실행되지 않으면 대체 이미지로 전환
-      const timeout = setTimeout(() => {
-        const iframes = document.querySelectorAll('iframe[src*="youtube"]');
-        
-        iframes.forEach((iframe, index) => {
-          const section = index === 0 ? 'left' : index === 1 ? 'center' : 'right';
-          
-          // iframe이 로드되었지만 자동재생이 시작되지 않은 경우를 감지
-          try {
-            // 모바일에서는 자동재생 정책상 대부분 실패하므로 모바일 감지
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            
-            if (isMobile) {
-              setVideoFallbacks(prev => ({
-                ...prev,
-                [section]: true
-              }));
-            }
-          } catch (error) {
-            console.log('Autoplay detection error:', error);
-            setVideoFallbacks(prev => ({
-              ...prev,
-              [section]: true
-            }));
-          }
-        });
-      }, 3000);
 
-      return () => clearTimeout(timeout);
-    };
-
-    if (videosLoaded) {
-      checkAutoplaySupport();
-    }
-  }, [videosLoaded]);
+  // 비디오 재생 상태 업데이트 함수
 
   return (
     <section 
@@ -85,18 +166,38 @@ const Main = () => {
         <div className={styles.leftSection}>
           <div className={styles.videoContainer}>
             {!videoFallbacks.left ? (
-              <iframe
-                src="https://www.youtube.com/embed/oDBWmq6Gf_A?autoplay=1&mute=1&loop=1&playlist=oDBWmq6Gf_A&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
-                title="Left Shorts"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
+              <video
+                data-section="left"
                 className={styles.video}
-              />
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                onError={() => {
+                  console.log(`Section 1 - left video error`);
+                  updateVideoPlayState('left', { hasError: true });
+                }}
+                onCanPlay={() => {
+                  console.log(`Section 1 - left video can play`);
+                  updateVideoPlayState('left', { hasStarted: true });
+                }}
+                onPlay={() => {
+                  console.log(`Section 1 - left video started playing`);
+                  updateVideoPlayState('left', { isPlaying: true });
+                }}
+                onPause={() => {
+                  console.log(`Section 1 - left video paused`);
+                  updateVideoPlayState('left', { isPlaying: false });
+                }}
+              >
+                <source src={videoSources.left} type="video/mp4" />
+                {/* 비디오 로딩 실패 시 대체 이미지로 fallback */}
+              </video>
             ) : (
               <div className={styles.fallbackImage}>
                 <img 
-                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/section1-left-fallback.jpg" 
+                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1-1.jpg" 
                   alt="Left Section Background"
                   className={styles.video}
                 />
@@ -154,18 +255,37 @@ const Main = () => {
         <div className={styles.centerSection}>
           <div className={styles.videoContainer}>
             {!videoFallbacks.center ? (
-              <iframe
-                src="https://www.youtube.com/embed/wYPBUV3V9j4?autoplay=1&mute=1&loop=1&playlist=wYPBUV3V9j4&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
-                title="Center Shorts - New Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
+              <video
+                data-section="center"
                 className={styles.video}
-              />
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                onError={() => {
+                  console.log(`Section 1 - center video error`);
+                  updateVideoPlayState('center', { hasError: true });
+                }}
+                onCanPlay={() => {
+                  console.log(`Section 1 - center video can play`);
+                  updateVideoPlayState('center', { hasStarted: true });
+                }}
+                onPlay={() => {
+                  console.log(`Section 1 - center video started playing`);
+                  updateVideoPlayState('center', { isPlaying: true });
+                }}
+                onPause={() => {
+                  console.log(`Section 1 - center video paused`);
+                  updateVideoPlayState('center', { isPlaying: false });
+                }}
+              >
+                <source src={videoSources.center} type="video/mp4" />
+              </video>
             ) : (
               <div className={styles.fallbackImage}>
                 <img 
-                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/section1-center-fallback.jpg" 
+                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1-2.jpg" 
                   alt="Center Section Background"
                   className={styles.video}
                 />
@@ -181,18 +301,37 @@ const Main = () => {
         <div className={styles.rightSection}>
           <div className={styles.videoContainer}>
             {!videoFallbacks.right ? (
-              <iframe
-                src="https://www.youtube.com/embed/n_R2ULPbLmM?autoplay=1&mute=1&loop=1&playlist=n_R2ULPbLmM&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
-                title="Right Shorts - New Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
+              <video
+                data-section="right"
                 className={styles.video}
-              />
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                onError={() => {
+                  console.log(`Section 1 - right video error`);
+                  updateVideoPlayState('right', { hasError: true });
+                }}
+                onCanPlay={() => {
+                  console.log(`Section 1 - right video can play`);
+                  updateVideoPlayState('right', { hasStarted: true });
+                }}
+                onPlay={() => {
+                  console.log(`Section 1 - right video started playing`);
+                  updateVideoPlayState('right', { isPlaying: true });
+                }}
+                onPause={() => {
+                  console.log(`Section 1 - right video paused`);
+                  updateVideoPlayState('right', { isPlaying: false });
+                }}
+              >
+                <source src={videoSources.right} type="video/mp4" />
+              </video>
             ) : (
               <div className={styles.fallbackImage}>
                 <img 
-                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/section1-right-fallback.jpg" 
+                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1-3.jpg" 
                   alt="Right Section Background"
                   className={styles.video}
                 />
