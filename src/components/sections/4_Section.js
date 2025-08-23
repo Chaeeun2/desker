@@ -14,6 +14,7 @@ const Section4 = () => {
   const [gifPlayed, setGifPlayed] = useState(false);
   const [animationStep, setAnimationStep] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [showFallbackImage, setShowFallbackImage] = useState(false);
 
   // 모바일 감지 (768px 이하)
   useEffect(() => {
@@ -31,6 +32,25 @@ const Section4 = () => {
   const getAnimationDelay = (desktopDelay) => {
     return isMobile ? desktopDelay : desktopDelay; // 모바일에서는 2배 늦게 시작
   };
+
+  // 배경 영상 자동재생 실패 감지
+  useEffect(() => {
+    const checkAutoplaySupport = () => {
+      // 3초 후에 자동재생이 실행되지 않으면 대체 이미지로 전환
+      const timeout = setTimeout(() => {
+        // 모바일에서는 자동재생 정책상 대부분 실패하므로 모바일 감지
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        
+        if (isMobileDevice) {
+          setShowFallbackImage(true);
+        }
+      }, 3000);
+
+      return () => clearTimeout(timeout);
+    };
+
+    checkAutoplaySupport();
+  }, []);
 
   // 순차적 애니메이션 실행
   useEffect(() => {
@@ -88,15 +108,23 @@ const Section4 = () => {
 
   return (
     <section ref={ref} className={styles.section4}>
-      {/* 배경 YouTube 영상 - 처음부터 로드 */}
+      {/* 배경 YouTube 영상 또는 대체 이미지 */}
       <div className={styles.backgroundVideo}>
-        <iframe
-          src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
-          title="Background Video"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
+        {!showFallbackImage ? (
+          <iframe
+            src="https://www.youtube.com/embed/j9mcHW97dLU?autoplay=1&mute=1&loop=1&playlist=j9mcHW97dLU&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
+            title="Background Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          <img 
+            src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/section4-fallback.jpg" 
+            alt="Section 4 Background"
+            className={styles.fallbackImage}
+          />
+        )}
       </div>
       
       {/* 영상 위의 콘텐츠 */}

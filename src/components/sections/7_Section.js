@@ -230,7 +230,7 @@ const Section7 = () => {
               
               <div ref={video3Ref} className={`${styles.videoThumbnail} ${video3HasIntersected ? styles.fadeIn : ''}`}>
                    <iframe
-                     src="https://www.youtube.com/embed/Mhv7ZC1k8eY?si=jI9n1aTHDDDIakQs&autoplay=1&mute=1&controls=1&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3"
+                     src="https://www.youtube.com/embed/Mhv7ZC1k8eY?si=jI9n1aTHDDDIakQs&autoplay=0&mute=0&controls=1&showinfo=0&rel=0&modestbranding=1&playsinline=1"
                      frameBorder="0"
                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                      allowFullScreen

@@ -36,6 +36,18 @@
   transform: scale(1.2); /* 40% 확대로 여백 완전 제거 */
 }
 
+/* 대체 이미지 스타일 */
+.fallbackImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* 영상 위의 콘텐츠를 위한 오버레이 */
 .section4::before {
   content: "";
