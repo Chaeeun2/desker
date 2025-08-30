@@ -374,7 +374,11 @@ const Section3 = () => {
           }
           
           setOverlayOpacity(finalOverlayOpacity);
-        }
+
+        
+
+        
+
         
         // 애니메이션 완료 여부에 따라 sticky 설정/해제
         if (sectionRef.current) {
