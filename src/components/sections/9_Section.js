@@ -6,13 +6,11 @@ const Section9 = () => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   
-  // 각 텍스트의 opacity 상태
-  const [text1Opacity, setText1Opacity] = useState(1); // 텍스트1은 1에서 시작
-  const [text2Opacity, setText2Opacity] = useState(0);
+  // 각 텍스트의 opacity 상태 (텍스트1 제거)
+  const [text2Opacity, setText2Opacity] = useState(1); // 텍스트2는 1에서 시작
   const [text3Opacity, setText3Opacity] = useState(0);
   
-  // 각 텍스트의 translateY 상태
-  const [text1TranslateY, setText1TranslateY] = useState(0);
+  // 각 텍스트의 translateY 상태 (텍스트1 제거)
   const [text2TranslateY, setText2TranslateY] = useState(0);
   
   // 스페이서 표시 상태
@@ -100,14 +98,12 @@ const Section9 = () => {
         if ((triggerPointRef.current !== null && scrollTop < triggerPointRef.current - window.innerHeight) ||
             (triggerPointRef.current === null && scrollTop < sectionTop - window.innerHeight)) {
           
-          // 상태 완전 리셋
+          // 상태 완전 리셋 (텍스트1 관련 제거)
           setIsAnimationComplete(false);
           isAnimationCompleteRef.current = false;
           setShowSpacer(true);
-          setText1Opacity(1); // 텍스트1은 1로 리셋
-          setText2Opacity(0);
+          setText2Opacity(1); // 텍스트2는 1로 리셋
           setText3Opacity(0);
-          setText1TranslateY(0);
           setText2TranslateY(0);
           
           // triggerPoint 관련 상태도 완전히 리셋
@@ -133,44 +129,25 @@ const Section9 = () => {
             const scrollDiff = Math.max(0, scrollTop - triggerPointRef.current); // 음수 방지
             const steps = Math.floor(scrollDiff / getScrollDistance(100)); // 100px마다 1단계 (모바일에서는 50px)
             
-            // 텍스트 1: 10~20단계에서만 사라짐 (1 → 0), 이후에는 0 유지
-            let newText1Opacity = 1; // 기본값은 1
-            if (steps > 10 && steps <= 20) {
-              newText1Opacity = Math.max(0, 1 - (steps - 10) * 0.1); // 1 → 0 (100px마다 0.1씩 감소, 모바일에서는 50px마다)
-            } else if (steps > 20) {
-              newText1Opacity = 0; // 20단계 이후에는 0으로 유지
+            // 텍스트 2: 0~10단계에서 사라짐 (1 → 0) - 초기에 1에서 시작
+            let newText2Opacity = 1; // 기본값은 1
+            if (steps > 0 && steps <= 10) {
+              newText2Opacity = Math.max(0, 1 - steps * 0.1); // 1 → 0 (100px마다 0.1씩 감소, 모바일에서는 50px마다)
+            } else if (steps > 10) {
+              newText2Opacity = 0; // 10단계 이후에는 0으로 유지
             }
             
-            // 텍스트 2: 20~30단계에서 나타나고 30~40단계에서 사라짐 (0 → 1 → 0)
-            let newText2Opacity = 0;
-            if (steps >= 20 && steps <= 30) {
-              newText2Opacity = (steps - 20) * 0.1; // 0 → 1 (100px마다 0.1씩 증가, 모바일에서는 50px마다)
-            } else if (steps > 30 && steps <= 40) {
-              newText2Opacity = Math.max(0, 1 - (steps - 30) * 0.1); // 1 → 0 (100px마다 0.1씩 감소, 모바일에서는 50px마다)
-            }
-            
-            // 텍스트 3: 40~50단계에서 나타남 (0 → 1)
+            // 텍스트 3: 10~20단계에서 나타남 (0 → 1) - 2000px 스크롤로 조정
             let newText3Opacity = 0;
-            if (steps >= 40) {
-              newText3Opacity = Math.min(1, (steps - 40) * 0.1); // 0 → 1 (100px마다 0.1씩 증가, 모바일에서는 50px마다)
+            if (steps >= 10) {
+              newText3Opacity = Math.min(1, (steps - 10) * 0.1); // 0 → 1 (100px마다 0.1씩 증가, 모바일에서는 50px마다)
             }
             
-            // 섹션3과 동일한 translateY 로직: 사라질 때만 translateY 계산
-            // 텍스트1: 나타날 때는 translateY = 0, 사라질 때만 위로 이동
-            if (steps <= 10) {
-              // 나타날 때: translateY = 0 (가운데 고정)
-              setText1TranslateY(0);
-            } else if (steps <= 20) {
-              // 사라질 때: translateY 계산 (위로 이동)
-              const translateY = (1.0 - newText1Opacity) * 30;
-              setText1TranslateY(translateY);
-            }
-            
-            // 텍스트2: 나타날 때는 translateY = 0, 사라질 때만 위로 이동
-            if (steps >= 20 && steps <= 30) {
-              // 나타날 때: translateY = 0 (가운데 고정)
+            // 텍스트2: 사라질 때만 translateY 계산 (위로 이동)
+            if (steps <= 0) {
+              // 초기 상태: translateY = 0 (가운데 고정)
               setText2TranslateY(0);
-            } else if (steps > 30 && steps <= 40) {
+            } else if (steps <= 10) {
               // 사라질 때: translateY 계산 (위로 이동)
               const translateY = (1.0 - newText2Opacity) * 30;
               setText2TranslateY(translateY);
@@ -185,7 +162,6 @@ const Section9 = () => {
               fixFinalState();
             } else if (!isAnimationCompleteRef.current) {
               // 애니메이션이 완료되지 않은 경우에만 opacity 변경
-              setText1Opacity(newText1Opacity);
               setText2Opacity(newText2Opacity);
               setText3Opacity(newText3Opacity);
             } 
@@ -215,8 +191,7 @@ const Section9 = () => {
     // 1. 스페이서 해제
     setShowSpacer(false);
     
-    // 2. 텍스트 상태 고정 (텍스트 1은 0.0으로 숨김, 텍스트 3을 1.0으로 유지)
-    setText1Opacity(0); // 텍스트1은 0으로 숨김
+    // 2. 텍스트 상태 고정 (텍스트 2는 0.0으로 숨김, 텍스트 3을 1.0으로 유지)
     setText2Opacity(0);
     setText3Opacity(1); // 텍스트 3을 완성된 상태로 고정
     
@@ -238,17 +213,6 @@ const Section9 = () => {
       <section ref={sectionRef} className={styles.section9}>
         <div className={styles.content}>
           <div className={styles.mainContent}>
-            
-            {/* 텍스트 1 - 사라질 때만 translateY 변화 */}
-            <div 
-              className={styles.textContainer}
-              style={{ 
-                opacity: text1Opacity, // 텍스트1의 opacity를 1에서 시작하도록 수정
-                transform: `translate(-50%, calc(-50% - ${text1TranslateY}px))`
-              }}
-            >
-              <h2><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker.png"/></h2>
-            </div>
             
             {/* 텍스트 2 - 사라질 때만 translateY 변화 */}
             <div 
@@ -280,7 +244,7 @@ const Section9 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: '800vh', // 5000px 애니메이션에 맞춤 (50단계 * 100px)
+            height: '300vh', // 2000px 애니메이션에 맞춤 (20단계 * 100px) - 2000px 스크롤로 조정
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'

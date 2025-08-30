@@ -26,7 +26,7 @@ const Section5 = () => {
       p: "잠깐 머물다 가는 단절된 휴식이 아닌,<br/>온전히 나만의 리듬을 회복하길 바랬습니다.<br/><br/>그래서 데스커는 일주일의 시간을 보낼 수 있도록<br/>스테이부터 고민했습니다."
     },
     {
-      p: "그래서 데스커는 '일하기 좋은 환경'을<br/>최우선으로 고려하여 설계했습니다.<br/><br/>누구든, 각자의 방식으로 일할 수 있도록<br/>개인 업무 공간부터 회의실, 폰부스까지<br/>쉼과 일이 공존하면서도, 일에 몰입할 수 있는<br/>환경을 완성했습니다."
+      p: "그래서 데스커는 '일하기 좋은 환경'을<br/>최우선으로 고려하여 설계했습니다.<br/><br/>개인 업무 공간부터 회의실, 폰부스까지<br/>누구든, 각자의 방식으로 일할 수 있고<br/>쉼과 일이 공존하면서도<br/>일에 몰입할 수 있는 환경을 완성했습니다."
     },
     {
       p: "일하는 장소를 바꾸는 것만으로<br/>진짜 '환기'가 될 수 있을까요?<br/><br/>요가, 서핑, 조향, 커피 등의 프로그램으로<br/>몸과 마음의 긴장을 풀고,<br/>새로운 사람들과 연결되어 자극을 받고,<br/>자전거를 타며 나에게 집중할 수 있도록<br/><br/>순간들이 쌓여 '환기'의 가치를 생생히 경험하는 시간<br/>데스커가 꿈꾼 워케이션은 그런 시간이었습니다."
@@ -42,7 +42,7 @@ const Section5 = () => {
       p: "잠깐 머물다 가는 단절된 휴식이 아닌,​<br/>온전히 나만의 리듬을 회복하길 바랬습니다.​​<br/><br/>그래서 데스커는 일주일의 시간을 보낼 수 있도록​<br/>스테이부터 고민했습니다.​"
     },
     {
-      p: "그래서 데스커는 '일하기 좋은 환경'을 최우선으로 고려하여 설계했습니다.<br/><br/>누구든, 각자의 방식으로 일할 수 있도록<br/>개인 업무 공간부터 회의실, 폰부스까지<br/>쉼과 일이 공존하면서도, 일에 몰입할 수 있는 환경을 완성했습니다."
+      p: "그래서 데스커는 '일하기 좋은 환경'을 최우선으로 고려하여 설계했습니다.<br/><br/>개인 업무 공간부터 회의실, 폰부스까지<br/>누구든, 각자의 방식으로 일할 수 있고<br/>쉼과 일이 공존하면서도 일에 몰입할 수 있는 환경을 완성했습니다."
     },
     {
       p: "일하는 장소를 바꾸는 것만으로 진짜 '환기'가 될 수 있을까요?<br /><br />요가, 서핑, 조향, 커피 등의 프로그램으로 몸과 마음의 긴장을 풀고,<br />새로운 사람들과 연결되어 자극을 받고, 자전거를 타며 나에게 집중할 수 있도록<br /><br />순간들이 쌓여 '환기'의 가치를 생생히 경험하는 시간<br/>데스커가 꿈꾼 워케이션은 그런 시간이었습니다."
@@ -163,7 +163,7 @@ const Section5 = () => {
                 </div>
               </div>
               <div className={styles.panelContent} data-panel-content>
-                <h3><span className={styles.highlight}>어디에서 일하면</span><br/>진짜 숨통이 트일까?</h3>
+                <h3><span className={styles.highlight}>어디에서 일하면</span><br/>진짜 숨통이 트일까요?</h3>
                 <p dangerouslySetInnerHTML={{ __html: currentTexts[0].p }} />
               </div>
             </div>
@@ -195,7 +195,7 @@ const Section5 = () => {
                 </div>
               </div>
               <div className={styles.panelContent} data-panel-content>
-                <h3><span className={styles.highlight}>휴양지</span>에서도,<br/>정말 일할 수 있을까?</h3>
+                <h3><span className={styles.highlight}>휴양지</span>에서도,<br/>정말 일할 수 있을까요?</h3>
                 <p dangerouslySetInnerHTML={{ __html: currentTexts[2].p }} />
               </div>
             </div>
@@ -203,7 +203,7 @@ const Section5 = () => {
             {/* 패널 4: 요가/운동 (이미지) */}
             <div className={styles.panel} ref={addPanelRef}>
               <div className={styles.panelContent} data-panel-content>
-                <h3><span className={styles.highlight}>일만 하다 돌아가는</span><br/>워케이션이 되지 않으려면</h3>
+                <h3><span className={styles.highlight}>일만 하다 돌아가는</span><br/>워케이션이 되지 않으려면?</h3>
                 <p dangerouslySetInnerHTML={{ __html: currentTexts[3].p }} />
               </div>
               <div className={styles.panelImage} data-panel-image>
