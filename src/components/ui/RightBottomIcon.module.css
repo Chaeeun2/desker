@@ -4,6 +4,13 @@
   bottom: 2.5rem;
   right: 5rem;
   z-index: 1000;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.rightBottomIcon.hidden {
+  transform: translateY(100px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .iconContainer {

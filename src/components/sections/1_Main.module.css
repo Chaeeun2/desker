@@ -187,12 +187,6 @@
   transform: translate(-50%, -50%);
 }
 
-/* 왼쪽 섹션의 롤링 텍스트만 특별 처리 */
-.leftSection .overlayText {
-  top: auto !important;
-  left: auto !important;
-}
-
 /* 반응형 디자인 */
 
 @media (max-width: 1200px) {
@@ -228,11 +222,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 2rem;
+    gap: 0rem;
   }
 
   /* 모바일에서 숨겨진 텍스트들을 표시 */
-  .textOverlay .overlayText[style*="display: none"] {
+  .textOverlay .overlayText {
     display: block !important;
     position: static !important;
     transform: none !important;

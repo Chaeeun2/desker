@@ -1,7 +1,7 @@
 /* Section 2 Styles */
 .section2 {
   width: 100vw;
-  height: 100dvh;
+  height: 110dvh;
   margin: 0;
   padding: 0;
   background-color: var(--color-white);
@@ -20,7 +20,7 @@
   width: 100%;
   overflow: hidden;
   position: relative;
-  height: calc(100vh - 615px);
+  height: calc(100vh - 550px);
 }
 
 .sliderWrapper {
@@ -31,6 +31,7 @@
   position: relative;
   overflow: hidden;
   height: 100%;
+  gap: 1.5rem;
 }
 
 .imageSlider {
@@ -45,10 +46,6 @@
   min-width: 100vw;
 }
 
-#marqueeClone {
-  padding-left: 2rem;
-}
-
 .imageWrapper {
   display: flex;
   flex-direction: row;
@@ -56,8 +53,7 @@
   gap: 10px;
   flex-shrink: 0;
   height: 100%;
-  aspect-ratio: 3/4;
-  border-radius: 12px;
+  aspect-ratio: 1/1;
   overflow: hidden;
   transition: transform 0.3s ease;
   pointer-events: none; /* 이미지 클릭 방지 */
@@ -71,7 +67,6 @@
   pointer-events: none; /* 이미지 클릭 방지 */
   user-select: none; /* 이미지 선택 방지 */
   -webkit-user-drag: none; /* 드래그 방지 */
-  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -88,7 +83,7 @@
   color: var(--color-black);
   font-family: var(--font-pret);
   letter-spacing: var(--spacing-91);
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   font-weight: 500;
   line-height: 1.5;
   word-break: keep-all;
@@ -96,7 +91,7 @@
 }
 
 .englishText {
-  font-size: var(--font-5xl);
+  font-size: 7rem;
   font-family: var(--font-prox);
   color: var(--color-primary);
   padding-top: 1rem;
@@ -114,7 +109,7 @@
   }
 
   .englishText {
-    font-size: 3.5rem;
+    font-size: 5rem;
   }
 
   .imageSliderContainer {
@@ -124,10 +119,6 @@
   .textContent {
     margin-top: 6rem;
   }
-
-  .imageWrapper {
-    border-radius: 8px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -136,7 +127,7 @@
   }
 
   .englishText {
-    font-size: 3.5rem;
+    font-size: 4rem;
   }
 
   .imageSliderContainer {
@@ -151,7 +142,7 @@
     gap: 1rem;
   }
 
-  #marqueeClone {
-    padding-left: 1rem;
+  .sliderWrapper {
+    gap: 1rem;
   }
 }

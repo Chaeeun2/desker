@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './RightBottomIcon.module.css';
 import SurveyModal from './SurveyModal';
 
-const RightBottomIcon = () => {
+const RightBottomIcon = ({ isSection1Visible }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -16,7 +16,7 @@ const RightBottomIcon = () => {
 
   return (
     <>
-      <div className={styles.rightBottomIcon}>
+      <div className={`${styles.rightBottomIcon} ${isSection1Visible ? styles.hidden : ''}`}>
         <div 
           className={styles.iconContainer}
           onMouseEnter={() => setIsHovered(true)}

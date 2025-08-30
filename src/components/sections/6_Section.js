@@ -102,7 +102,24 @@ const Section6 = () => {
               </div>
             </>
           ) : (
-            <>
+              <>
+                
+                              {/* 데스크톱 순서: 텍스트 나중에 */}
+              <div className={styles.campaignContent}>
+                <div ref={campaignTitleRef} className={styles.campaignTitle}>
+                  <h2>데스커가 제안한<br/>새로운 워크 라이프,</h2>
+                  <span className={styles.englishTitle}>DESKER WORKATION</span>
+                </div>
+
+                <div ref={campaignDescriptionRef} className={styles.campaignDescription}>
+                  <p>
+                    2022년 본격적으로 시작된 새로운 워크라이프 '데스커 워케이션',<br/>그 시작을 함께한 "WORK ON THE BEACH" 캠페인을 지금 확인해 보세요!
+                  </p>
+                  <button className={styles.campaignButton}>
+                    <a href="https://youtube.com/playlist?list=PLB7PYmHaa-5plHT1jBKvVLdmIqryLUvcB&si=HO5erAp1VVufIwnq" target="_blank">캠페인 영상 더보기 →</a>
+                  </button>
+                </div>
+              </div>
               {/* 데스크톱 순서: 비디오 먼저 */}
               <div ref={videoSectionRef} className={styles.videoSection}>
                 {/* 비디오 로드 로직 제거 */}
@@ -119,22 +136,6 @@ const Section6 = () => {
                 </div>
               </div>
 
-              {/* 데스크톱 순서: 텍스트 나중에 */}
-              <div className={styles.campaignContent}>
-                <div ref={campaignTitleRef} className={styles.campaignTitle}>
-                  <h2>데스커가 제안한<br/>새로운 워크 라이프,</h2>
-                  <span className={styles.englishTitle}>DESKER WORKATION</span>
-                </div>
-
-                <div ref={campaignDescriptionRef} className={styles.campaignDescription}>
-                  <p>
-                    2022년 본격적으로 시작된 새로운 워크라이프 '데스커 워케이션',<br/>그 시작을 함께한 "WORK ON THE BEACH" 캠페인을 지금 확인해 보세요!
-                  </p>
-                  <button className={styles.campaignButton}>
-                    <a href="https://youtube.com/playlist?list=PLB7PYmHaa-5plHT1jBKvVLdmIqryLUvcB&si=HO5erAp1VVufIwnq" target="_blank">캠페인 영상 더보기 →</a>
-                  </button>
-                </div>
-              </div>
             </>
           )}
         </div>

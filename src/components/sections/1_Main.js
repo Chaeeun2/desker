@@ -3,15 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import styles from './1_Main.module.css';
 
-const Main = () => {
+const Main = ({ onVisibilityChange }) => {
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
     threshold: 0.3,
     rootMargin: '-50px'
   });
 
-  // 롤링 텍스트 상태
-  const texts = ['WORK', 'STORY', 'MEMORY'];
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  // 롤링 텍스트 상태 제거
   const [videosLoaded, setVideosLoaded] = useState(false);
   
   // 비디오 자동재생 감지 상태
@@ -133,6 +131,13 @@ const Main = () => {
     setVideosLoaded(true);
   }, []);
 
+  // 가시성 변경을 부모 컴포넌트로 전달
+  useEffect(() => {
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
+
   // 비디오 재생 상태 업데이트 함수
 
   // 비디오 소스 URL들 (mp4 파일로 교체 필요)
@@ -142,14 +147,14 @@ const Main = () => {
     right: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_3_FINAL.mp4' // 실제 mp4 URL로 교체
   };
 
-  // 5초마다 텍스트 변경
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTextIndex((prevIndex) => (prevIndex + 1) % texts.length);
-    }, 3000);
+  // 5초마다 텍스트 변경 제거
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentTextIndex((prevIndex) => (prevIndex + 1) % texts.length);
+  //   }, 3000);
 
-    return () => clearInterval(interval);
-  }, [texts.length]);
+  //   return () => clearInterval(interval);
+  // }, [texts.length]);
 
 
 
@@ -204,45 +209,8 @@ const Main = () => {
               </div>
             )}
             <div className={styles.textOverlay}>
-              {/* 모바일에서 세로로 표시될 모든 텍스트 */}
-              <div className="rolling_wrap" style={{width: '400px', height: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
-                <h2 style={{opacity: 0, visibility: 'hidden', height: 0, overflow: 'hidden'}}>WORK</h2>
-                <AnimatePresence mode="sync">
-                  <motion.h2
-                    key={currentTextIndex}
-                    className={styles.overlayText}
-                    initial={{ 
-                      rotateX: -90, 
-                      y: 50, 
-                      opacity: 0,
-                      scale: 0.9
-                    }}
-                    animate={{ 
-                      rotateX: 0, 
-                      y: 0, 
-                      opacity: 1,
-                      scale: 1
-                    }}
-                    exit={{ 
-                      rotateX: 90, 
-                      y: -50, 
-                      opacity: 0,
-                      scale: 0.9
-                    }}
-                    transition={{ 
-                      duration: 0.4, 
-                      ease: "easeInOut",
-                      type: "tween"
-                    }}
-                    style={{
-                      transformOrigin: "center center",
-                      transformStyle: "preserve-3d"
-                    }}
-                  >
-                    {texts[currentTextIndex]}
-                  </motion.h2>
-                </AnimatePresence>
-              </div>
+              {/* 롤링 텍스트를 "WORK"로 고정 */}
+              <h2 className={styles.overlayText}>WORK</h2>
               
               {/* 모바일에서 추가로 표시될 텍스트들 */}
               <h2 className={styles.overlayText} style={{display: 'none'}}>ON THE</h2>

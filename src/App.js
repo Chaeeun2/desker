@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Section0 from './components/sections/0_Intro';
 import Section1 from './components/sections/1_Main';
@@ -16,6 +16,8 @@ import FloatingMenu from './components/ui/FloatingMenu';
 import RightBottomIcon from './components/ui/RightBottomIcon';
 
 function App() {
+  const [isSection1Visible, setIsSection1Visible] = useState(false);
+
   // 스크롤 성능 최적화
   useEffect(() => {
     // 모바일에서 스크롤 성능 향상
@@ -27,7 +29,7 @@ function App() {
   return (
     <div className="App">
       <Section0 />
-      <Section1 />
+      <Section1 onVisibilityChange={setIsSection1Visible} />
       <Section2 />
       <Section3 />
       <Section4 />
@@ -44,7 +46,7 @@ function App() {
       <FloatingMenu />
       
       {/* 우측 하단 플로팅 아이콘 */}
-      <RightBottomIcon />
+      <RightBottomIcon isSection1Visible={isSection1Visible} />
     </div>
   );
 }
