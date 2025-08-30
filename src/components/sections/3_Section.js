@@ -71,12 +71,10 @@ const Section3 = () => {
     setOverlayColor('#336DFF');
     setOverlayOpacity(1);
     
-    // 5. .App의 scrollTop을 뷰포트*2 위치로 자동스크롤
+    // 5. .App의 scrollTop을 triggerPointRef.current 위치로 자동스크롤
     const appElement = document.querySelector('.App');
     if (appElement && triggerPointRef.current !== null) {
-      const viewportHeight = window.innerHeight;
-      const targetScrollTop = viewportHeight * 2;
-      appElement.scrollTop = targetScrollTop;
+      appElement.scrollTop = triggerPointRef.current;
     }
     
     // 6. sticky 해제 (자유스크롤)
