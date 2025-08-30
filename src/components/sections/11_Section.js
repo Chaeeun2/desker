@@ -1,13 +1,20 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 import styles from "./11_Section.module.css";
 
-const Section11 = () => {
+const Section11 = ({ onVisibilityChange }) => {
   const sectionRef = useRef(null);
   
   // fade in 애니메이션을 위한 intersection observer
-  const [mainTextRef, mainTextIntersecting, mainTextHasIntersected] = useIntersectionObserver({ threshold: 0.3 });
+  const [mainTextRef, mainTextIntersecting, mainTextHasIntersected] = useIntersectionObserver({ threshold: 0.01 }); // 0.01로 변경
   const [copyrightRef, copyrightIntersecting, copyrightHasIntersected] = useIntersectionObserver({ threshold: 0.3 });
+
+  // 가시성 변경을 부모 컴포넌트로 전달
+  useEffect(() => {
+    if (onVisibilityChange) {
+      onVisibilityChange(mainTextIntersecting);
+    }
+  }, [mainTextIntersecting, onVisibilityChange]);
 
   return (
       <section ref={sectionRef} className={styles.section11}>

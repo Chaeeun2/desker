@@ -14,9 +14,13 @@ import Section10 from './components/sections/10_Section';
 import Section11 from './components/sections/11_Section';
 import FloatingMenu from './components/ui/FloatingMenu';
 import RightBottomIcon from './components/ui/RightBottomIcon';
+import SurveyModal from './components/ui/SurveyModal';
 
 function App() {
   const [isSection1Visible, setIsSection1Visible] = useState(false);
+  const [isSection11Visible, setIsSection11Visible] = useState(false);
+  const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+  const [hasShownSurvey, setHasShownSurvey] = useState(false); // 최초 실행 여부를 추적하는 상태
 
   // 스크롤 성능 최적화
   useEffect(() => {
@@ -25,6 +29,14 @@ function App() {
       window.history.scrollRestoration = 'manual';
     }
   }, []);
+
+  // 섹션11이 보일 때 설문조사 모달 표시 (최초 한 번만)
+  useEffect(() => {
+    if (isSection11Visible && !isSurveyModalOpen && !hasShownSurvey) {
+      setIsSurveyModalOpen(true);
+      setHasShownSurvey(true); // 최초 실행 표시
+    }
+  }, [isSection11Visible, isSurveyModalOpen, hasShownSurvey]);
 
   return (
     <div className="App">
@@ -39,7 +51,7 @@ function App() {
       <Section8 />
       <Section9 />
       <Section10 />
-      <Section11 />
+      <Section11 onVisibilityChange={setIsSection11Visible} />
       {/* 추후 다른 섹션들도 여기에 추가 */}
       
       {/* 플로팅 메뉴 */}
@@ -47,6 +59,9 @@ function App() {
       
       {/* 우측 하단 플로팅 아이콘 */}
       <RightBottomIcon isSection1Visible={isSection1Visible} />
+
+      {/* 설문조사 모달 */}
+      <SurveyModal isOpen={isSurveyModalOpen} onClose={() => setIsSurveyModalOpen(false)} />
     </div>
   );
 }
