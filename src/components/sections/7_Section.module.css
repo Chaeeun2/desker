@@ -292,10 +292,20 @@
   transform: scale(1.05);
 }
 
+@media (max-width: 1400px) {
+  .panelTitle {
+    font-size: 5.5rem !important;
+  }
+
+  .panelSubtitle {
+    font-size: 1.8rem;
+  }
+}
+
 /* 모바일 반응형 */
 @media (max-width: 1080px) {
   .panelTitle {
-    font-size: 6rem;
+    font-size: 4.5rem !important;
   }
 
   .panelSubtitle {
@@ -335,6 +345,10 @@
 
   .panelContent {
     flex-direction: column;
+  }
+
+  .backgroundImage {
+    min-height: 40vh;
   }
 
   .leftSide,

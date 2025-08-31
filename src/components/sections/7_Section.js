@@ -165,24 +165,55 @@ const Section7 = () => {
         setIsInSection(true);
         lockPosition.current = sectionTop;
         
-        // 부드럽게 섹션 위치로 스크롤
-        appElement.scrollTo({
-          top: sectionTop,
-          behavior: 'smooth'
-        });
+        // 부드럽게 섹션 위치로 이동한 후 고정
+        const startPosition = scrollTop;
+        const distance = sectionTop - startPosition;
+        const duration = 600;
+        const startTime = performance.now();
         
-        // 스크롤 애니메이션 완료 후 고정
-        setTimeout(() => {
-          if (sectionRef.current && scrollLocked.current) {
-            sectionRef.current.style.position = 'fixed';
-            sectionRef.current.style.top = '0';
-            sectionRef.current.style.left = '0';
-            sectionRef.current.style.right = '0';
+        const easeInOutQuad = (t) => {
+          return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        };
+        
+        const animateScroll = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easedProgress = easeInOutQuad(progress);
+          
+          appElement.scrollTop = startPosition + (distance * easedProgress);
+          
+          if (progress < 1) {
+            requestAnimationFrame(animateScroll);
+          } else {
+            // 애니메이션 완료 후 fixed로 변경
+            if (sectionRef.current && scrollLocked.current) {
+              // 현재 위치를 저장
+              const rect = sectionRef.current.getBoundingClientRect();
+              
+              // fixed로 변경
+              sectionRef.current.style.position = 'fixed';
+              sectionRef.current.style.top = `${rect.top}px`;
+              sectionRef.current.style.left = '0';
+              sectionRef.current.style.right = '0';
+              
+              // 부드럽게 top을 0으로 조정
+              requestAnimationFrame(() => {
+                if (sectionRef.current) {
+                  sectionRef.current.style.transition = 'top 0.3s ease-out';
+                  sectionRef.current.style.top = '0';
+                  
+                  setTimeout(() => {
+                    if (sectionRef.current) {
+                      sectionRef.current.style.transition = '';
+                    }
+                  }, 300);
+                }
+              });
+            }
           }
-          if (scrollLocked.current) {
-            appElement.scrollTop = sectionTop;
-          }
-        }, 300);
+        };
+        
+        requestAnimationFrame(animateScroll);
       }
       
       // 스크롤이 잠겨있을 때 위치 강제 고정 (모바일에서는 비활성화)
@@ -216,6 +247,16 @@ const Section7 = () => {
       
       // 섹션 7에 있을 때만 처리
       if (scrollLocked.current && isInSection) {
+        // 패널 4에서 rightSide 영역 클릭 시 휠 이벤트 무시
+        if (currentPanel === 3) {
+          // 이벤트가 rightSide 영역에서 발생했는지 확인
+          const rightSideElement = document.querySelector(`.${styles.rightSidePanel4}`);
+          if (rightSideElement && rightSideElement.contains(e.target)) {
+            // rightSide 영역에서는 휠 이벤트 무시 (기본 스크롤 허용)
+            return;
+          }
+        }
+        
         e.preventDefault();
         e.stopPropagation();
         
@@ -245,6 +286,7 @@ const Section7 = () => {
               sectionRef.current.style.top = 'auto';
               sectionRef.current.style.left = 'auto';
               sectionRef.current.style.right = 'auto';
+              sectionRef.current.style.transition = '';
             }
             
             // 스크롤 위치를 섹션7 끝으로 설정하여 다음 섹션 표시 (PC에서만)
@@ -267,6 +309,7 @@ const Section7 = () => {
               sectionRef.current.style.top = 'auto';
               sectionRef.current.style.left = 'auto';
               sectionRef.current.style.right = 'auto';
+              sectionRef.current.style.transition = '';
             }
             
             // 강제 스크롤 없이 자연스럽게 이전 섹션으로 이동

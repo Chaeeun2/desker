@@ -182,6 +182,11 @@
   .mapDescription p {
     font-size: 2rem;
   }
+
+  .mapImage img {
+    height: auto;
+    width: 100%;
+  }
 }
 
 @media (max-width: 1080px) {
