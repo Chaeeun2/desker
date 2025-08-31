@@ -25,8 +25,8 @@
 
 /* 펼쳐진 상태 */
 .menuContainer.expanded {
-  width: 200px;
-  height: 210px;
+  width: 190px;
+  height: 190px;
 }
 /* + 버튼 */
 .toggleButton {

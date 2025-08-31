@@ -120,7 +120,7 @@ const Section3 = () => {
 
   // texts 배열을 동적으로 생성하여 색상 변경 가능하게 함
   const getTexts = (text4Color) => [
-    "데스커가<br/>워케이션에 주목하게 된 이유",
+    "데스커는<br/>왜 워케이션에 주목하게 되었을까요?",
     "사무실에 출근하는<br/>반복적인 일상.",
     `같은 공간, 책상에서<br/><span style='color:#336DFF'>일</span>과 <span style='color:#336DFF'>쉼</span>의 공존은 어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
@@ -129,7 +129,7 @@ const Section3 = () => {
 
   // 모바일용 texts 배열 (줄바꿈 다르게)
   const getMobileTexts = (text4Color) => [
-    "데스커가<br/>워케이션에<br/>주목하게 된 이유",
+    "데스커는<br/>왜 워케이션에<br/>주목하게 되었을까요?",
     "사무실에 출근하는<br/>반복적인 일상.",
     `같은 공간, 책상에서<br/><span style='color:#336DFF'>일</span>과 <span style='color:#336DFF'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",

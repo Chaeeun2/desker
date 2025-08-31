@@ -90,6 +90,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
         photoUpload: null,
         siteDiscovery: [],
         visitPurpose: [],
+        siteDiscoverySearch: '',
         siteDiscoveryOther: '',
         visitPurposeOther: '',
         companyName: '',
@@ -112,6 +113,36 @@ const SurveyModal = ({ isOpen, onClose }) => {
       });
     }
   }, [isOpen]);
+
+  const handlePrev = () => {
+    // 이전 버튼을 누를 때마다 indicatorStep을 -1씩 감소
+    setIndicatorStep(prev => Math.max(1, prev - 1));
+    
+    // 모달 내 스크롤을 최상위로 이동
+    const modalBodyContainer = document.querySelector(`.${styles.modalBodyContainer}`);
+    if (modalBodyContainer) {
+      modalBodyContainer.scrollTop = 0;
+    }
+    
+    if (currentStep === 1) {
+      setCurrentStep(0);
+    } else if (currentStep === 2) {
+      setCurrentStep(1);
+    } else if (currentStep === 3) {
+      setCurrentStep(2);
+    } else if (currentStep === 4) {
+      // 브랜드 협업 체크 여부에 따라 이전 단계 결정
+      if (surveyAnswers.visitPurpose.includes('brand_collaboration')) {
+        setCurrentStep(3);
+      } else {
+        setCurrentStep(2);
+      }
+    } else if (currentStep === 5) {
+      setCurrentStep(4);
+    } else if (currentStep === 6) {
+      setCurrentStep(5);
+    }
+  };
 
   const handleNext = () => {
     // 다음 버튼을 누를 때마다 indicatorStep을 +1씩 증가
@@ -221,7 +252,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                 데스커는 일하는 사람들의 새로운 가능을 응원하는 워크 앤 라이프스타일 브랜드입니다. 
                 <br/>현재 일하는 환경에 대한 여러분의 생각을 남겨주시면, 앞으로의 활동에 참고하겠습니다.
                 <br/>
-                <br/>설문에 참여해주신 모든 분께는 <span style={{ fontWeight: '700' }}>공식몰 00% 할인쿠폰</span>과 <br/><span style={{ fontWeight: '700' }}>워케이션 준비하기 툴킷 패키지(PDF)</span>를 드리며, 
+                <br/>설문에 참여해주신 모든 분께는<br/><span style={{ fontWeight: '700' }}>공식몰 쿠폰북</span>과 <span style={{ fontWeight: '700' }}>워케이션 준비하기 툴킷 패키지(PDF)</span>를 드리며, 
                 <br/>추첨을 통해 <span style={{ fontWeight: '700' }}>데스커 라운지 홍대 0시간 이용권</span>을 드립니다. (매월 추첨 10명)
               </p>
             </div>
@@ -365,6 +396,19 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   <span className={styles.checkboxText}>검색</span>
                 </label>
                 
+                {surveyAnswers.siteDiscovery.includes('search') && (
+                  <input
+                    type="text"
+                    className={styles.otherInput}
+                    placeholder="어떤 검색어로 검색하셨나요?"
+                    value={surveyAnswers.siteDiscoverySearch || ''}
+                    onChange={(e) => setSurveyAnswers(prev => ({
+                      ...prev,
+                      siteDiscoverySearch: e.target.value
+                    }))}
+                  />
+                )}
+                
                 <label className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
@@ -394,20 +438,20 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   />
                   <span className={styles.checkboxText}>기타</span>
                 </label>
+                
+                {surveyAnswers.siteDiscovery.includes('other') && (
+                  <input
+                    type="text"
+                    className={styles.otherInput}
+                    placeholder="사이트를 알게 되신 경로를 자유롭게 작성해 주세요."
+                    value={surveyAnswers.siteDiscoveryOther || ''}
+                    onChange={(e) => setSurveyAnswers(prev => ({
+                      ...prev,
+                      siteDiscoveryOther: e.target.value
+                    }))}
+                  />
+                )}
               </div>
-              
-              {surveyAnswers.siteDiscovery.includes('other') && (
-                <input
-                  type="text"
-                  className={styles.otherInput}
-                  placeholder="기타 내용을 입력해주세요"
-                  value={surveyAnswers.siteDiscoveryOther || ''}
-                  onChange={(e) => setSurveyAnswers(prev => ({
-                    ...prev,
-                    siteDiscoveryOther: e.target.value
-                  }))}
-                />
-              )}
             </div>
 <div className={styles.questionWrap}>
               <h3 className={styles.questionTitle}>사이트 방문 목적이 어떻게 되시나요? (중복 선택 가능)</h3>
@@ -478,7 +522,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   className={styles.otherInput}
-                  placeholder="기타 내용을 입력해주세요"
+                  placeholder="사이트 방문 목적을 자유롭게 작성해 주세요."
                   value={surveyAnswers.visitPurposeOther || ''}
                   onChange={(e) => setSurveyAnswers(prev => ({
                     ...prev,
@@ -598,7 +642,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   className={styles.formInput}
                   value={surveyAnswers.workType || ''}
                   onChange={(e) => handleAnswerChange('workType', e.target.value)}
-                  placeholder="직업이나 업무를 입력해주세요"
+                  placeholder="ex) 가구회사 브랜드 마케터"
                 />
               </div>
               
@@ -665,7 +709,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     className={styles.otherInput}
-                    placeholder="기타 내용을 입력해주세요"
+                    placeholder="가장 중요하게 보는 공간을 자유롭게 작성해 주세요."
                     value={surveyAnswers.importantSpaceOther || ''}
                     onChange={(e) => handleAnswerChange('importantSpaceOther', e.target.value)}
                   />
@@ -678,7 +722,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   className={styles.formTextarea}
                   value={surveyAnswers.discomfortPoints || ''}
                   onChange={(e) => handleAnswerChange('discomfortPoints', e.target.value)}
-                  placeholder="ex. 레이아웃, 가구, 실내 공기질 등"
+                  placeholder="ex) 레이아웃, 가구, 실내 공기질 등"
                   rows={4}
                 />
               </div>
@@ -753,7 +797,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     className={styles.otherInput}
-                    placeholder="기타 내용을 입력해주세요"
+                    placeholder="가장 관심 있는 업무 환경을 자유롭게 작성해 주세요."
                     value={surveyAnswers.workEnvironmentOther || ''}
                     onChange={(e) => handleAnswerChange('workEnvironmentOther', e.target.value)}
                   />
@@ -838,7 +882,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     className={styles.otherInput}
-                    placeholder="기타 내용을 입력해주세요"
+                    placeholder="데스커에 기대하는 활동을 자유롭게 작성해 주세요."
                     value={surveyAnswers.expectedActivitiesOther || ''}
                     onChange={(e) => handleAnswerChange('expectedActivitiesOther', e.target.value)}
                   />
@@ -852,11 +896,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
         return (
           <div className={styles.modalBody}>
             <div className={styles.questionSection}>
-              <div className={styles.questionWrap}>
-                <p className={styles.privacyNotice}>
-                  ∙ 경품 발송을 위한 최소한의 개인정보를 수집하며, 발송 후 즉시 파기됩니다.
-                </p>
-              </div>
               
               <div className={styles.questionWrap}>
                 <h3 className={styles.questionTitle}>성함</h3>
@@ -947,7 +986,23 @@ const SurveyModal = ({ isOpen, onClose }) => {
   const canProceed = () => {
     if (currentStep === 0) return true;
     if (currentStep === 1) return surveyAnswers.hasExperienced !== '';
-    if (currentStep === 2) return surveyAnswers.siteDiscovery.length > 0 && surveyAnswers.visitPurpose.length > 0;
+    if (currentStep === 2) {
+      // 기본 조건: 각 질문에 최소 하나 이상 선택
+      const hasDiscovery = surveyAnswers.siteDiscovery.length > 0;
+      const hasPurpose = surveyAnswers.visitPurpose.length > 0;
+      
+      // '검색' 선택 시 입력란 필수
+      const discoverySearchValid = !surveyAnswers.siteDiscovery.includes('search') || 
+                                   (surveyAnswers.siteDiscoverySearch && surveyAnswers.siteDiscoverySearch.trim() !== '');
+      
+      // '기타' 선택 시 입력란 필수
+      const discoveryOtherValid = !surveyAnswers.siteDiscovery.includes('other') || 
+                                   (surveyAnswers.siteDiscoveryOther && surveyAnswers.siteDiscoveryOther.trim() !== '');
+      const purposeOtherValid = !surveyAnswers.visitPurpose.includes('other') || 
+                                (surveyAnswers.visitPurposeOther && surveyAnswers.visitPurposeOther.trim() !== '');
+      
+      return hasDiscovery && hasPurpose && discoverySearchValid && discoveryOtherValid && purposeOtherValid;
+    }
     if (currentStep === 3) {
       // 브랜드 협업에 체크한 경우에만 브랜드 협업 제안 폼 표시
       if (surveyAnswers.visitPurpose.includes('brand_collaboration')) {
@@ -955,8 +1010,31 @@ const SurveyModal = ({ isOpen, onClose }) => {
       }
       return true; // 브랜드 협업을 체크하지 않은 경우 건너뛰기 메시지 표시이므로 통과
     }
-    if (currentStep === 4) return surveyAnswers.workType !== '' && surveyAnswers.importantSpace !== '' && surveyAnswers.discomfortPoints !== '';
-    if (currentStep === 5) return surveyAnswers.workEnvironment !== '' && surveyAnswers.expectedActivities.length > 0;
+    if (currentStep === 4) {
+      // 기본 필수 필드
+      const hasWorkType = surveyAnswers.workType !== '';
+      const hasImportantSpace = surveyAnswers.importantSpace !== '';
+      const hasDiscomfortPoints = surveyAnswers.discomfortPoints !== '';
+      
+      // '기타' 선택 시 입력란 필수
+      const importantSpaceOtherValid = surveyAnswers.importantSpace !== 'other' || 
+                                       (surveyAnswers.importantSpaceOther && surveyAnswers.importantSpaceOther.trim() !== '');
+      
+      return hasWorkType && hasImportantSpace && hasDiscomfortPoints && importantSpaceOtherValid;
+    }
+    if (currentStep === 5) {
+      // 기본 필수 필드
+      const hasEnvironment = surveyAnswers.workEnvironment !== '';
+      const hasActivities = surveyAnswers.expectedActivities.length > 0;
+      
+      // '기타' 선택 시 입력란 필수
+      const environmentOtherValid = surveyAnswers.workEnvironment !== 'other' || 
+                                   (surveyAnswers.workEnvironmentOther && surveyAnswers.workEnvironmentOther.trim() !== '');
+      const activitiesOtherValid = !surveyAnswers.expectedActivities.includes('other') || 
+                                   (surveyAnswers.expectedActivitiesOther && surveyAnswers.expectedActivitiesOther.trim() !== '');
+      
+      return hasEnvironment && hasActivities && environmentOtherValid && activitiesOtherValid;
+    }
     if (currentStep === 6) {
       const requiredFields = surveyAnswers.fullName !== '' && 
                            surveyAnswers.phoneFirst !== '' && 
@@ -1046,13 +1124,23 @@ const SurveyModal = ({ isOpen, onClose }) => {
         
         {currentStep > 0 && currentStep < 7 && (
           <div className={styles.modalFooter}>
-            <button 
-              className={`${styles.nextButton} ${!canProceed() ? styles.disabled : ''}`}
-              onClick={handleNext}
-              disabled={!canProceed()}
-            >
-              {getButtonText()}
-            </button>
+            <div className={styles.buttonGroup}>
+              {currentStep >= 1 && (
+                <button 
+                  className={styles.prevButton}
+                  onClick={handlePrev}
+                >
+                  ← 이전
+                </button>
+              )}
+              <button 
+                className={`${styles.nextButton} ${!canProceed() ? styles.disabled : ''}`}
+                onClick={handleNext}
+                disabled={!canProceed()}
+              >
+                {getButtonText()}
+              </button>
+            </div>
           </div>
         )}
       </div>

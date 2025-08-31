@@ -191,7 +191,7 @@ const FloatingMenu = () => {
                 className={`${styles.navItem} ${activeTab === 'story' ? styles.active : ''}`}
                 onClick={() => handleTabClick('story')}
               >
-                <span className={styles.navText}>워케이션 이야기</span>
+                <span className={styles.navText}>워케이션에 주목하게 된 이유</span>
                 {activeTab === 'story' && <span className={styles.dottedUnderline}></span>}
               </button>
 
@@ -199,16 +199,8 @@ const FloatingMenu = () => {
                 className={`${styles.navItem} ${activeTab === 'series' ? styles.active : ''}`}
                 onClick={() => handleTabClick('series')}
               >
-                <span className={styles.navText}>DESKER × EO 시리즈</span>
-                {activeTab === 'series' && <span className={styles.dottedUnderline}></span>}
-              </button>
-
-              <button
-                className={`${styles.navItem} ${activeTab === 'activities' ? styles.active : ''}`}
-                onClick={() => handleTabClick('activities')}
-              >
                 <span className={styles.navText}>워케이션 활동</span>
-                {activeTab === 'activities' && <span className={styles.dottedUnderline}></span>}
+                {activeTab === 'series' && <span className={styles.dottedUnderline}></span>}
               </button>
 
               <button

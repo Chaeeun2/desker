@@ -138,6 +138,11 @@
   width: 100%;
 }
 
+/* buttonGroup 내부에서 nextButton 스타일 조정 */
+.buttonGroup .nextButton {
+  flex: 1;
+}
+
 .nextButton:hover {
   opacity: 0.8;
 }
@@ -388,6 +393,37 @@
   text-align: center;
 }
 
+/* 버튼 그룹 */
+.buttonGroup {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 이전 버튼 */
+.prevButton {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-pret);
+  opacity: 1;
+  transition: all 0.2s ease;
+}
+
+.prevButton:hover {
+  background: #e0e0e0;
+}
+
+.prevButton:active {
+  transform: translateY(0);
+}
+
 /* 버튼 비활성화 */
 .nextButton.disabled {
   opacity: 0.5;
@@ -458,7 +494,6 @@
   font-size: 1.8rem;
   font-family: var(--font-pret);
   transition: border-color 0.3s ease;
-  margin-top: 10px;
   margin-left: 30px;
 }
 
@@ -586,8 +621,17 @@
     font-size: 1.6rem;
   }
 
+  .prevButton {
+    padding: 14px 28px;
+    font-size: 1.6rem;
+  }
+
   .modalBodyContainer {
     padding: 0;
+  }
+
+  .buttonGroup {
+    grid-template-columns: 1fr 2fr;
   }
 
   /* Modal Footer - 하단 고정 */

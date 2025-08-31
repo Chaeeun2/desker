@@ -184,17 +184,11 @@ const MobileFloatingMenu = () => {
               className={styles.menuItem}
               onClick={() => handleMenuClick("story")}
             >
-              워케이션 이야기
+              워케이션에<br/>주목하게 된 이유
             </button>
             <button
               className={styles.menuItem}
               onClick={() => handleMenuClick("series")}
-            >
-              DESKER × EO 시리즈
-            </button>
-            <button
-              className={styles.menuItem}
-              onClick={() => handleMenuClick("activities")}
             >
               워케이션 활동
             </button>

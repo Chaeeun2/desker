@@ -61,12 +61,12 @@
 }
 
 /* 워크라이프 소식 받아보기 메뉴 강조 */
-.navItem:nth-child(4) .navText {
+.navItem:nth-child(3) .navText {
   font-weight: 800;
   position: relative;
 }
 
-.navItem:nth-child(4) {
+.navItem:nth-child(3) {
   opacity: 1 !important;
 }
 

@@ -28,7 +28,9 @@ const RightBottomIcon = ({ isSection1Visible }) => {
           
           {/* 호버 시 말풍선 */}
           <div className={`${styles.tooltip} ${isHovered ? styles.visible : ''}`}>
-            <span>워크라이프 소식 받아보기</span>
+            <span>더 나은 WORK-LIFE에 대한 
+<br/>여러분의 이야기를 들려주세요!
+</span>
           </div>
         </div>
       </div>

@@ -110,7 +110,7 @@
 
 .centerText {
   color: white;
-  font-size: 8rem;
+  font-size: 7rem;
   font-weight: 800;
   text-align: center;
   font-family: var(--font-pret);
@@ -155,6 +155,17 @@
 
 .highlight {
   color: var(--color-primary);
+}
+
+@media (max-width: 1200px) {
+  .centerText {
+    font-size: 6rem !important;
+  }
+
+  .centerTextBlack,
+  .centerTextWhite {
+    font-size: 5rem !important;
+  }
 }
 
 /* 반응형 디자인 */
