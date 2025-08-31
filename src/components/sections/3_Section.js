@@ -16,7 +16,6 @@ const Section3 = () => {
   const [text3TranslateY, setText3TranslateY] = useState(0); // 텍스트3 translateY
   const [text4TranslateY, setText4TranslateY] = useState(0); // 텍스트4 translateY
   const [text1Color, setText1Color] = useState('black'); // 텍스트1 색상
-  const [text3Color, setText3Color] = useState('black'); // 텍스트3 색상
   const [text4Color, setText4Color] = useState('black'); // 텍스트4 색상 (black → white)
   const [text5Color, setText5Color] = useState('black'); // 텍스트5 색상
   const [text6Color, setText6Color] = useState('white'); // 텍스트6 색상
@@ -74,10 +73,9 @@ const Section3 = () => {
     setOverlayColor('#336DFF');
     setOverlayOpacity(1);
     
-    // 5. .App의 scrollTop을 뷰포트*2 위치로 자동스크롤
+    // 5. .App의 scrollTop을 triggerPoint 위치로 자동스크롤
     const appElement = document.querySelector('.App');
     if (appElement && triggerPointRef.current !== null) {
-      const viewportHeight = window.innerHeight;
       const targetScrollTop = triggerPointRef.current;
       appElement.scrollTop = targetScrollTop;
     }
@@ -119,7 +117,7 @@ const Section3 = () => {
   const getTexts = (text4Color) => [
     "데스커가<br/>워케이션에 주목하게 된 이유",
     "사무실에 출근하는<br/>반복적인 일상.",
-    `같은 공간, 책상에서<br/><span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>일</span>과 <span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>쉼</span>의 공존은 어렵게만 느껴졌습니다.`,
+    `같은 공간, 책상에서<br/><span style='color:'#336DFF'>일</span>과 <span style='color:'#336DFF'>쉼</span>의 공존은 어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
     "일과 삶의 환기를 위한<br/>데스커 워케이션이 시작되었습니다."
   ];
@@ -128,7 +126,7 @@ const Section3 = () => {
   const getMobileTexts = (text4Color) => [
     "데스커가<br/>워케이션에<br/>주목하게 된 이유",
     "사무실에 출근하는<br/>반복적인 일상.",
-    `같은 공간, 책상에서<br/><span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>일</span>과 <span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
+    `같은 공간, 책상에서<br/><span style='color:'#336DFF'>일</span>과 <span style='color:'#336DFF'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
     "일과 삶의 환기를 위한<br/>데스커 워케이션이<br/>시작되었습니다."
   ];
@@ -216,7 +214,6 @@ const Section3 = () => {
           setText4TranslateY(0);
           setText5TranslateY(0);
           setText1Color('black');
-                setText3Color('black');
           setText4Color('black');
           setText5Color('black');
           setText6Color('white');
@@ -378,6 +375,14 @@ const Section3 = () => {
             setSvg2TranslateX(-20 + (svgAnimation * 40)); // -20vw → 20vw
           }
           
+          // svg1 stroke 색상: 7500px에서 흰색으로 변경 (전역적으로 처리)
+          const svg1ColorChangePoint = getScrollDistance(7500);
+          if (scrollDiff >= svg1ColorChangePoint) {
+            setSvg1StrokeColor('white'); // 흰색으로 변경
+          } else {
+            setSvg1StrokeColor('black'); // 검은색 유지
+          }
+          
           // 텍스트3: opacity 0 → 1 → 0 (사라질 때 translateY 30px 위로)
           // 텍스트4: opacity 0 → 1 → 0
           
@@ -454,10 +459,33 @@ const Section3 = () => {
                       // 최종 애니메이션 (새로운 SVG들)
                       const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1500)); // 7500px → 모바일에서는 3750px, 1500px → 모바일에서는 750px
                       
-                      // overlay 배경색을 primary로 변경
-                      if (finalAnimation > 0) {
-                        setOverlayColor('#336DFF'); // primary 색상
-                        setText4Color('white'); // 텍스트4 색상을 흰색으로 변경
+                      // overlay 배경색을 7500px-8000px 구간에서 점진적으로 변경
+                      const overlayColorStartPoint = getScrollDistance(7500);
+                      const overlayColorEndPoint = getScrollDistance(8000);
+                      
+                      if (scrollDiff >= overlayColorStartPoint) {
+                        if (scrollDiff >= overlayColorEndPoint) {
+                          // 8000px 이상에서는 완전히 파란색
+                          setOverlayColor('#336DFF');
+                          setText4Color('white');
+                        } else {
+                          // 7500px-8000px 구간에서 점진적 변경
+                          const colorProgress = (scrollDiff - overlayColorStartPoint) / (overlayColorEndPoint - overlayColorStartPoint);
+                          // RGB 보간을 통한 색상 전환
+                          const r = Math.round(255 - (255 - 51) * colorProgress); // 255 -> 51
+                          const g = Math.round(255 - (255 - 109) * colorProgress); // 255 -> 109
+                          const b = Math.round(255); // 255 유지
+                          setOverlayColor(`rgb(${r}, ${g}, ${b})`);
+                          
+                          // 텍스트4 색상도 점진적으로 변경
+                          if (colorProgress > 0.5) {
+                            setText4Color('white');
+                          }
+                        }
+                      } else {
+                        // 7500px 이하에서는 흰색
+                        setOverlayColor('white');
+                        setText4Color('black');
                       }
                       
                       // 텍스트5 애니메이션
@@ -477,9 +505,8 @@ const Section3 = () => {
                       
                       // SVG와 라인 애니메이션: 스크롤에 따라 점진적으로 변화
                       if (finalAnimation > 0) {
-                        // svg1: stroke 색상을 흰색으로 변경
+                        // svg1: 위치 유지
                         setSvg1TranslateY(0); // 가운데 유지
-                        setSvg1StrokeColor('white'); // 흰색으로 변경
                         
                         // svg2는 이미 6500px에서 처리됨
                         
@@ -686,7 +713,6 @@ const Section3 = () => {
             transform: `translate(-50%, calc(-50% - ${text4TranslateY}px))`,
             transition: 'opacity 0.1s ease-out, transform 0.1s ease-out, color 0.3s ease-out',
             zIndex: 11, // 텍스트3보다 위에 표시
-            color: text4Color, // 동적 색상 적용
             fontSize: '6rem'
           }}
           dangerouslySetInnerHTML={{ __html: currentTexts[2] }}
