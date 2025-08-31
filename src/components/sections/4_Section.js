@@ -145,7 +145,7 @@ const Section4 = () => {
           }
         }
         setAnimationStep(4);
-      }, getAnimationDelay(2600)); // 모바일에서는 5200ms
+      }, getAnimationDelay(3000)); // 모바일에서는 5200ms
 
       setGifPlayed(true);
     }

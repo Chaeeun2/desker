@@ -112,10 +112,6 @@
   height: auto;
 }
 
-.glide__track {
-  border-radius: 12px;
-}
-
 /* 슬라이더 이미지 아이템 스타일 */
 .sliderImageItem {
   width: 100%;
@@ -319,6 +315,21 @@
   .description p {
     font-size: 1.8rem;
   }
+  .panelTitle img {
+    zoom: 0.8;
+  }
+}
+
+/* 모바일 fade-in 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
@@ -340,7 +351,31 @@
     width: 100%;
     height: auto;
     min-height: 100vh;
+  }
+  
+  /* leftSide는 항상 보이게 */
+  .leftSide {
+    opacity: 1 !important;
+  }
+  
+  /* rightSide는 기본적으로 보이도록 */
+  .rightSide {
     opacity: 1;
+  }
+  
+  /* 각 요소들이 개별적으로 fade-in */
+  .description,
+  .videoThumbnail,
+  .sliderImageItem {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  
+  /* JavaScript에서 추가되는 visible 클래스 */
+  .description.visible,
+  .videoThumbnail.visible,
+  .sliderImageItem.visible {
+    animation: fadeInUp 0.8s ease-out forwards;
   }
 
   .panelContent {
@@ -363,11 +398,11 @@
 
   .rightSide {
     min-height: 60vh;
-    padding: 4rem 3rem;
+    padding: 7rem 2rem;
   }
 
   .panelTitle {
-    font-size: 4rem;
+    font-size: 3.5rem !important;
   }
 
   .panelSubtitle {
@@ -379,52 +414,37 @@
     padding: 3rem;
   }
 
+  .description {
+    opacity: 0;
+  }
+  
   .description p {
     font-size: 1.6rem;
+    text-align: center;
+  }
+  
+  .videoThumbnail {
+    opacity: 0;
+    border-radius: 8px;
+  }
+  
+  .sliderImageItem {
+    opacity: 0;
   }
 
   .contentWrapper {
-    gap: 3rem;
+    gap: 4rem;
   }
 
   .imageGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
-}
 
-@media (max-width: 480px) {
-  .panelTitle {
-    font-size: 3rem;
+  .videoThumbnail {
+    border-radius: 8px;
   }
-
-  .panelSubtitle {
-    font-size: 1.4rem;
+  .panelTitle img {
+    zoom: 0.6;
   }
-
-  .description p {
-    font-size: 1.4rem;
-  }
-
-  .rightSide {
-    padding: 3rem 2rem;
-  }
-}
-
-/* 스크롤바 스타일링 */
-.rightSide::-webkit-scrollbar {
-  width: 6px;
-}
-
-.rightSide::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.rightSide::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-.rightSide::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
 }

@@ -208,7 +208,7 @@
   }
 
   .mapImage {
-    padding: 0 30px;
+    padding: 0 20px;
   }
 
   .mapDescription p {
@@ -225,5 +225,9 @@
   #firstRowClone,
   #secondRowClone {
     padding-left: 1rem;
+  }
+
+  .mapSection {
+    margin-bottom: 6rem;
   }
 }

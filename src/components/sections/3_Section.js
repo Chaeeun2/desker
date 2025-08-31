@@ -1,10 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import styles from './3_Section.module.css';
 
 const Section3 = () => {
   const sectionRef = useRef(null);
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [currentTextIndex] = useState(0);
   const currentTextIndexRef = useRef(0);
 
   
@@ -54,7 +53,7 @@ const Section3 = () => {
     setSvg1TranslateY(0);
     setSvg1StrokeColor('white');
     setSvg2TranslateX(20);
-    setSvg2TranslateY(200);
+    setSvg2TranslateY(300);
     setSvg2Width(0);
     setSvg2StrokeColor('black');
     setLineTranslateY(500);
@@ -109,7 +108,10 @@ const Section3 = () => {
   const [linePadding, setLinePadding] = useState(30); // line padding (50px → 0px)
   const [lineWidth, setLineWidth] = useState(0); // 초기 width 0
   const [lineOpacity, setLineOpacity] = useState(0); // 라인 opacity (0에서 1로 증가)
-  const [lineBottom, setLineBottom] = useState(110); // 라인 bottom 위치 (110px → -10px)
+  const [lineBottom, setLineBottom] = useState(() => {
+    // 초기값을 함수로 설정하여 정확한 값을 가져옴
+    return window.innerWidth <= 768 ? 5 : 12;
+  }); // 라인 bottom 위치 (데스크톱: 110px → -10px, 모바일: 50px → -10px)
   const [text5Opacity, setText5Opacity] = useState(0); // 텍스트5 opacity
   const [text5TranslateY, setText5TranslateY] = useState(0); // 텍스트5 translateY
   const [text6Opacity, setText6Opacity] = useState(0); // 텍스트6 opacity
@@ -140,7 +142,15 @@ const Section3 = () => {
   // 모바일 감지 (768px 이하)
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      // 모바일 여부에 따라 lineBottom 초기값 조정 (애니메이션이 시작되지 않았을 때만)
+      // 현재 lineBottom이 초기값 범위에 있을 때만 변경
+      setLineBottom(prev => {
+        // 애니메이션이 진행 중이면 변경하지 않음
+        if (prev < -30 || prev > 10) return prev;
+        return mobile ? 5 : 12;
+      });
     };
     
     checkMobile();
@@ -235,7 +245,7 @@ const Section3 = () => {
           setLinePadding(30);
           setLineWidth(0);
           setLineOpacity(0);
-          setLineBottom(110);
+          setLineBottom(isMobile ? 5 : 12);
           setNewSvgScale(0);
           setNewSvg2Scale(0);
           setNewSvg3Scale(0);
@@ -280,7 +290,7 @@ const Section3 = () => {
           setLineTranslateY(0);
           setLineWidth(0);
           setLineOpacity(0);
-          setLineBottom(110);
+          setLineBottom(isMobile ? 5 : 12);
           setLineStrokeColor('black');
           setLinePadding(30);
           setNewSvgScale(0);
@@ -421,7 +431,8 @@ const Section3 = () => {
                 if (scrollDiff >= lineBottomStartPoint) {
                   const lineBottomScrollDiff = scrollDiff - lineBottomStartPoint;
                   const lineBottomAnimation = Math.min(1, lineBottomScrollDiff / getScrollDistance(500)); // 1000px에 걸쳐 애니메이션
-                  setLineBottom(110 - (lineBottomAnimation * 150)); // 110px → -10px
+                  const initialBottom = isMobile ? 5 : 12;
+                  setLineBottom(initialBottom - (lineBottomAnimation * 15)); // 데스크톱: 110px → -40px, 모바일: 50px → -100px
                 }
                 
                 // 텍스트4가 완전히 나타나면 새로운 애니메이션 시작
@@ -451,7 +462,7 @@ const Section3 = () => {
                       setSvg1Left(currentSvg1Left);
                       
                       // svg2 아래로 이동
-                      setSvg2TranslateY(animationProgress * 200); // 0 → 200px
+                      setSvg2TranslateY(animationProgress * 300); // 0 → 200px
                       const fastSvg2WidthAnimation = Math.min(1, animationProgress * 2);
                       setSvg2Width(199 - (fastSvg2WidthAnimation * 199)); // 199 → 0px
                       // stroke color는 검은색으로 고정
@@ -577,7 +588,7 @@ const Section3 = () => {
                 setLinePadding(30);
                 setLineWidth(0); // width도 0으로 리셋
                 setLineOpacity(0); // 라인 opacity도 0으로 리셋
-                setLineBottom(110); // 라인 bottom도 110px로 리셋
+                setLineBottom(isMobile ? 5 : 12); // 라인 bottom도 리셋 (모바일: 50px, 데스크톱: 110px)
                 setText4TranslateY(0); // 텍스트4 translateY도 0으로 리셋
                 setText4Color('black'); // 텍스트4 색상도 black으로 리셋
                 setText5Opacity(0); // 텍스트5 opacity도 0으로 리셋
@@ -766,7 +777,7 @@ const Section3 = () => {
             transform: `translateX(-50%)`,
             transition: 'bottom 0.05s linear, left 0.3s ease-out',
             position: 'absolute',
-            bottom: `${svg1Bottom}vh`,
+            bottom: `${svg1Bottom}dvh`,
             left: `${svg1Left}%`,
             zIndex: 11
           }}
@@ -785,7 +796,7 @@ const Section3 = () => {
           style={{
             position: 'absolute',
             left: 'calc(50% - 190px)', // svg1보다 약간 왼쪽
-            bottom: '10vh',
+            bottom: '10dvh',
             transform: `scale(${newSvgScale})`,
             transition: 'transform 0.3s ease-out',
             zIndex: 11
@@ -807,7 +818,7 @@ const Section3 = () => {
           style={{
             position: 'absolute',
             left: 'calc(50%)', // svg1 가운데 정렬
-            bottom: '22vh', // svg1보다 위쪽
+            bottom: isMobile ? '18dvh' : '22dvh', // svg1보다 위쪽
             transform: `translateX(-50%) scale(${newSvg2Scale})`,
             transition: 'transform 0.3s ease-out',
             zIndex: 11
@@ -829,7 +840,7 @@ const Section3 = () => {
           style={{
             position: 'absolute',
             left: 'calc(50% + 75px)', // svg1보다 약간 오른쪽
-            bottom: '10vh',
+            bottom: '10dvh',
             transform: `scale(${newSvgScale})`,
             transition: 'transform 0.3s ease-out',
             zIndex: 11
@@ -852,7 +863,7 @@ const Section3 = () => {
             transition: 'transform 0.3s ease-out, width 0.3s ease-out, padding 0.3s ease-out, bottom 0.3s ease-out',
             padding: `0 ${linePadding}px`,
             position: 'absolute',
-            bottom: `${lineBottom}px`,
+            bottom: `${lineBottom}dvh`,
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 11
@@ -870,7 +881,7 @@ const Section3 = () => {
                 height: '100%'
               }}
             >
-              <line x1="0" y1="1.5" x2="100%" y2="1.5" stroke={lineStrokeColor} strokeWidth="3" strokeDasharray="3,3"/>
+              <line x1="0" y1="1.5" x2="100%" y2="1.5" stroke={lineStrokeColor} strokeWidth={isMobile ? "2" : "3"} strokeDasharray="3,3"/>
             </svg>
           </div>
         
@@ -884,7 +895,7 @@ const Section3 = () => {
             transform: `translate(50%, ${svg2TranslateY}px)`,
             transition: 'right 0.3s ease-out, transform 0.3s ease-out, width 0.3s ease-out',
             position: 'absolute',
-            bottom: '5vh',
+            bottom: '5dvh',
             right: `${svg2TranslateX}%`,
             zIndex: 11
           }}
@@ -901,7 +912,7 @@ const Section3 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: isMobile ? '2000vh' : '1400vh', // 모바일에서는 절반으로 줄임 (700vh vs 1400vh)
+            height: isMobile ? '2000dvh' : '1400dvh', // 모바일에서는 절반으로 줄임 (700vh vs 1400vh)
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'

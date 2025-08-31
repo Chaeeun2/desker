@@ -536,7 +536,8 @@ const Section7 = () => {
       glideInstance2.current = null;
     }
     
-    if (currentPanel === 3 && !isMobile) {
+    // 모바일에서는 항상 패널 4가 보이고, 데스크톱에서는 currentPanel이 3일 때만
+    if ((isMobile && currentTexts[3]) || (!isMobile && currentPanel === 3)) {
       // 약간의 지연 후 초기화
       setTimeout(() => {
         // 첫 번째 슬라이더 초기화
@@ -547,7 +548,7 @@ const Section7 = () => {
             gap: 0,
             focusAt: 'center',
             autoplay: false,
-            animationDuration: 600,
+            animationDuration: 1000, // 슬라이드 속도 (ms) - 더 빠르게
             breakpoints: {
               9999: {
                 perView: 1
@@ -565,7 +566,7 @@ const Section7 = () => {
             gap: 0,
             focusAt: 'center',
             autoplay: false,
-            animationDuration: 600,
+            animationDuration:1000, // 슬라이드 속도 (ms) - 더 빠르게
             breakpoints: {
               9999: {
                 perView: 1
@@ -589,6 +590,54 @@ const Section7 = () => {
       }
     };
   }, [currentPanel, isMobile]);
+
+  // 모바일에서 Intersection Observer 설정
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // 요소에 직접 visible 클래스 추가
+            entry.target.classList.add(styles.visible);
+          }
+        });
+      },
+      {
+        threshold: 0.1, // 10% 보이면 애니메이션 시작
+        rootMargin: '0px 0px -10% 0px'
+      }
+    );
+
+    // 모든 description, videoThumbnail, sliderImageItem 요소를 관찰
+    setTimeout(() => {
+      // CSS 모듈 클래스명을 이스케이프 처리
+      const descriptionClass = styles.description.replace(/[^\w-]/g, '\\$&');
+      const videoThumbnailClass = styles.videoThumbnail.replace(/[^\w-]/g, '\\$&');
+      const sliderImageItemClass = styles.sliderImageItem.replace(/[^\w-]/g, '\\$&');
+      
+      const elementsToObserve = document.querySelectorAll(
+        `.${descriptionClass}, .${videoThumbnailClass}, .${sliderImageItemClass}`
+      );
+      
+      elementsToObserve.forEach((element) => {
+        observer.observe(element);
+      });
+    }, 100); // DOM이 렌더링된 후 실행
+
+    return () => {
+      // cleanup에서도 동일하게 처리
+      const descriptionClass = styles.description.replace(/[^\w-]/g, '\\$&');
+      const videoThumbnailClass = styles.videoThumbnail.replace(/[^\w-]/g, '\\$&');
+      const sliderImageItemClass = styles.sliderImageItem.replace(/[^\w-]/g, '\\$&');
+      
+      const elementsToObserve = document.querySelectorAll(
+        `.${descriptionClass}, .${videoThumbnailClass}, .${sliderImageItemClass}`
+      );
+      elementsToObserve.forEach(element => observer.unobserve(element));
+    };
+  }, [isMobile]);
 
   return (
     <>
@@ -626,6 +675,7 @@ const Section7 = () => {
                     }}
                   >
                     <iframe
+                      title="I AM. SURFER 비디오"
                       src={`https://www.youtube.com/embed/-ae3O7u2IZM?start=47&autoplay=${playingVideos['video1'] ? 1 : 0}&mute=0&controls=1&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
@@ -672,6 +722,7 @@ const Section7 = () => {
                     }}
                   >
                     <iframe
+                      title="환기의 정원 비디오"
                       src={`https://www.youtube.com/embed/aFlpwKq6WfI?si=z5vVdim0lvJAFmq0&autoplay=${playingVideos['video2'] ? 1 : 0}&mute=0&controls=1&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
@@ -716,6 +767,7 @@ const Section7 = () => {
                     }}
                   >
                     <iframe
+                      title="WORKATION START-UP DAY 비디오"
                       src={`https://www.youtube.com/embed/Mhv7ZC1k8eY?si=jI9n1aTHDDDIakQs&autoplay=${playingVideos['video3'] ? 1 : 0}&mute=0&controls=1&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
@@ -754,7 +806,7 @@ const Section7 = () => {
                   
                   {/* 첫 번째 이미지 슬라이더 (이미지 1,2,3,4) */}
                   <div className="glide" ref={glideRef1}>
-                    <div className="glide__track" data-glide-el="track" style={{ borderRadius: '12px' }}>
+                    <div className="glide__track" data-glide-el="track" style={{ borderRadius: isMobile ? '8px' : '12px' }}>
                       <ul className="glide__slides">
                         {currentTexts[3].images1.map((img, index) => (
                           <li key={index} className="glide__slide">
@@ -766,8 +818,8 @@ const Section7 = () => {
                       </ul>
                     </div>
                     <div className="glide__arrows" data-glide-el="controls">
-                      <button className="glide__arrow glide__arrow--left" data-glide-dir="<"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14.2893 5.70708C13.8988 5.31655 13.2657 5.31655 12.8751 5.70708L7.98768 10.5993C7.20729 11.3805 7.2076 12.6463 7.98837 13.427L12.8787 18.3174C13.2693 18.7079 13.9024 18.7079 14.293 18.3174C14.6835 17.9269 14.6835 17.2937 14.293 16.9032L10.1073 12.7175C9.71678 12.327 9.71678 11.6939 10.1073 11.3033L14.2893 7.12129C14.6799 6.73077 14.6799 6.0976 14.2893 5.70708Z" fill="#ffffff"></path> </g></svg></button>
-                      <button className="glide__arrow glide__arrow--right" data-glide-dir=">"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.71069 18.2929C10.1012 18.6834 10.7344 18.6834 11.1249 18.2929L16.0123 13.4006C16.7927 12.6195 16.7924 11.3537 16.0117 10.5729L11.1213 5.68254C10.7308 5.29202 10.0976 5.29202 9.70708 5.68254C9.31655 6.07307 9.31655 6.70623 9.70708 7.09676L13.8927 11.2824C14.2833 11.6729 14.2833 12.3061 13.8927 12.6966L9.71069 16.8787C9.32016 17.2692 9.32016 17.9023 9.71069 18.2929Z" fill="#ffffff"></path> </g></svg></button>
+                      <button className="glide__arrow glide__arrow--left" data-glide-dir="<"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14.2893 5.70708C13.8988 5.31655 13.2657 5.31655 12.8751 5.70708L7.98768 10.5993C7.20729 11.3805 7.2076 12.6463 7.98837 13.427L12.8787 18.3174C13.2693 18.7079 13.9024 18.7079 14.293 18.3174C14.6835 17.9269 14.6835 17.2937 14.293 16.9032L10.1073 12.7175C9.71678 12.327 9.71678 11.6939 10.1073 11.3033L14.2893 7.12129C14.6799 6.73077 14.6799 6.0976 14.2893 5.70708Z" fill="#ffffff"></path> </g></svg></button>
+                      <button className="glide__arrow glide__arrow--right" data-glide-dir=">"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.71069 18.2929C10.1012 18.6834 10.7344 18.6834 11.1249 18.2929L16.0123 13.4006C16.7927 12.6195 16.7924 11.3537 16.0117 10.5729L11.1213 5.68254C10.7308 5.29202 10.0976 5.29202 9.70708 5.68254C9.31655 6.07307 9.31655 6.70623 9.70708 7.09676L13.8927 11.2824C14.2833 11.6729 14.2833 12.3061 13.8927 12.6966L9.71069 16.8787C9.32016 17.2692 9.32016 17.9023 9.71069 18.2929Z" fill="#ffffff"></path> </g></svg></button>
                     </div>
                   </div>
 
@@ -778,7 +830,7 @@ const Section7 = () => {
                   
                   {/* 두 번째 이미지 슬라이더 (이미지 5,6,7,8) */}
                   <div className="glide" ref={glideRef2}>
-                    <div className="glide__track" data-glide-el="track" style={{ borderRadius: '12px' }}>
+                    <div className="glide__track" data-glide-el="track" style={{ borderRadius: isMobile ? '8px' : '12px' }}>
                       <ul className="glide__slides">
                         {currentTexts[3].images2.map((img, index) => (
                           <li key={index} className="glide__slide">
@@ -790,8 +842,8 @@ const Section7 = () => {
                       </ul>
                     </div>
                     <div className="glide__arrows" data-glide-el="controls">
-                      <button className="glide__arrow glide__arrow--left" data-glide-dir="<"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14.2893 5.70708C13.8988 5.31655 13.2657 5.31655 12.8751 5.70708L7.98768 10.5993C7.20729 11.3805 7.2076 12.6463 7.98837 13.427L12.8787 18.3174C13.2693 18.7079 13.9024 18.7079 14.293 18.3174C14.6835 17.9269 14.6835 17.2937 14.293 16.9032L10.1073 12.7175C9.71678 12.327 9.71678 11.6939 10.1073 11.3033L14.2893 7.12129C14.6799 6.73077 14.6799 6.0976 14.2893 5.70708Z" fill="#ffffff"></path> </g></svg></button>
-                      <button className="glide__arrow glide__arrow--right" data-glide-dir=">"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.71069 18.2929C10.1012 18.6834 10.7344 18.6834 11.1249 18.2929L16.0123 13.4006C16.7927 12.6195 16.7924 11.3537 16.0117 10.5729L11.1213 5.68254C10.7308 5.29202 10.0976 5.29202 9.70708 5.68254C9.31655 6.07307 9.31655 6.70623 9.70708 7.09676L13.8927 11.2824C14.2833 11.6729 14.2833 12.3061 13.8927 12.6966L9.71069 16.8787C9.32016 17.2692 9.32016 17.9023 9.71069 18.2929Z" fill="#ffffff"></path> </g></svg></button>
+                      <button className="glide__arrow glide__arrow--left" data-glide-dir="<"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14.2893 5.70708C13.8988 5.31655 13.2657 5.31655 12.8751 5.70708L7.98768 10.5993C7.20729 11.3805 7.2076 12.6463 7.98837 13.427L12.8787 18.3174C13.2693 18.7079 13.9024 18.7079 14.293 18.3174C14.6835 17.9269 14.6835 17.2937 14.293 16.9032L10.1073 12.7175C9.71678 12.327 9.71678 11.6939 10.1073 11.3033L14.2893 7.12129C14.6799 6.73077 14.6799 6.0976 14.2893 5.70708Z" fill="#ffffff"></path> </g></svg></button>
+                      <button className="glide__arrow glide__arrow--right" data-glide-dir=">"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.71069 18.2929C10.1012 18.6834 10.7344 18.6834 11.1249 18.2929L16.0123 13.4006C16.7927 12.6195 16.7924 11.3537 16.0117 10.5729L11.1213 5.68254C10.7308 5.29202 10.0976 5.29202 9.70708 5.68254C9.31655 6.07307 9.31655 6.70623 9.70708 7.09676L13.8927 11.2824C14.2833 11.6729 14.2833 12.3061 13.8927 12.6966L9.71069 16.8787C9.32016 17.2692 9.32016 17.9023 9.71069 18.2929Z" fill="#ffffff"></path> </g></svg></button>
                     </div>
                   </div>
                 </div>
