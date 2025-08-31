@@ -1,24 +1,29 @@
 /* Section 7 Styles */
 .section7 {
   width: 100vw;
-  height: auto; /* 4개 패널을 위한 높이 */
+  height: 100vh;
   position: relative;
   background: #ffffff;
-  z-index: 0;
+  z-index: 10;
+  overflow: hidden;
 }
 
-.content {
-  width: 100%;
+/* 패널 컨테이너 - 횡스크롤을 위한 래퍼 */
+.panelsContainer {
+  display: flex;
+  width: 400%; /* 4개 패널 = 400% */
   height: 100%;
+  transition: transform 1s ease;
+  will-change: transform;
 }
 
 /* 각 패널 */
 .panel {
-  width: 100%;
-  height: 100dvh;
+  width: 100vw; /* 각 패널은 화면 너비 */
+  height: 100vh;
   display: flex;
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
+  opacity: 1;
 }
 
 .panelContent {
@@ -37,10 +42,7 @@
 
 .highlight {
   font-weight: 800;
-}
-
-.panel4des {
-  margin-top: 100px;
+  color: var(--color-primary);
 }
 
 .backgroundImage {
@@ -53,6 +55,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.backgroundImage::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
 }
 
 .textOverlay {
@@ -80,273 +93,324 @@
   margin-top: 4rem;
 }
 
-.panel:nth-child(odd) .rightSide {
-  background: #faf6eb;
-}
-
-/* 오른쪽: 설명 텍스트와 비디오 썸네일 */
+/* 오른쪽: 설명 텍스트와 비디오/이미지 */
 .rightSide {
   height: 100%;
-  width: 50vw;
+  width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 12rem 7rem;
   box-sizing: border-box;
   background: #ffffff;
+  overflow-y: auto;
+}
+
+/* 패널 4의 오른쪽 영역 특별 스타일 */
+.rightSidePanel4 {
+  display: block;
+  height: auto;
+}
+
+.glide__track {
+  border-radius: 12px;
+}
+
+/* 슬라이더 이미지 아이템 스타일 */
+.sliderImageItem {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.sliderImageItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* Glide 슬라이더 커스텀 스타일 */
+.rightSidePanel4 :global(.glide__arrow) {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.3s ease;
+  padding: 10px;
+}
+
+.rightSidePanel4 :global(.glide__arrow:hover) {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.rightSidePanel4 :global(.glide__arrow--left) {
+  left: 10px;
+}
+
+.rightSidePanel4 :global(.glide__arrow--right) {
+  right: 10px;
+}
+
+.rightSidePanel4 :global(.glide) {
+  position: relative;
+  width: 100%;
+}
+
+.rightSidePanel4 :global(.glide__slides) {
+  margin: 0;
+  padding: 0;
 }
 
 .contentWrapper {
   width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+
+.scrollableContent {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
 }
 
 .description {
-  margin-bottom: 6rem;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.description.fadeIn {
   opacity: 1;
   transform: translateY(0);
-}
-
-.videoThumbnail {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.videoThumbnail.fadeIn {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.imageGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin: 2rem 0;
 }
 
 .description p {
   font-size: 2rem;
-  color: rgba(0, 0, 0, 0.7);
   line-height: 1.8;
-  letter-spacing: var(--spacing-91);
-  font-weight: 500;
-  margin: 0;
-  text-align: left;
-  word-break: keep-all;
   font-family: var(--font-pret);
+  font-weight: 500;
+  word-break: keep-all;
 }
 
 .videoThumbnail {
   width: 100%;
-  aspect-ratio: 16/9;
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 비율 */
+  background: #f0f0f0;
   border-radius: 12px;
   overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.videoThumbnail iframe {
+.video {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   border: none;
+  pointer-events: none; /* 휠 이벤트가 통과하도록 설정 */
 }
 
-/* 이미지 그리드 스타일 */
-.imageGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-/* 모바일용 이미지 나열 스타일 */
-.imageSlider {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-.sliderTrack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.sliderItem {
-  aspect-ratio: 16 / 10;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.sliderItem.fadeIn {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.sliderItem img {
+/* 투명한 오버레이 추가 - 휠 이벤트 캡처용 */
+.videoThumbnail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  z-index: 2;
+  background: transparent;
+  pointer-events: none; /* 클릭은 통과하도록 */
 }
 
-/* 기존 이미지 아이템 스타일 (데스크톱용) */
-.imageItem {
-  aspect-ratio: 16 / 10;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+/* 재생 버튼 */
+.playButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: white;
+  cursor: pointer;
+  z-index: 3;
+  transition: background 0.3s ease;
 }
 
-.imageItem.fadeIn {
+.playButton:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* 비디오 썸네일 클릭 가능하도록 */
+.videoThumbnail {
+  cursor: pointer;
+}
+
+/* 이미지 그리드 - 패널 4 */
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  width: 100%;
   opacity: 1;
   transform: translateY(0);
+}
+
+.imageItem {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f0f0f0;
 }
 
 .imageItem img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-/* 패널 4번 특별 스타일 */
-.panel:nth-child(4) {
-  height: auto; /* 패널 4번만 더 큰 높이 설정 */
+.imageItem:hover img {
+  transform: scale(1.05);
 }
 
-.panel:nth-child(4) .leftSide {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  z-index: 10;
-}
-
-.panel:nth-child(4) .rightSide {
-  overflow-y: hidden; /* 기본적으로는 스크롤 비활성화 */
-}
-
-.panel:nth-child(4) .scrollableContent {
-  box-sizing: border-box;
-}
-
-/* 패널 4번이 sticky 상태일 때 오른쪽 스크롤 활성화 */
-.panel:nth-child(4) .rightSide.stickyActive {
-  overflow-y: auto;
-  height: 100dvh;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 1200px) {
+/* 모바일 반응형 */
+@media (max-width: 1080px) {
   .panelTitle {
-    font-size: 6rem !important;
+    font-size: 6rem;
   }
 
   .panelSubtitle {
-    font-size: 2rem;
+    font-size: 1.8rem;
+  }
+
+  .rightSide {
+    padding: 8rem 5rem;
   }
 
   .description p {
     font-size: 1.8rem;
   }
-
-  .rightSide {
-    padding: 10rem 4rem;
-  }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
+  /* 모바일에서는 횡스크롤 비활성화, 상하 스크롤로 변경 */
+  .section7 {
+    height: auto;
+    position: relative !important;
+    top: auto !important;
+  }
+
+  .panelsContainer {
+    width: 100%;
+    flex-direction: column;
+    transform: none !important;
+    transition: none;
+  }
+
   .panel {
     width: 100%;
     height: auto;
-    display: flex;
-    position: static;
-    top: 0;
+    min-height: 100vh;
+    opacity: 1;
   }
 
   .panelContent {
-    display: flex;
     flex-direction: column;
   }
 
   .leftSide,
   .rightSide {
     width: 100%;
+    height: auto;
   }
 
   .leftSide {
-    height: 40vh;
+    min-height: 40vh;
   }
 
   .rightSide {
-    padding: 6rem 2rem 7rem 2rem;
+    min-height: 60vh;
+    padding: 4rem 3rem;
   }
 
   .panelTitle {
-    font-size: 4rem !important;
-  }
-
-  .panelTitle img {
-    width: 250px !important;
+    font-size: 4rem;
   }
 
   .panelSubtitle {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     margin-top: 2rem;
+  }
+
+  .textOverlay {
+    padding: 3rem;
   }
 
   .description p {
     font-size: 1.6rem;
-    text-align: center;
-    line-height: 1.7;
   }
 
-  .description {
-    margin-bottom: 4rem;
-  }
-
-  .videoThumbnail,
-  .imageItem,
-  .sliderItem {
-    border-radius: 8px;
-  }
-
-  /* 패널 4번 특별 스타일 */
-  .panel:nth-child(4) {
-    height: auto;
-  }
-
-  .panel:nth-child(4) .leftSide {
-    position: static;
-    height: 40vh;
-  }
-
-  .panel:nth-child(4) .panelTitle {
-    font-size: 3.8rem !important;
-  }
-
-  /* 패널 4번이 sticky 상태일 때 오른쪽 스크롤 활성화 */
-  .panel:nth-child(4) .rightSide.stickyActive {
-    overflow-y: auto;
-    height: auto;
-  }
-
-  .panel4des {
-    margin-top: 60px;
+  .contentWrapper {
+    gap: 3rem;
   }
 
   .imageGrid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    width: 100%;
   }
+}
+
+@media (max-width: 480px) {
+  .panelTitle {
+    font-size: 3rem;
+  }
+
+  .panelSubtitle {
+    font-size: 1.4rem;
+  }
+
+  .description p {
+    font-size: 1.4rem;
+  }
+
+  .rightSide {
+    padding: 3rem 2rem;
+  }
+}
+
+/* 스크롤바 스타일링 */
+.rightSide::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rightSide::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rightSide::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.rightSide::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }

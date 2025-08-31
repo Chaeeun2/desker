@@ -125,7 +125,7 @@ const Section6 = () => {
                 {/* 비디오 로드 로직 제거 */}
                 <div className={styles.videoContainer}>
                   <iframe
-                    src="https://www.youtube.com/embed/-fdnYORFIzo?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-fdnYORFIzo"
+                    src="https://www.youtube.com/embed/-fdnYORFIzo?controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-fdnYORFIzo"
                     title="DESKER WORKATION - WORK ON THE BEACH"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

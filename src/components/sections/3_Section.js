@@ -24,6 +24,7 @@ const Section3 = () => {
   const [isAnimationComplete, setIsAnimationComplete] = useState(false); // 애니메이션 완료 상태
   const isAnimationCompleteRef = useRef(false); // 즉시 반영을 위한 ref
   const triggerPointRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false); // 모바일 감지
   
   // 애니메이션 완료 상태를 한번 true로 설정하면 다시 false로 되돌리지 않음
   const setAnimationComplete = (value) => {
@@ -73,15 +74,17 @@ const Section3 = () => {
     setOverlayColor('#336DFF');
     setOverlayOpacity(1);
     
-    // 5. .App의 scrollTop을 triggerPoint 위치로 자동스크롤
-    const appElement = document.querySelector('.App');
-    if (appElement && triggerPointRef.current !== null) {
-      const targetScrollTop = triggerPointRef.current;
-      appElement.scrollTop = targetScrollTop;
+    // 5. .App의 scrollTop을 triggerPoint 위치로 자동스크롤 (PC에서만)
+    if (!isMobile) {
+      const appElement = document.querySelector('.App');
+      if (appElement && triggerPointRef.current !== null) {
+        const targetScrollTop = triggerPointRef.current;
+        appElement.scrollTop = targetScrollTop;
+      }
     }
     
-    // 6. sticky 해제 (자유스크롤)
-    if (sectionRef.current) {
+    // 6. sticky 해제 (자유스크롤) - PC에서만
+    if (sectionRef.current && !isMobile) {
       sectionRef.current.style.position = 'relative';
       sectionRef.current.style.top = 'auto';
       sectionRef.current.style.zIndex = 'auto';
@@ -117,7 +120,7 @@ const Section3 = () => {
   const getTexts = (text4Color) => [
     "데스커가<br/>워케이션에 주목하게 된 이유",
     "사무실에 출근하는<br/>반복적인 일상.",
-    `같은 공간, 책상에서<br/><span style='color:'#336DFF'>일</span>과 <span style='color:'#336DFF'>쉼</span>의 공존은 어렵게만 느껴졌습니다.`,
+    `같은 공간, 책상에서<br/><span style='color:#336DFF'>일</span>과 <span style='color:#336DFF'>쉼</span>의 공존은 어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
     "일과 삶의 환기를 위한<br/>데스커 워케이션이 시작되었습니다."
   ];
@@ -126,13 +129,13 @@ const Section3 = () => {
   const getMobileTexts = (text4Color) => [
     "데스커가<br/>워케이션에<br/>주목하게 된 이유",
     "사무실에 출근하는<br/>반복적인 일상.",
-    `같은 공간, 책상에서<br/><span style='color:'#336DFF'>일</span>과 <span style='color:'#336DFF'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
+    `같은 공간, 책상에서<br/><span style='color:#336DFF'>일</span>과 <span style='color:#336DFF'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
     "일과 삶의 환기를 위한<br/>데스커 워케이션이<br/>시작되었습니다."
   ];
 
   // 화면 크기에 따라 텍스트 선택
-  const [isMobile, setIsMobile] = useState(false);
+  // isMobile은 이미 위에서 선언됨
 
   // 모바일 감지 (768px 이하)
   useEffect(() => {
@@ -606,8 +609,8 @@ const Section3 = () => {
         // 애니메이션 완료 여부에 따라 sticky 설정/해제
         if (sectionRef.current) {
           if (isAnimationCompleteRef.current) {
-            // 애니메이션 완료 시 sticky 해제
-            sectionRef.current.style.position = 'relative';
+            // 애니메이션 완료 시 sticky 해제 (PC에서만)
+            sectionRef.current.style.position = isMobile ? 'relative' : 'relative';
             sectionRef.current.style.top = 'auto';
             sectionRef.current.style.zIndex = 'auto';
             sectionRef.current.style.transform = 'none';
@@ -615,8 +618,8 @@ const Section3 = () => {
             sectionRef.current.classList.add(styles.scrollable);
 
           } else {
-            // 애니메이션 진행 중일 때는 sticky 유지
-            sectionRef.current.style.position = 'sticky';
+            // 애니메이션 진행 중일 때는 sticky 유지 (PC에서만)
+            sectionRef.current.style.position = isMobile ? 'relative' : 'sticky';
             sectionRef.current.style.top = '0';
             sectionRef.current.style.zIndex = '10';
             sectionRef.current.style.transform = 'none';
