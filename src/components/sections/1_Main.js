@@ -35,17 +35,7 @@ const Main = ({ onVisibilityChange }) => {
       Object.keys(videoPlayStates).forEach(key => {
         const state = videoPlayStates[key];
         const shouldFallback = state.hasError || (state.hasStarted && !state.isPlaying);
-        
-        // 콘솔에 비디오 재생 상태 출력
-        console.log(`Section 1 - ${key} video state:`, {
-          isPlaying: state.isPlaying,
-          hasError: state.hasError,
-          hasStarted: state.hasStarted,
-          shouldFallback,
-          currentTime: document.querySelector(`[data-section="${key}"]`)?.currentTime || 'N/A',
-          readyState: document.querySelector(`[data-section="${key}"]`)?.readyState || 'N/A',
-          paused: document.querySelector(`[data-section="${key}"]`)?.paused || 'N/A'
-        });
+      
         
         if (shouldFallback && !newFallbacks[key]) {
           newFallbacks[key] = true;
@@ -76,12 +66,9 @@ const Main = ({ onVisibilityChange }) => {
   const attemptAutoplay = (section) => {
     const videoElement = document.querySelector(`[data-section="${section}"]`);
     if (videoElement) {
-      console.log(`Attempting to autoplay ${section} video`);
       videoElement.play().then(() => {
-        console.log(`${section} video autoplay successful`);
         updateVideoPlayState(section, { isPlaying: true });
       }).catch((error) => {
-        console.log(`${section} video autoplay failed:`, error);
         updateVideoPlayState(section, { hasError: true });
       });
     }
@@ -106,7 +93,6 @@ const Main = ({ onVisibilityChange }) => {
   // 사용자 상호작용 후 자동재생 시도
   useEffect(() => {
     const handleUserInteraction = () => {
-      console.log('User interaction detected, attempting autoplay');
       setTimeout(() => {
         attemptAutoplay('left');
         attemptAutoplay('center');
@@ -180,19 +166,15 @@ const Main = ({ onVisibilityChange }) => {
                 playsInline
                 preload="auto"
                 onError={() => {
-                  console.log(`Section 1 - left video error`);
                   updateVideoPlayState('left', { hasError: true });
                 }}
                 onCanPlay={() => {
-                  console.log(`Section 1 - left video can play`);
                   updateVideoPlayState('left', { hasStarted: true });
                 }}
                 onPlay={() => {
-                  console.log(`Section 1 - left video started playing`);
                   updateVideoPlayState('left', { isPlaying: true });
                 }}
                 onPause={() => {
-                  console.log(`Section 1 - left video paused`);
                   updateVideoPlayState('left', { isPlaying: false });
                 }}
               >
@@ -232,19 +214,15 @@ const Main = ({ onVisibilityChange }) => {
                 playsInline
                 preload="auto"
                 onError={() => {
-                  console.log(`Section 1 - center video error`);
                   updateVideoPlayState('center', { hasError: true });
                 }}
                 onCanPlay={() => {
-                  console.log(`Section 1 - center video can play`);
                   updateVideoPlayState('center', { hasStarted: true });
                 }}
                 onPlay={() => {
-                  console.log(`Section 1 - center video started playing`);
                   updateVideoPlayState('center', { isPlaying: true });
                 }}
                 onPause={() => {
-                  console.log(`Section 1 - center video paused`);
                   updateVideoPlayState('center', { isPlaying: false });
                 }}
               >
@@ -278,19 +256,15 @@ const Main = ({ onVisibilityChange }) => {
                 playsInline
                 preload="auto"
                 onError={() => {
-                  console.log(`Section 1 - right video error`);
                   updateVideoPlayState('right', { hasError: true });
                 }}
                 onCanPlay={() => {
-                  console.log(`Section 1 - right video can play`);
                   updateVideoPlayState('right', { hasStarted: true });
                 }}
                 onPlay={() => {
-                  console.log(`Section 1 - right video started playing`);
                   updateVideoPlayState('right', { isPlaying: true });
                 }}
                 onPause={() => {
-                  console.log(`Section 1 - right video paused`);
                   updateVideoPlayState('right', { isPlaying: false });
                 }}
               >

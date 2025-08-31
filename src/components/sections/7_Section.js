@@ -19,6 +19,9 @@ const Section7 = () => {
   const lockPosition = useRef(0);
   const exitingSection = useRef(false); // 섹션 탈출 중 플래그
   const [playingVideos, setPlayingVideos] = useState({}); // 비디오 재생 상태
+  const lastScrollTime = useRef(0);
+  const scrollVelocity = useRef(0);
+  const isAnimating = useRef(false);
   
   // 모바일 감지
   useEffect(() => {
@@ -133,6 +136,29 @@ const Section7 = () => {
     }, 1000); // CSS transition 시간과 동일
   };
 
+  // 섹션7 리셋 함수
+  const resetSection7 = () => {
+    scrollLocked.current = false;
+    setIsInSection(false);
+    setCurrentPanel(0);
+    setPlayingVideos({});
+    exitingSection.current = false;
+    lockPosition.current = 0;
+    
+    if (sectionRef.current) {
+      sectionRef.current.style.position = 'relative';
+      sectionRef.current.style.top = 'auto';
+      sectionRef.current.style.left = 'auto';
+      sectionRef.current.style.right = 'auto';
+      sectionRef.current.style.transition = '';
+    }
+    
+    // 패널 컨테이너도 초기 위치로
+    if (panelsContainerRef.current) {
+      panelsContainerRef.current.style.transform = 'translateX(0%)';
+    }
+  };
+
   // 섹션 감지 처리 (데스크톱에서만)
   useEffect(() => {
     const handleScroll = (e) => {
@@ -146,6 +172,66 @@ const Section7 = () => {
       const sectionTop = sectionRef.current.offsetTop;
       const viewportHeight = window.innerHeight;
       
+      // 디버깅 로그 추가
+      console.log('스크롤 이벤트 발생', {
+        scrollTop,
+        sectionTop,
+        lockPosition: lockPosition.current,
+        isInSection,
+        currentPanel,
+        position: sectionRef.current.style.position
+      });
+      
+      // 섹션7보다 위로 스크롤하면 무조건 리셋
+      // fixed 상태일 때 sectionTop이 제대로 안 읽힐 수 있으므로 여러 값 체크
+      let actualSectionTop = sectionTop;
+      
+      // lockPosition이 유효하면 사용
+      if (lockPosition.current > 0) {
+        actualSectionTop = lockPosition.current;
+      }
+      
+      // 섹션7이 화면 아래에 있을 때 무조건 리셋
+      const threshold = actualSectionTop - viewportHeight;
+      console.log('리셋 체크', {
+        scrollTop,
+        threshold,
+        shouldReset: scrollTop < threshold,
+        conditions: {
+          scrollLocked: scrollLocked.current,
+          isInSection,
+          currentPanel,
+          isFixed: sectionRef.current.style.position === 'fixed'
+        }
+      });
+      
+      // 섹션7보다 위로 올라가면 무조건 리셋
+      if (scrollTop < threshold) {
+        console.log('🔴 섹션7보다 위로 스크롤 - 무조건 리셋 실행!');
+        
+        // 강제로 모든 상태 초기화
+        scrollLocked.current = false;
+        setIsInSection(false);
+        setCurrentPanel(0);
+        setPlayingVideos({});
+        exitingSection.current = false;
+        lockPosition.current = 0;
+        
+        if (sectionRef.current) {
+          sectionRef.current.style.position = 'relative';
+          sectionRef.current.style.top = 'auto';
+          sectionRef.current.style.left = 'auto';
+          sectionRef.current.style.right = 'auto';
+          sectionRef.current.style.transition = '';
+        }
+        
+        if (panelsContainerRef.current) {
+          panelsContainerRef.current.style.transform = 'translateX(0%)';
+        }
+        
+        return;
+      }
+      
       // 탈출 중일 때는 모든 처리 무시
       if (exitingSection.current) {
         // 섹션을 완전히 벗어났을 때만 플래그 리셋
@@ -155,20 +241,37 @@ const Section7 = () => {
         return; // 탈출 중에는 다른 처리 하지 않음
       }
       
+      // 스크롤 속도 계산
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastScrollTime.current;
+      if (timeDiff > 0) {
+        scrollVelocity.current = Math.abs(scrollTop - lockPosition.current) / timeDiff;
+      }
+      lastScrollTime.current = currentTime;
+      
       // 섹션 7이 뷰포트에 90% 이상 들어왔을 때 자동으로 고정
       const sectionVisibleThreshold = sectionTop - viewportHeight * 0.2;
       const isApproachingSection = scrollTop >= sectionVisibleThreshold && scrollTop < sectionTop + 50;
       
       // 섹션 7에 진입할 때 (접근 중이고, 잠기지 않았을 때만)
-      if (isApproachingSection && !scrollLocked.current) {
+      if (isApproachingSection && !scrollLocked.current && !isAnimating.current) {
+        isAnimating.current = true;
         scrollLocked.current = true;
         setIsInSection(true);
         lockPosition.current = sectionTop;
         
-        // 부드럽게 섹션 위치로 이동한 후 고정
+        // 즉시 fixed로 변경
+        if (sectionRef.current) {
+          sectionRef.current.style.position = 'fixed';
+          sectionRef.current.style.top = '0';
+          sectionRef.current.style.left = '0';
+          sectionRef.current.style.right = '0';
+        }
+        
+        // 부드럽게 섹션 위치로 이동
         const startPosition = scrollTop;
         const distance = sectionTop - startPosition;
-        const duration = 600;
+        const duration = 600; // 원래 고정 duration으로 복원
         const startTime = performance.now();
         
         const easeInOutQuad = (t) => {
@@ -185,31 +288,8 @@ const Section7 = () => {
           if (progress < 1) {
             requestAnimationFrame(animateScroll);
           } else {
-            // 애니메이션 완료 후 fixed로 변경
-            if (sectionRef.current && scrollLocked.current) {
-              // 현재 위치를 저장
-              const rect = sectionRef.current.getBoundingClientRect();
-              
-              // fixed로 변경
-              sectionRef.current.style.position = 'fixed';
-              sectionRef.current.style.top = `${rect.top}px`;
-              sectionRef.current.style.left = '0';
-              sectionRef.current.style.right = '0';
-              
-              // 부드럽게 top을 0으로 조정
-              requestAnimationFrame(() => {
-                if (sectionRef.current) {
-                  sectionRef.current.style.transition = 'top 0.3s ease-out';
-                  sectionRef.current.style.top = '0';
-                  
-                  setTimeout(() => {
-                    if (sectionRef.current) {
-                      sectionRef.current.style.transition = '';
-                    }
-                  }, 300);
-                }
-              });
-            }
+            // 애니메이션 완료
+            isAnimating.current = false;
           }
         };
         
@@ -217,9 +297,12 @@ const Section7 = () => {
       }
       
       // 스크롤이 잠겨있을 때 위치 강제 고정 (모바일에서는 비활성화)
-      if (!isMobile && scrollLocked.current && Math.abs(scrollTop - lockPosition.current) > 5) {
-        e.preventDefault();
-        appElement.scrollTop = lockPosition.current;
+      // 애니메이션 중이 아닐 때만 강제 고정
+      if (!isMobile && scrollLocked.current && !isAnimating.current) {
+        if (Math.abs(scrollTop - lockPosition.current) > 5) {
+          e.preventDefault();
+          appElement.scrollTop = lockPosition.current;
+        }
       }
     };
     
@@ -271,7 +354,7 @@ const Section7 = () => {
           if (currentPanel < 3) {
             moveToPanel(currentPanel + 1);
           } else {
-            // 마지막 패널에서 아래로 스크롤 시 섹션 7 탈출
+            // 마지막 패널에서 아래로 스크롤 시 섹션 7 탈출 (리셋하지 않음)
             exitingSection.current = true; // 탈출 중 플래그 설정
             scrollLocked.current = false;
             setIsInSection(false);
@@ -297,23 +380,24 @@ const Section7 = () => {
         } else if (e.deltaY < 0) {
           // 위로 스크롤
           if (currentPanel === 0) {
-            // 패널1에서 위로 스크롤 시 무조건 섹션 7 탈출
-            exitingSection.current = true; // 탈출 중 플래그 설정
-            scrollLocked.current = false;
-            setIsInSection(false);
-            setPlayingVideos({}); // 모든 비디오 일시정지
+            // 패널1에서 위로 스크롤 시 무조건 섹션7 리셋
+            console.log('🔴 패널1에서 위로 스크롤 - 섹션7 리셋 실행!', {
+              currentPanel,
+              scrollLocked: scrollLocked.current,
+              isInSection
+            });
             
-            // 섹션 고정 해제
-            if (sectionRef.current) {
-              sectionRef.current.style.position = 'relative';
-              sectionRef.current.style.top = 'auto';
-              sectionRef.current.style.left = 'auto';
-              sectionRef.current.style.right = 'auto';
-              sectionRef.current.style.transition = '';
+            // 먼저 리셋 실행
+            resetSection7();
+            
+            // 탈출 플래그 설정
+            exitingSection.current = true;
+            
+            // 스크롤 위치 조정 (필요시)
+            const appElement = document.querySelector('.App');
+            if (appElement && lockPosition.current > 0) {
+              appElement.scrollTop = lockPosition.current - 100;
             }
-            
-            // 강제 스크롤 없이 자연스럽게 이전 섹션으로 이동
-            // appElement.scrollTop = previousSectionEnd;
           } else {
             // 패널2,3,4에서는 이전 패널로 이동 (패널4에서도 탈출 안됨)
             moveToPanel(currentPanel - 1);

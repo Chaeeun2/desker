@@ -27,18 +27,8 @@ const Section4 = () => {
   useEffect(() => {
     // 콘솔에 비디오 재생 상태 출력
     const videoElement = document.querySelector('[data-section="section4"]');
-    console.log('Section 4 - video state:', {
-      isPlaying: videoPlayState.isPlaying,
-      hasError: videoPlayState.hasError,
-      hasStarted: videoPlayState.hasStarted,
-      currentTime: videoElement?.currentTime || 'N/A',
-      readyState: videoElement?.readyState || 'N/A',
-      paused: videoElement?.paused || 'N/A',
-      autoplay: videoElement?.autoplay || 'N/A'
-    });
-    
+
     if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
-      console.log('Section 4 - showing fallback image');
       setShowFallbackImage(true);
     }
   }, [videoPlayState]);
@@ -67,12 +57,9 @@ const Section4 = () => {
   const attemptAutoplay = () => {
     const videoElement = document.querySelector('[data-section="section4"]');
     if (videoElement) {
-      console.log('Section 4: Attempting to autoplay video');
       videoElement.play().then(() => {
-        console.log('Section 4: Video autoplay successful');
         setVideoPlayState(prev => ({ ...prev, isPlaying: true }));
       }).catch((error) => {
-        console.log('Section 4: Video autoplay failed:', error);
         setVideoPlayState(prev => ({ ...prev, hasError: true }));
       });
     }
@@ -93,7 +80,6 @@ const Section4 = () => {
   // 사용자 상호작용 후 자동재생 시도
   useEffect(() => {
     const handleUserInteraction = () => {
-      console.log('Section 4: User interaction detected, attempting autoplay');
       setTimeout(() => {
         attemptAutoplay();
       }, 100);
@@ -179,23 +165,18 @@ const Section4 = () => {
             playsInline
             preload="auto"
             onError={() => {
-              console.log('Section 4 - video error');
               setVideoPlayState(prev => ({ ...prev, hasError: true }));
             }}
             onCanPlay={() => {
-              console.log('Section 4 - video can play');
               setVideoPlayState(prev => ({ ...prev, hasStarted: true }));
             }}
             onPlay={() => {
-              console.log('Section 4 - video started playing');
               setVideoPlayState(prev => ({ ...prev, isPlaying: true }));
             }}
             onPause={() => {
-              console.log('Section 4 - video paused');
               setVideoPlayState(prev => ({ ...prev, isPlaying: false }));
             }}
             onStalled={() => {
-              console.log('Section 4 - video stalled');
               setVideoPlayState(prev => ({ ...prev, isPlaying: false }));
             }}
           >
