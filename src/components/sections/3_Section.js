@@ -10,15 +10,12 @@ const Section3 = () => {
   
   // opacity 상태들과 스크롤 가능 상태
   const [text1Opacity, setText1Opacity] = useState(1);
-  const [text2Opacity, setText2Opacity] = useState(0);
   const [text3Opacity, setText3Opacity] = useState(0); // 텍스트3 opacity
   const [text4Opacity, setText4Opacity] = useState(0); // 텍스트4 opacity
   const [text1TranslateY, setText1TranslateY] = useState(0); // 텍스트1 translateY
-  const [text2TranslateY, setText2TranslateY] = useState(0); // 텍스트2 translateY
   const [text3TranslateY, setText3TranslateY] = useState(0); // 텍스트3 translateY
   const [text4TranslateY, setText4TranslateY] = useState(0); // 텍스트4 translateY
   const [text1Color, setText1Color] = useState('black'); // 텍스트1 색상
-  const [text2Color, setText2Color] = useState('black'); // 텍스트2 색상
   const [text3Color, setText3Color] = useState('black'); // 텍스트3 색상
   const [text4Color, setText4Color] = useState('black'); // 텍스트4 색상 (black → white)
   const [text5Color, setText5Color] = useState('black'); // 텍스트5 색상
@@ -46,24 +43,25 @@ const Section3 = () => {
   const fixFinalState = () => {
     // 1. 모든 텍스트와 SVG를 최종 상태로 고정
     setText1Opacity(0);
-    setText2Opacity(0);
     setText3Opacity(0);
     setText4Opacity(0); // 텍스트4는 완성된 상태로 유지
     setText5Opacity(0);
     setText6Opacity(1); // 텍스트6은 완성된 상태로 유지
     
     // 2. SVG와 라인을 최종 상태로 고정
-    setSvg1TranslateX(0);
+    setSvg1Bottom(5);
+    setSvg1Left(50);
     setSvg1TranslateY(0);
     setSvg1StrokeColor('white');
-    setSvg2TranslateX(0);
-    setSvg2TranslateY(500);
+    setSvg2TranslateX(20);
+    setSvg2TranslateY(200);
     setSvg2Width(0);
-    setSvg2StrokeColor('white');
+    setSvg2StrokeColor('black');
     setLineTranslateY(500);
     setLineWidth(0);
-    setLineStrokeColor('white');
+    setLineStrokeColor('black');
     setLinePadding(0);
+    setLineBottom(-40);
     
     // 3. 새로운 SVG들을 최종 상태로 고정
     setNewSvgScale(1);
@@ -80,7 +78,7 @@ const Section3 = () => {
     const appElement = document.querySelector('.App');
     if (appElement && triggerPointRef.current !== null) {
       const viewportHeight = window.innerHeight;
-      const targetScrollTop = viewportHeight * 2;
+      const targetScrollTop = triggerPointRef.current;
       appElement.scrollTop = targetScrollTop;
     }
     
@@ -94,8 +92,9 @@ const Section3 = () => {
       sectionRef.current.classList.add(styles.scrollable);
     }
   };
-  const [svg1TranslateX, setSvg1TranslateX] = useState(-0); // 왼쪽 화면밖 (vw 단위)
-  const [svg2TranslateX, setSvg2TranslateX] = useState(0); // 오른쪽 화면밖 (vw 단위)
+  const [svg1Bottom, setSvg1Bottom] = useState(-20); // svg1 bottom 위치 (-300px → 50px)
+  const [svg1Left, setSvg1Left] = useState(50); // svg1 left 위치 (50% → 10%)
+  const [svg2TranslateX, setSvg2TranslateX] = useState(-20); // svg2 right 위치 (-10vw → 20vw)
   const [svg1TranslateY, setSvg1TranslateY] = useState(0); // svg1 Y 위치 (0 → 가운데)
   const [svg2TranslateY, setSvg2TranslateY] = useState(0); // svg2 Y 위치 (0 → 아래로)
   const [svg2Width, setSvg2Width] = useState(199); // svg2 width (199 → 0)
@@ -109,7 +108,7 @@ const Section3 = () => {
   const [linePadding, setLinePadding] = useState(30); // line padding (50px → 0px)
   const [lineWidth, setLineWidth] = useState(0); // 초기 width 0
   const [lineOpacity, setLineOpacity] = useState(0); // 라인 opacity (0에서 1로 증가)
-  const [svgOpacity, setSvgOpacity] = useState(0); // SVG opacity (0에서 1로 증가)
+  const [lineBottom, setLineBottom] = useState(110); // 라인 bottom 위치 (110px → -10px)
   const [text5Opacity, setText5Opacity] = useState(0); // 텍스트5 opacity
   const [text5TranslateY, setText5TranslateY] = useState(0); // 텍스트5 translateY
   const [text6Opacity, setText6Opacity] = useState(0); // 텍스트6 opacity
@@ -119,7 +118,6 @@ const Section3 = () => {
   // texts 배열을 동적으로 생성하여 색상 변경 가능하게 함
   const getTexts = (text4Color) => [
     "데스커가<br/>워케이션에 주목하게 된 이유",
-    "일에 몰입하기 위해선<br/>꼭 사무실이어야만 할까?",
     "사무실에 출근하는<br/>반복적인 일상.",
     `같은 공간, 책상에서<br/><span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>일</span>과 <span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>쉼</span>의 공존은 어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
@@ -129,7 +127,6 @@ const Section3 = () => {
   // 모바일용 texts 배열 (줄바꿈 다르게)
   const getMobileTexts = (text4Color) => [
     "데스커가<br/>워케이션에<br/>주목하게 된 이유",
-    "일에 몰입하기<br/>위해선 꼭<br/>사무실이어야만 할까?",
     "사무실에 출근하는<br/>반복적인 일상.",
     `같은 공간, 책상에서<br/><span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>일</span>과 <span style='color:${text4Color === 'white' ? 'white' : '#336DFF'}'>쉼</span>의 공존은<br/>어렵게만 느껴졌습니다.`,
     "그 고민 앞에서,",
@@ -210,26 +207,24 @@ const Section3 = () => {
           
           // 모든 상태 초기화
           setText1Opacity(0);
-          setText2Opacity(0);
-          setText3Opacity(0);
+                setText3Opacity(0);
           setText4Opacity(0);
           setText5Opacity(0);
           setText6Opacity(0);
           setText1TranslateY(0);
-          setText2TranslateY(0);
-          setText3TranslateY(0);
+                setText3TranslateY(0);
           setText4TranslateY(0);
           setText5TranslateY(0);
           setText1Color('black');
-          setText2Color('black');
-          setText3Color('black');
+                setText3Color('black');
           setText4Color('black');
           setText5Color('black');
           setText6Color('white');
           setOverlayColor('white');
           setOverlayOpacity(0);
-          setSvg1TranslateX(-100);
-          setSvg2TranslateX(100);
+          setSvg1Bottom(-20);
+          setSvg1Left(50);
+          setSvg2TranslateX(-20);
           setSvg1TranslateY(0);
           setSvg2TranslateY(0);
           setSvg2Width(199);
@@ -240,7 +235,7 @@ const Section3 = () => {
           setLinePadding(30);
           setLineWidth(0);
           setLineOpacity(0);
-          setSvgOpacity(0);
+          setLineBottom(110);
           setNewSvgScale(0);
           setNewSvg2Scale(0);
           setNewSvg3Scale(0);
@@ -270,13 +265,13 @@ const Section3 = () => {
           setOverlayColor('white');
           setOverlayOpacity(0);
           setText1Opacity(1);
-          setText2Opacity(0);
-          setText3Opacity(0);
+          setSvg1Left(50);
+                setText3Opacity(0);
           setText4Opacity(0);
           setText5Opacity(0);
           setText6Opacity(0);
           setText4Color('black');
-          setSvg1TranslateX(-100);
+          setSvg1Bottom(-20);
           setSvg1TranslateY(0);
           setSvg1StrokeColor('black');
           setSvg2TranslateY(0);
@@ -285,9 +280,9 @@ const Section3 = () => {
           setLineTranslateY(0);
           setLineWidth(0);
           setLineOpacity(0);
+          setLineBottom(110);
           setLineStrokeColor('black');
           setLinePadding(30);
-          setSvgOpacity(0);
           setNewSvgScale(0);
           setNewSvg2Scale(0);
           setNewSvg3Scale(0);
@@ -305,22 +300,29 @@ const Section3 = () => {
           return;
         }
         
+        // svg1 bottom 애니메이션 - triggerPoint와 무관하게 항상 처리
+        // 절대적인 스크롤 위치 기준으로 애니메이션
+        const svg1AbsoluteStart = viewportHeight * 2 + getScrollDistance(2500); // 섹션3 시작 + 2500px (1000px 더 뒤로)
+        if (scrollTop >= svg1AbsoluteStart) {
+          const svg1ScrollDiff = scrollTop - svg1AbsoluteStart;
+          const svg1Progress = Math.min(1, svg1ScrollDiff / getScrollDistance(1000)); // 1000px에 걸쳐 애니메이션
+          const newSvg1Bottom = -20 + (svg1Progress * 25);
+          setSvg1Bottom(newSvg1Bottom);
+        }
+        
         // triggerPoint에 도달하면 애니메이션 시작
         if (scrollTop >= triggerPoint) {
           const scrollDiff = scrollTop - triggerPoint; // triggerPoint 기준으로 계산
-          const steps = Math.floor(scrollDiff / 100); // 100px마다 1단계 (200px → 100px로 절반)
           
-          const newText1Opacity = Math.max(0, Math.min(1, 1 - (steps * 0.1)));
-          const newText2Opacity = Math.max(0, Math.min(1, steps * 0.1 - 1));
+          // 텍스트1은 항상 표시
+          setText1Opacity(1);
           
-
-          
-          // 텍스트2가 완료된 후 오버레이 애니메이션 계산 (150px마다 0.1씩)
-          const overlayStartPoint = getScrollDistance(2000); // 2000px → 모바일에서는 1000px (텍스트2 완료 후)
+          // 오버레이 애니메이션 계산 (150px마다 0.1씩)
+          const overlayStartPoint = getScrollDistance(1000); // 1000px → 모바일에서는 500px
           let newOverlayOpacity = 0;
           
           if (scrollDiff >= overlayStartPoint) {
-            const overlayScrollDiff = scrollDiff - overlayStartPoint; // 텍스트2 완료 후 추가 스크롤 거리
+            const overlayScrollDiff = scrollDiff - overlayStartPoint;
             if (overlayScrollDiff >= 0) { // 음수 방지
               const overlaySteps = Math.floor(overlayScrollDiff / getScrollDistance(150)); // 150px마다 1단계 (모바일에서는 75px)
               newOverlayOpacity = Math.max(0, Math.min(1, overlaySteps * 0.1)); // 75px마다 0.1씩 증가 (모바일)
@@ -330,17 +332,13 @@ const Section3 = () => {
           // 오버레이가 한번 완료되면 계속 1.0으로 유지
           const finalOverlayOpacity = Math.max(newOverlayOpacity, overlayOpacity);
           
-          // 오버레이가 완료되면 텍스트1,2를 완전히 숨김
+          // 오버레이가 완료되면 텍스트1를 완전히 숨김
           if (finalOverlayOpacity >= 1.0) {
             setText1Opacity(0);
-            setText2Opacity(0);
-          } else {
-            setText1Opacity(newText1Opacity);
-            setText2Opacity(newText2Opacity);
           }
           
           // 오버레이가 완료된 후 텍스트3 애니메이션 시작 (100px마다 0.1씩)
-          const text3StartPoint = getScrollDistance(3500); // 3500px → 모바일에서는 1750px (오버레이 완료 후)
+          const text3StartPoint = getScrollDistance(2500); // 2500px → 모바일에서는 1250px (오버레이 완료 후)
           let newText3Opacity = 0;
           
           if (scrollDiff >= text3StartPoint) {
@@ -355,7 +353,7 @@ const Section3 = () => {
           setText3Opacity(newText3Opacity);
           
           // 텍스트4 애니메이션 (텍스트3 완성 후)
-          const text4StartPoint = getScrollDistance(4000); // 4000px → 모바일에서는 2000px
+          const text4StartPoint = getScrollDistance(3000); // 3000px → 모바일에서는 1500px
           let newText4Opacity = 0;
           
           if (scrollDiff >= text4StartPoint) {
@@ -371,12 +369,21 @@ const Section3 = () => {
           let finalText3Opacity = newText3Opacity;
           let finalText4Opacity = newText4Opacity; // newText4Opacity 값을 직접 사용
           
+          // svg1과 svg2 애니메이션: 텍스트3보다 2000px 뒤에 시작
+          const svgAnimationStartPoint = getScrollDistance(4500); // 텍스트3(2500px) + 2000px = 4500px
+          if (scrollDiff >= svgAnimationStartPoint) {
+            const svgScrollDiff = scrollDiff - svgAnimationStartPoint;
+            const svgAnimation = Math.min(1, svgScrollDiff / getScrollDistance(1000)); // 1000px에 걸쳐 애니메이션
+            setSvg1Left(50 - (svgAnimation * 30)); // 50% → 10%
+            setSvg2TranslateX(-20 + (svgAnimation * 40)); // -20vw → 20vw
+          }
+          
           // 텍스트3: opacity 0 → 1 → 0 (사라질 때 translateY 30px 위로)
           // 텍스트4: opacity 0 → 1 → 0
           
           if (newText3Opacity >= 1.0) {
             // 텍스트3 완성 후 사라지는 애니메이션
-            const text3FadeOutStart = getScrollDistance(4500); // 4500px → 모바일에서는 2250px
+            const text3FadeOutStart = getScrollDistance(3500); // 3500px → 모바일에서는 1750px
             const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000)); // 1000px에 걸쳐 사라짐 (모바일에서는 500px)
             finalText3Opacity = text3FadeOut;
             setText3Opacity(finalText3Opacity);
@@ -391,35 +398,28 @@ const Section3 = () => {
             
             // 텍스트3이 완전히 사라진 후 텍스트4 시작
             if (finalText3Opacity <= 0) {
-              const text4StartPoint = getScrollDistance(5500); // 5500px → 모바일에서는 2750px
+              const text4StartPoint = getScrollDistance(4500); // 4500px → 모바일에서는 2250px
               const text4Start = Math.min(1, (scrollDiff - text4StartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
               setText4Opacity(text4Start);
               
-              // SVG 애니메이션: 텍스트4와 함께 시작 (더 빠르게)
+              // line width 애니메이션: 텍스트4와 함께 시작
               if (text4Start > 0) {
-                // svg1, svg2가 원래 자리로 이동 (텍스트4와 동시에)
-                const svgStartPoint = getScrollDistance(5500); // 5500px → 모바일에서는 2750px
-                const svgAnimation = Math.min(1, (scrollDiff - svgStartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
-                setSvg1TranslateX(-100 + (svgAnimation * 100)); // -100vw → 0vw
-                setSvg2TranslateX(100 - (svgAnimation * 100)); // 100vw → 0vw
-                setSvgOpacity(svgAnimation); // SVG opacity도 0에서 1로 증가
+                const lineWidthAnimation = text4Start; // 텍스트4와 동일한 진행도
+                setLineWidth(lineWidthAnimation * 40); // 0 → 40vw
+                setLineOpacity(lineWidthAnimation); // opacity도 함께 증가
                 
-                // line width 애니메이션: svg 애니메이션 완료 후 시작
-                if (svgAnimation >= 1.0) {
-                  const lineStartPoint = getScrollDistance(6500); // 6500px → 모바일에서는 3250px
-                  const lineAnimation = Math.min(1, (scrollDiff - lineStartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
-                  const newLineWidth = lineAnimation * 40; // 0 → 40vw로 확장
-                  setLineWidth(newLineWidth);
-                  setLineOpacity(lineAnimation); // 라인 opacity도 0에서 1로 증가
-                  
-
-                  
-                  // lineHeight와 strokeWidth는 항상 3px로 고정
-                  
-                  // 라인 애니메이션이 완료되면 새로운 애니메이션 시작
-                  if (lineAnimation >= 1.0) {
+                // line bottom 애니메이션: 텍스트4보다 2000px 뒤에 시작 (기존 1000px + 추가 1000px)
+                const lineBottomStartPoint = getScrollDistance(6500); // 텍스트4(4500px) + 2000px = 6500px
+                if (scrollDiff >= lineBottomStartPoint) {
+                  const lineBottomScrollDiff = scrollDiff - lineBottomStartPoint;
+                  const lineBottomAnimation = Math.min(1, lineBottomScrollDiff / getScrollDistance(500)); // 1000px에 걸쳐 애니메이션
+                  setLineBottom(110 - (lineBottomAnimation * 150)); // 110px → -10px
+                }
+                
+                // 텍스트4가 완전히 나타나면 새로운 애니메이션 시작
+                if (text4Start >= 1.0) {
                     // 텍스트4 페이드아웃 (새로운 요소들이 나타나면서)
-                    const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1000)); // 7500px → 모바일에서는 3750px, 1000px → 모바일에서는 500px
+                    const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(6500)) / getScrollDistance(1000)); // 6500px → 모바일에서는 3250px, 1000px → 모바일에서는 500px
                     setText4Opacity(text4FadeOut);
                     
                     // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
@@ -432,10 +432,27 @@ const Section3 = () => {
                     
 
                     
-                                        // 텍스트4가 완전히 사라진 후 텍스트5 시작 (8500px부터 1500px에 걸쳐)
+                                        // svg1과 svg2 애니메이션 (6500px부터)
+                    const animationStartPoint = getScrollDistance(6500);
+                    if (scrollDiff >= animationStartPoint) {
+                      const animationProgress = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(500));
+                      const animationProgress2 = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(1000));
+                      
+                      // svg1 left를 50%로 이동
+                      const currentSvg1Left = 20 + (animationProgress2 * 30); // 20% → 50%
+                      setSvg1Left(currentSvg1Left);
+                      
+                      // svg2 아래로 이동
+                      setSvg2TranslateY(animationProgress * 200); // 0 → 200px
+                      const fastSvg2WidthAnimation = Math.min(1, animationProgress * 2);
+                      setSvg2Width(199 - (fastSvg2WidthAnimation * 199)); // 199 → 0px
+                      // stroke color는 검은색으로 고정
+                    }
+                    
+                    // 텍스트4가 완전히 사라진 후 텍스트5 시작 (8500px부터 1500px에 걸쳐)
                     if (text4FadeOut <= 0) {
                       // 최종 애니메이션 (새로운 SVG들)
-                      const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(8500)) / getScrollDistance(1500)); // 8500px → 모바일에서는 4250px, 1500px → 모바일에서는 750px
+                      const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1500)); // 7500px → 모바일에서는 3750px, 1500px → 모바일에서는 750px
                       
                       // overlay 배경색을 primary로 변경
                       if (finalAnimation > 0) {
@@ -446,38 +463,33 @@ const Section3 = () => {
                       // 텍스트5 애니메이션
                       setText5Opacity(finalAnimation);
                       
-                      // SVG와 라인 애니메이션 변수들 선언
-                      let svg2TranslateYValue = 0;
-                      let svg2WidthValue = 199;
+                      // 새로운 SVG들 애니메이션 (7500px에서 시작)
+                      const newSvgStartPoint = getScrollDistance(8500);
+                      if (scrollDiff >= newSvgStartPoint) {
+                        const newSvgAnimation = Math.min(1, (scrollDiff - newSvgStartPoint) / getScrollDistance(1500));
+                        setNewSvgScale(newSvgAnimation);
+                        setNewSvg2Scale(newSvgAnimation);
+                        setNewSvg3Scale(newSvgAnimation);
+                      }
+                      
+                      // 라인 애니메이션 변수들 선언
                       let lineTranslateYValue = 0;
-                      let lineWidthValue = 40;
                       
                       // SVG와 라인 애니메이션: 스크롤에 따라 점진적으로 변화
                       if (finalAnimation > 0) {
-                        // svg1: 가운데로 이동하면서 stroke 색상을 흰색으로 변경
-                        setSvg1TranslateX(0); // 가운데로
+                        // svg1: stroke 색상을 흰색으로 변경
                         setSvg1TranslateY(0); // 가운데 유지
                         setSvg1StrokeColor('white'); // 흰색으로 변경
                         
-                        // svg2: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
-                        svg2TranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
-                        // svg2 width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
-                        const fastSvg2Animation = Math.min(1, finalAnimation * 2); // 2배 빠르게
-                        svg2WidthValue = 199 - (fastSvg2Animation * 199); // 199 → 0px (더 빨리)
-                        setSvg2TranslateY(svg2TranslateYValue);
-                        setSvg2Width(svg2WidthValue);
-                        setSvg2StrokeColor('white'); // 흰색으로 변경
+                        // svg2는 이미 6500px에서 처리됨
                         
                         // line: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
                         lineTranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
-                        // line width 애니메이션을 2배 빠르게 (절반 수준으로 빠르게)
-                        const fastLineAnimation = Math.min(1, finalAnimation * 2); // 2배 빠르게
-                        lineWidthValue = 40 - (fastLineAnimation * 40); // 40vw → 0vw (더 빨리)
+                        // line padding 애니메이션
                         const linePaddingValue = 30 - (finalAnimation * 30); // 50px → 0px
                         setLineTranslateY(lineTranslateYValue);
-                        setLineWidth(lineWidthValue);
                         setLinePadding(linePaddingValue);
-                        setLineStrokeColor('white'); // 흰색으로 변경
+                        // line stroke color는 검은색으로 고정
                       }
                       
 
@@ -485,7 +497,7 @@ const Section3 = () => {
                       // 텍스트5가 완료되면 텍스트6 시작 (10000px부터 1000px에 걸쳐)
                       if (finalAnimation >= 1.0) {
                         // 텍스트5 페이드아웃 (10000px부터 1000px에 걸쳐)
-                        const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(10000)) / getScrollDistance(1000)); // 10000px → 모바일에서는 5000px, 1000px → 모바일에서는 500px
+                        const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(9000)) / getScrollDistance(1000)); // 9000px → 모바일에서는 4500px, 1000px → 모바일에서는 500px
                         setText5Opacity(text5FadeOut);
                         
                         // 텍스트5가 사라지면서 translateY 변화
@@ -496,13 +508,10 @@ const Section3 = () => {
                         
                         // 텍스트5가 완전히 사라진 후 텍스트6 시작
                         if (text5FadeOut <= 0) {
-                          const text6Animation = Math.min(1, (scrollDiff - getScrollDistance(11000)) / getScrollDistance(1000)); // 11000px → 모바일에서는 5500px, 1000px → 모바일에서는 500px
+                          const text6Animation = Math.min(1, (scrollDiff - getScrollDistance(10000)) / getScrollDistance(1000)); // 10000px → 모바일에서는 5000px, 1000px → 모바일에서는 500px
                           setText6Opacity(text6Animation);
                           
-                          // 새로운 SVG들도 함께 나타남
-                          setNewSvgScale(text6Animation);
-                          setNewSvg2Scale(text6Animation);
-                          setNewSvg3Scale(text6Animation);
+                          // 새로운 SVG들은 이미 7500px에서 처리됨
                           
                           // 애니메이션 완료 체크 (텍스트 6이 완성되면)
                           if (text6Animation >= 1.0 && !isAnimationCompleteRef.current) {
@@ -525,9 +534,9 @@ const Section3 = () => {
                           // 애니메이션이 완료된 후에는 리셋하지 않음
               if (!isAnimationComplete) {
                 setText4Opacity(0);
-                // SVG 초기 상태 유지
-                setSvg1TranslateX(-100);
-                setSvg2TranslateX(100);
+                // SVG 초기 상태 유지 (svg1Bottom은 리셋하지 않음 - 독립적으로 처리)
+                //setSvg2TranslateX(-10);
+                //setSvg1Left(50);
                 setSvg1TranslateY(0);
                 setSvg2TranslateY(0);
                 setSvg2Width(199);
@@ -536,9 +545,9 @@ const Section3 = () => {
                 setSvg2StrokeColor('black');
                 setLineStrokeColor('black');
                 setLinePadding(30);
-                setLineWidth(0);
+                setLineWidth(0); // width도 0으로 리셋
                 setLineOpacity(0); // 라인 opacity도 0으로 리셋
-                setSvgOpacity(0); // SVG opacity도 0으로 리셋
+                setLineBottom(110); // 라인 bottom도 110px로 리셋
                 setText4TranslateY(0); // 텍스트4 translateY도 0으로 리셋
                 setText4Color('black'); // 텍스트4 색상도 black으로 리셋
                 setText5Opacity(0); // 텍스트5 opacity도 0으로 리셋
@@ -589,7 +598,6 @@ const Section3 = () => {
           }
         }
       }
-    };
     
     // 즉시 한 번 실행
     setTimeout(handleScroll, 100);
@@ -626,27 +634,13 @@ const Section3 = () => {
               position: 'absolute',
               top: '50%',
               left: '50%',
-              transform: `translate(-50%, calc(-50% - ${(1 - text1Opacity) * 30}px))`,
+              transform: 'translate(-50%, -50%)',
               transition: 'opacity 0.1s ease-out, transform 0.1s ease-out',
               fontSize: '8rem'
             }}
             dangerouslySetInnerHTML={{ __html: currentTexts[0] }}
           />
           
-          {/* 텍스트 2 */}
-          <div
-            className={styles.centerText}
-            style={{ 
-              opacity: text2Opacity,
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              transition: 'opacity 0.1s ease-out',
-              fontSize: '8rem'
-            }}
-            dangerouslySetInnerHTML={{ __html: currentTexts[1] }}
-          />
         </div>
         
         {/* 동적 배경색 오버레이 */}
@@ -678,7 +672,7 @@ const Section3 = () => {
             zIndex: 10, // 오버레이보다 훨씬 위에 표시
             fontSize: '6rem'
           }}
-          dangerouslySetInnerHTML={{ __html: currentTexts[2] }}
+          dangerouslySetInnerHTML={{ __html: currentTexts[1] }}
         />
         
         {/* 텍스트 4 - 검은색으로 표시 */}
@@ -695,7 +689,7 @@ const Section3 = () => {
             color: text4Color, // 동적 색상 적용
             fontSize: '6rem'
           }}
-          dangerouslySetInnerHTML={{ __html: currentTexts[3] }}
+          dangerouslySetInnerHTML={{ __html: currentTexts[2] }}
         />
 
         
@@ -713,7 +707,7 @@ const Section3 = () => {
               color: 'white', // 흰색 텍스트
               fontSize: '6rem'
             }}
-            dangerouslySetInnerHTML={{ __html: currentTexts[4] }}
+            dangerouslySetInnerHTML={{ __html: currentTexts[3] }}
           />
           
           {/* 텍스트 6 - 흰색으로 표시 */}
@@ -730,32 +724,22 @@ const Section3 = () => {
               color: 'white', // 흰색 텍스트
               fontSize: '6rem'
             }}
-            dangerouslySetInnerHTML={{ __html: currentTexts[5] }}
+            dangerouslySetInnerHTML={{ __html: currentTexts[4] }}
           />
         
-        {/* 하단 SVG 요소들 - 텍스트4와 함께 나타남 */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '5%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            opacity: svgOpacity, // text4Opacity 대신 svgOpacity 사용
-            transition: 'opacity 0.1s ease-out',
-            zIndex: 11
-          }}
-        >
-                  {/* svg1: 책상 + 노트북 */}
+        {/* svg1: 책상 + 노트북 */}
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="177" 
           height="133" 
           fill="none"
           style={{
-            transform: `translate(${svg1TranslateX}vw, ${svg1TranslateY}px)`,
-            transition: 'transform 0.3s ease-out'
+            transform: `translateX(-50%)`,
+            transition: 'bottom 0.05s linear, left 0.3s ease-out',
+            position: 'absolute',
+            bottom: `${svg1Bottom}vh`,
+            left: `${svg1Left}%`,
+            zIndex: 11
           }}
         >
           <path stroke={svg1StrokeColor} strokeLinejoin="round" strokeWidth="3" d="M174.766 132.342V68.096H2v64.246"/>
@@ -771,11 +755,11 @@ const Section3 = () => {
           fill="none"
           style={{
             position: 'absolute',
-            left: 'calc(50% - 185px)', // svg1보다 약간 왼쪽
-            bottom: '40%',
+            left: 'calc(50% - 190px)', // svg1보다 약간 왼쪽
+            bottom: '10vh',
             transform: `scale(${newSvgScale})`,
             transition: 'transform 0.3s ease-out',
-            zIndex: 12 // svg1보다 위에 표시
+            zIndex: 11
           }}
         >
           <path fill="#fff" d="M55.133 112.022V32.449a1.5 1.5 0 0 1 3 0v79.573a1.5 1.5 0 1 1-3 0Z"/>
@@ -793,11 +777,11 @@ const Section3 = () => {
           fill="none"
           style={{
             position: 'absolute',
-            left: 'calc(50% - 44px)', // svg1 가운데 정렬
-            bottom: '110%', // svg1보다 위쪽
-            transform: `scale(${newSvg2Scale})`,
+            left: 'calc(50%)', // svg1 가운데 정렬
+            bottom: '22vh', // svg1보다 위쪽
+            transform: `translateX(-50%) scale(${newSvg2Scale})`,
             transition: 'transform 0.3s ease-out',
-            zIndex: 12 // svg1보다 위에 표시
+            zIndex: 11
           }}
         >
           <path fill="#fff" d="M41.6 77.001v-52.66a1.5 1.5 0 0 1 3 0v52.66a1.5 1.5 0 0 1-3 0Z"/>
@@ -815,11 +799,11 @@ const Section3 = () => {
           fill="none"
           style={{
             position: 'absolute',
-            left: 'calc(50% + 70px)', // svg1보다 약간 왼쪽
-            bottom: '40%',
+            left: 'calc(50% + 75px)', // svg1보다 약간 오른쪽
+            bottom: '10vh',
             transform: `scale(${newSvgScale})`,
             transition: 'transform 0.3s ease-out',
-            zIndex: 12 // svg1보다 위에 표시
+            zIndex: 11
           }}
         >
           <path fill="#fff" d="M55.133 112.022V32.449a1.5 1.5 0 0 1 3 0v79.573a1.5 1.5 0 1 1-3 0Z"/>
@@ -836,9 +820,13 @@ const Section3 = () => {
             display: 'flex', 
             alignItems: 'center', 
             overflow: 'hidden',
-            transform: `translateY(${lineTranslateY}px)`,
-            transition: 'transform 0.3s ease-out, width 0.3s ease-out, padding 0.3s ease-out',
-            padding: `0 ${linePadding}px`
+            transition: 'transform 0.3s ease-out, width 0.3s ease-out, padding 0.3s ease-out, bottom 0.3s ease-out',
+            padding: `0 ${linePadding}px`,
+            position: 'absolute',
+            bottom: `${lineBottom}px`,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 11
           }}>
             <svg 
               width="100%" 
@@ -848,22 +836,28 @@ const Section3 = () => {
               style={{ 
                 opacity: lineOpacity, 
                 transition: 'opacity 0.1s ease-out',
-                visibility: lineWidth > 0 ? 'visible' : 'hidden' // width가 0일 때 숨김
+                visibility: lineWidth > 0 ? 'visible' : 'hidden', // width가 0일 때 숨김
+                width: '100%',
+                height: '100%'
               }}
             >
               <line x1="0" y1="1.5" x2="100%" y2="1.5" stroke={lineStrokeColor} strokeWidth="3" strokeDasharray="3,3"/>
             </svg>
           </div>
-          
-                  {/* svg2: 야자나무 2개 */}
+        
+        {/* svg2: 야자나무 2개 - 컨테이너 밖에 위치 */}
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
-          width={svg2Width}
+          width="199"
           height="146" 
           fill="none"
           style={{
-            transform: `translate(${svg2TranslateX}vw, ${svg2TranslateY}px)`,
-            transition: 'transform 0.3s ease-out, width 0.3s ease-out'
+            transform: `translate(50%, ${svg2TranslateY}px)`,
+            transition: 'right 0.3s ease-out, transform 0.3s ease-out, width 0.3s ease-out',
+            position: 'absolute',
+            bottom: '5vh',
+            right: `${svg2TranslateX}%`,
+            zIndex: 11
           }}
         >
             <path stroke={svg2StrokeColor} strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M45.191 81v63.358M88.687 86.057H67.154c-6.959-5.452-16.232-5.739-21.828-.4a10.27 10.27 0 0 0-.113-1.3v-.041c-.009-.043-.009-.072-.026-.114.409-2.764 1.76-5.314 3.796-7.48 2.364-2.538 5.684-4.54 9.559-5.731 2.566-.804 5.372-1.237 8.326-1.237 12.046 0 21.82 7.304 21.82 16.308v-.005Z"/>
@@ -872,7 +866,6 @@ const Section3 = () => {
             <path stroke={svg2StrokeColor} strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="m172.322 76.986-35.501-35.502h.08c0-.18 0-.361-.013-.538v-.013c7.704-7.354 20.477-6.959 30.062.551.946.72 1.859 1.532 2.726 2.398 9.866 9.867 11.061 24.69 2.646 33.104ZM136.698 38.928c-.021.055-.021.101-.021.16a.218.218 0 0 0-.021.08c-.08.585-.135 1.17-.147 1.767-7.704-7.355-20.478-6.959-30.054.551H76.79c0-12.399 13.459-22.458 30.061-22.458 4.056 0 7.918.598 11.444 1.692h.013c5.351 1.645 9.925 4.413 13.177 7.918 2.806 2.987 4.653 6.5 5.213 10.295v-.004Z"/>
             <path stroke={svg2StrokeColor} strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M136.584 41.486 101.07 76.987c-8.402-8.414-7.22-23.237 2.659-33.103a27.023 27.023 0 0 1 2.726-2.398c9.576-7.514 22.346-7.906 30.054-.551-.013.18-.013.37-.013.55h.088ZM118.294 20.714 103.8 6.22c7.005-7.006 20.275-5.091 29.645 4.278a31.04 31.04 0 0 1 3.265 3.83 29.872 29.872 0 0 1 3.256-3.83c9.37-9.37 22.64-11.284 29.632-4.278l-14.507 14.507"/>
           </svg>
-        </div>
       </section>
         
       {/* 스크롤 애니메이션을 위한 투명한 스페이서 - 섹션 외부 */}

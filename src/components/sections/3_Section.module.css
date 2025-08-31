@@ -184,8 +184,4 @@
   .section3 svg {
     zoom: 0.5;
   }
-
-  .section3 div:has(svg) {
-    bottom: 3% !important;
-  }
 }
