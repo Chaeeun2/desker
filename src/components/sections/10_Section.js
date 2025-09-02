@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
+import { db } from "../../admin/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import styles from "./10_Section.module.css";
 
 const Section10 = () => {
@@ -13,6 +15,78 @@ const Section10 = () => {
     4: { isExpanded: false }
   });
 
+  // Firebase 데이터 상태
+  const [workLifeData, setWorkLifeData] = useState({});
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Firebase에서 work-life 데이터 로드
+  useEffect(() => {
+    const loadWorkLifeData = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'workLifeSection');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setWorkLifeData(data);
+        }
+      } catch (error) {
+        console.error('WorkLife 데이터 로드 실패:', error);
+      } finally {
+        setDataLoaded(true);
+      }
+    };
+
+    loadWorkLifeData();
+  }, []);
+
+  // 동적 CSS 스타일 생성
+  useEffect(() => {
+    if (!dataLoaded || !workLifeData.item1) return;
+
+    const style = document.createElement('style');
+    style.id = 'dynamic-worklife-gradients';
+    
+    // 기존 동적 스타일 제거
+    const existingStyle = document.getElementById('dynamic-worklife-gradients');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+
+    let css = '';
+    
+    // itemOrder를 사용하여 순서대로 처리
+    const itemOrder = workLifeData.itemOrder || ['item1', 'item2', 'item3', 'item4'];
+    itemOrder.forEach((itemKey, index) => {
+      const itemData = workLifeData[itemKey];
+      if (!itemData || !itemData.overlayColor) return;
+      
+      const itemIndex = index + 1; // nth-child는 1부터 시작
+      const { r, g, b } = itemData.overlayColor;
+      
+      css += `
+        [data-item="${itemIndex}"]::before {
+          background: linear-gradient(
+            0deg,
+            rgba(${r}, ${g}, ${b}, 0) 0%,
+            rgba(${r}, ${g}, ${b}, 1) 50%,
+            rgba(${r}, ${g}, ${b}, 1) 100%
+          ) !important;
+        }
+      `;
+    });
+
+    style.textContent = css;
+    document.head.appendChild(style);
+
+    return () => {
+      const styleToRemove = document.getElementById('dynamic-worklife-gradients');
+      if (styleToRemove) {
+        styleToRemove.remove();
+      }
+    };
+  }, [workLifeData, dataLoaded]);
+
   // fade in 애니메이션을 위한 intersection observer
   const [headerRef, headerIntersecting, headerHasIntersected] = useIntersectionObserver({ threshold: 0.3 });
   const [descriptionRef, descriptionIntersecting, descriptionHasIntersected] = useIntersectionObserver({ threshold: 0.3 });
@@ -20,7 +94,7 @@ const Section10 = () => {
 
   // 아이템 클릭 핸들러
   const handleItemClick = (itemIndex) => {
-    const currentState = itemStates[itemIndex].isExpanded;
+    const currentState = itemStates[itemIndex]?.isExpanded || false;
     
     // Safari 감지
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -109,184 +183,56 @@ const Section10 = () => {
 
         {/* 2x2 그리드 레이아웃 */}
         <div ref={gridRef} className={`${styles.gridContainer} ${gridHasIntersected ? styles.fadeIn : ''}`}>
-          {/* 데스커 라운지 홍대 */}
-          <div className={`${styles.gridItem} ${itemStates[1].isExpanded ? styles.expanded : ''}`} data-item="1">
-            <div className={styles.itemContent}>
-              <div className={`${styles.textWrapper} ${itemStates[1].isExpanded ? styles.hidden : ''}`}>
-                <p className={styles.itemContentText1}>
-                  가치있게 일하는 사람들의 연결고리
-                </p>
-              </div>
-              <h3>데스커 라운지 홍대</h3>
-              <div className={`${styles.iconWrapper} ${itemStates[1].isExpanded ? styles.hidden : ''}`}>
-                <div 
-                  className={styles.plusIcon}
-                  onClick={() => handleItemClick(1)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span>→</span>
+          {dataLoaded && (workLifeData.itemOrder || ['item1', 'item2', 'item3', 'item4']).map((itemKey, index) => {
+            const itemData = workLifeData[itemKey];
+            if (!itemData) return null;
+            const itemIndex = index + 1;
+            return (
+              <div key={itemKey} className={`${styles.gridItem} ${itemStates[itemIndex]?.isExpanded ? styles.expanded : ''}`} data-item={itemIndex}>
+                <div className={styles.itemContent}>
+                  <div className={`${styles.textWrapper} ${itemStates[itemIndex]?.isExpanded ? styles.hidden : ''}`}>
+                    <p className={styles.itemContentText1} style={{ whiteSpace: 'pre-line' }}>
+                      {itemData.subtitle}
+                    </p>
+                  </div>
+                  <h3 style={{ whiteSpace: 'pre-line' }}>
+                    {itemData.title}
+                  </h3>
+                  <div className={`${styles.iconWrapper} ${itemStates[itemIndex]?.isExpanded ? styles.hidden : ''}`}>
+                    <div 
+                      className={styles.plusIcon}
+                      onClick={() => handleItemClick(itemIndex)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <span>→</span>
+                    </div>
+                  </div>
+                  <p className={`${styles.itemContentText2} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`} style={{ whiteSpace: 'pre-line' }}>
+                    {itemData.description}
+                  </p>
+                  <a href={itemData.link} target="_blank" rel="noopener noreferrer">
+                    <button className={`${styles.ctaButton} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`}>
+                      {itemData.buttonText}
+                    </button>
+                  </a>
+                  <div 
+                    className={`${styles.closeIcon} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`}
+                    onClick={() => handleItemClick(itemIndex)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <span>×</span>
+                  </div>
+                </div>
+                <div className={styles.itemImage}>
+                  <img
+                    src={itemData.image}
+                    alt={itemData.title}
+                    className={styles.image}
+                  />
                 </div>
               </div>
-              <p className={`${styles.itemContentText2} ${itemStates[1].isExpanded ? styles.visible : ''}`}>
-                일을 통해 성장하는 사람들이 함께 연결되어,
-                <br />
-                다양한 가능성을 찾아갈 수 있는 공간을 꿈꿉니다.
-                          </p>
-                          <a href="https://www.instagram.com/desker_lounge_hd/" target="_blank">
-              <button className={`${styles.ctaButton} ${itemStates[1].isExpanded ? styles.visible : ''}`}>
-                데스커 라운지 홍대 보러가기 →
-                              </button>
-                              </a>
-              <div 
-                className={`${styles.closeIcon} ${itemStates[1].isExpanded ? styles.visible : ''}`}
-                onClick={() => handleItemClick(1)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span>×</span>
-              </div>
-            </div>
-            <div className={styles.itemImage}>
-              <img
-                src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S10-1.jpg"
-                alt="데스커 라운지 홍대"
-                className={styles.image}
-              />
-            </div>
-          </div>
-
-          {/* 데스커 라운지 대구 */}
-          <div className={`${styles.gridItem} ${itemStates[2].isExpanded ? styles.expanded : ''}`} data-item="2">
-            <div className={styles.itemContent}>
-              <div className={`${styles.textWrapper} ${itemStates[2].isExpanded ? styles.hidden : ''}`}>
-                <p className={styles.itemContentText1}>
-                  삶을 위한 배움의 시작과 성장을 경험하는 공간
-                </p>
-              </div>
-              <h3>데스커 라운지 대구</h3>
-              <div className={`${styles.iconWrapper} ${itemStates[2].isExpanded ? styles.hidden : ''}`}>
-                <div 
-                  className={styles.plusIcon}
-                  onClick={() => handleItemClick(2)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span>→</span>
-                </div>
-              </div>
-              <p className={`${styles.itemContentText2} ${itemStates[2].isExpanded ? styles.visible : ''}`}>
-                새로운 시작과 성장으로 이어갈 수 있는
-                <br/>기회를 제공합니다.
-                          </p>
-                                                 <a href="https://www.instagram.com/desker_lounge_dg/" target="_blank">
-              <button className={`${styles.ctaButton} ${itemStates[2].isExpanded ? styles.visible : ''}`}>
-                데스커 라운지 대구 보러가기 →
-                              </button>
-                              </a>
-              <div 
-                className={`${styles.closeIcon} ${itemStates[2].isExpanded ? styles.visible : ''}`}
-                onClick={() => handleItemClick(2)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span>×</span>
-              </div>
-            </div>
-            <div className={styles.itemImage}>
-              <img
-                src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S10-2.jpg"
-                alt="데스커 라운지 대구"
-                className={styles.image}
-              />
-            </div>
-          </div>
-
-          {/* 데스커 베이스캠프 with nonce */}
-          <div className={`${styles.gridItem} ${itemStates[3].isExpanded ? styles.expanded : ''}`} data-item="3">
-            <div className={styles.itemContent}>
-              <div className={`${styles.textWrapper} ${itemStates[3].isExpanded ? styles.hidden : ''}`}>
-                <p className={styles.itemContentText1}>
-                  미래의 창업가를 위한 성장 베이스 캠프
-                </p>
-              </div>
-              <h3>데스커 베이스캠프<br/>with nonce</h3>
-              <div className={`${styles.iconWrapper} ${itemStates[3].isExpanded ? styles.hidden : ''}`}>
-                <div 
-                  className={styles.plusIcon}
-                  onClick={() => handleItemClick(3)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span>→</span>
-                </div>
-              </div>
-              <p className={`${styles.itemContentText2} ${itemStates[3].isExpanded ? styles.visible : ''}`}>
-                매년 150명의 창업 희망 학생을 선발해 
-                <br/>전문가 멘토링, 기술 워크샵, 네트워크 등 
-                <br/>다양한 프로그램을 통해 노하우를 전달하고 있습니다.
-                          </p>
-               <a href="https://www.instagram.com/desker_basecamp_with_nonce/" target="_blank">
-              <button className={`${styles.ctaButton} ${itemStates[3].isExpanded ? styles.visible : ''}`}>
-                데스커 베이스캠프 보러가기 →
-                              </button>
-                              </a>
-              <div 
-                className={`${styles.closeIcon} ${itemStates[3].isExpanded ? styles.visible : ''}`}
-                onClick={() => handleItemClick(3)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span>×</span>
-              </div>
-            </div>
-            <div className={styles.itemImage}>
-              <img
-                src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S10-3.jpg"
-                alt="데스커 베이스캠프 with nonce"
-                className={styles.image}
-              />
-            </div>
-          </div>
-
-          {/* differ */}
-          <div className={`${styles.gridItem} ${itemStates[4].isExpanded ? styles.expanded : ''}`} data-item="4">
-            <div className={styles.itemContent}>
-              <div className={`${styles.textWrapper} ${itemStates[4].isExpanded ? styles.hidden : ''}`}>
-                <p className={styles.itemContentText1}>
-                  책상 앞 우리들의 성장 커뮤니티
-                </p>
-              </div>
-              <h3>differ</h3>
-              <div className={`${styles.iconWrapper} ${itemStates[4].isExpanded ? styles.hidden : ''}`}>
-                <div 
-                  className={styles.plusIcon}
-                  onClick={() => handleItemClick(4)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span>→</span>
-                </div>
-              </div>
-              <p className={`${styles.itemContentText2} ${itemStates[4].isExpanded ? styles.visible : ''}`}>
-                책상에서 시작된 가능성의 이야기를 조명하고,
-                <br/>그 앞에서 마주한 고민과 영감을 주고 받는
-                <br/>성장 커뮤니티입니다.
-                          </p>
-                                         <a href="https://differ.co.kr/" target="_blank">
-              <button className={`${styles.ctaButton} ${itemStates[4].isExpanded ? styles.visible : ''}`}>
-           differ 보러가기 →
-                              </button>
-                              </a>
-              <div 
-                className={`${styles.closeIcon} ${itemStates[4].isExpanded ? styles.visible : ''}`}
-                onClick={() => handleItemClick(4)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span>×</span>
-              </div>
-            </div>
-            <div className={styles.itemImage}>
-              <img
-                src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S10-4.jpg"
-                alt="differ"
-                className={styles.image}
-              />
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -3584,7 +3584,53 @@ label.admin-checkbox-label {
   background: rgb(255, 80, 80);
   color: white;
   position: absolute;
+
   right: 0px;
   top: 10px;
   z-index: 1000;
+}
+
+.worklife-modal .admin-form-group {
+  margin: 20px 30px;
+  gap: 0px;
+}
+
+.worklife-modal .admin-form-group .btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: black;
+  font-weight: 700;
+  transition: all 0.2s;
+  margin-right: 10px;
+  background: #ededed;
+  color: black;
+}
+
+.worklife-modal .admin-modal-header .btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: black;
+  font-weight: 700;
+  transition: all 0.2s;
+  background: #ededed;
+  color: black;
+}
+
+.worklife-modal .admin-modal-header .btn:last-child {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: black;
+  font-weight: 700;
+  transition: all 0.2s;
+  background: black;
+  color: white;
 }

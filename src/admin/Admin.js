@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import SurveyManager from './pages/SurveyManager';
 import EmailTemplateManager from './pages/EmailTemplateManager';
 import GalleryManager from './pages/GalleryManager';
+import WorkLifeManager from './pages/WorkLifeManager';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext'
 import './styles/admin.css'
@@ -31,6 +32,11 @@ function AdminApp() {
         <Route path="gallery" element={
           <ProtectedRoute>
             <GalleryManager />
+          </ProtectedRoute>
+        } />
+        <Route path="work-life" element={
+          <ProtectedRoute>
+            <WorkLifeManager />
           </ProtectedRoute>
         } />
       </Routes>

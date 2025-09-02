@@ -42,6 +42,11 @@ const AdminLayout = ({ children, title }) => {
               갤러리 관리
             </Link>
           </li>
+            <li className={isActive('work-life') ? 'active' : ''}>
+            <Link to="/admin/work-life">
+              워크라이프 관리
+            </Link>
+          </li>
 
           </ul>
         </nav>
