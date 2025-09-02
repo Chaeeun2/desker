@@ -125,14 +125,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
 }
 
 /* Glide 슬라이더 커스텀 스타일 */
 .rightSidePanel4 :global(.glide__arrow) {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
