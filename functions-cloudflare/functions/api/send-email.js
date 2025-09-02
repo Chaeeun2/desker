@@ -103,60 +103,28 @@ export async function onRequest(context) {
         });
       }
 
-      // 템플릿이 제공되면 사용, 아니면 기본 템플릿 사용
-      let htmlBody;
-      let subject = '데스커 워케이션 설문조사 참여 감사합니다 🎉';
-      
-      if (template) {
-        // 템플릿 변수 치환
-        const templateData = {
-          fullName: surveyData.fullName || '고객',
-          hasExperienced: hasExperiencedText,
-          goodPoints: surveyData.goodPoints || '',
-          workType: surveyData.workType || '',
-          email: recipientEmail,
-          phoneNumber: surveyData.phoneNumber || ''
-        };
-        htmlBody = processTemplate(template.content, templateData);
-        subject = template.subject || subject;
-      } else {
-        // 기본 템플릿
-        htmlBody = `
-          <!DOCTYPE html>
-          <html lang="ko">
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body { font-family: 'Pretendard', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; }
-              .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
-              .content { padding: 30px; }
-              .section { background-color: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>🎉 데스커 워케이션 설문조사 참여 완료</h1>
-            </div>
-            <div class="content">
-              <p>안녕하세요, <strong>${surveyData.fullName || '고객'}님</strong>!</p>
-              <p>데스커 워케이션 설문조사에 참여해 주셔서 감사합니다.</p>
-              
-              <div class="section">
-                <h2>📋 제출하신 설문 내용</h2>
-                <p>양양 워케이션 경험: ${hasExperiencedText}</p>
-                ${surveyData.goodPoints ? `<p>좋았던 점: ${surveyData.goodPoints}</p>` : ''}
-                ${surveyData.workType ? `<p>업무 분야: ${surveyData.workType}</p>` : ''}
-              </div>
-              
-              <div class="section">
-                <h2>🎁 경품 이벤트 안내</h2>
-                <p>추첨을 통해 다양한 경품을 드립니다!</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
+      // Firebase 템플릿만 사용
+      if (!template) {
+        return new Response(JSON.stringify({ 
+          success: false, 
+          error: 'Email template not found in Firebase. Please create template in admin panel.' 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
+      
+      // 템플릿 변수 치환
+      const templateData = {
+        fullName: surveyData.fullName || '고객',
+        hasExperienced: hasExperiencedText,
+        goodPoints: surveyData.goodPoints || '',
+        workType: surveyData.workType || '',
+        email: recipientEmail,
+        phoneNumber: surveyData.phoneNumber || ''
+      };
+      const htmlBody = processTemplate(template.content, templateData);
+      const subject = template.subject || '데스커 워케이션 설문조사 참여 감사합니다 🎉';
 
       const emailPayload = {
         from: context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>',
