@@ -23,15 +23,102 @@ const Section10 = () => {
   useEffect(() => {
     const loadWorkLifeData = async () => {
       try {
+        console.log('WorkLife 데이터 로딩 시작...');
         const docRef = doc(db, 'settings', 'workLifeSection');
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
+          console.log('WorkLife 데이터 로드 성공:', data);
           setWorkLifeData(data);
+        } else {
+          console.log('WorkLife 문서가 존재하지 않습니다.');
+          // 기본 데이터 설정
+          const defaultData = {
+            itemOrder: ['item1', 'item2', 'item3', 'item4'],
+            item1: {
+              title: '데스커 라운지 홍대',
+              subtitle: 'DESKER LOUNGE',
+              description: '홍대의 활기찬 에너지와 함께하는 워크스페이스',
+              image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-1.jpg',
+              link: '#',
+              buttonText: '자세히 보기',
+              overlayColor: { r: 255, g: 107, b: 107 }
+            },
+            item2: {
+              title: '데스커 라운지 대구',
+              subtitle: 'DESKER LOUNGE',
+              description: '대구의 중심에서 만나는 새로운 워크라이프',
+              image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-2.jpg',
+              link: '#',
+              buttonText: '자세히 보기',
+              overlayColor: { r: 107, g: 255, b: 107 }
+            },
+            item3: {
+              title: '데스커 베이스캠프',
+              subtitle: 'DESKER BASECAMP',
+              description: '자연과 함께하는 워케이션 베이스캠프',
+              image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-3.jpg',
+              link: '#',
+              buttonText: '자세히 보기',
+              overlayColor: { r: 107, g: 107, b: 255 }
+            },
+            item4: {
+              title: 'differ',
+              subtitle: 'DIFFER',
+              description: '차별화된 워크라이프 경험',
+              image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-4.jpg',
+              link: '#',
+              buttonText: '자세히 보기',
+              overlayColor: { r: 255, g: 255, b: 107 }
+            }
+          };
+          setWorkLifeData(defaultData);
+          console.log('기본 데이터 설정:', defaultData);
         }
       } catch (error) {
-
+        console.error('WorkLife 데이터 로드 실패:', error);
+        // Firebase 접근 실패 시에도 기본 데이터 제공
+        const defaultData = {
+          itemOrder: ['item1', 'item2', 'item3', 'item4'],
+          item1: {
+            title: '데스커 라운지 홍대',
+            subtitle: 'DESKER LOUNGE',
+            description: '홍대의 활기찬 에너지와 함께하는 워크스페이스',
+            image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-1.jpg',
+            link: '#',
+            buttonText: '자세히 보기',
+            overlayColor: { r: 255, g: 107, b: 107 }
+          },
+          item2: {
+            title: '데스커 라운지 대구',
+            subtitle: 'DESKER LOUNGE',
+            description: '대구의 중심에서 만나는 새로운 워크라이프',
+            image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-2.jpg',
+            link: '#',
+            buttonText: '자세히 보기',
+            overlayColor: { r: 107, g: 255, b: 107 }
+          },
+          item3: {
+            title: '데스커 베이스캠프',
+            subtitle: 'DESKER BASECAMP',
+            description: '자연과 함께하는 워케이션 베이스캠프',
+            image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-3.jpg',
+            link: '#',
+            buttonText: '자세히 보기',
+            overlayColor: { r: 107, g: 107, b: 255 }
+          },
+          item4: {
+            title: 'differ',
+            subtitle: 'DIFFER',
+            description: '차별화된 워크라이프 경험',
+            image: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/default-worklife-4.jpg',
+            link: '#',
+            buttonText: '자세히 보기',
+            overlayColor: { r: 255, g: 255, b: 107 }
+          }
+        };
+        setWorkLifeData(defaultData);
       } finally {
         setDataLoaded(true);
       }
@@ -183,11 +270,20 @@ const Section10 = () => {
 
         {/* 2x2 그리드 레이아웃 */}
         <div ref={gridRef} className={`${styles.gridContainer} ${gridHasIntersected ? styles.fadeIn : ''}`}>
-          {dataLoaded && (workLifeData.itemOrder || ['item1', 'item2', 'item3', 'item4']).map((itemKey, index) => {
-            const itemData = workLifeData[itemKey];
-            if (!itemData) return null;
-            const itemIndex = index + 1;
-            return (
+          {(() => {
+            console.log('렌더링 상태:', { dataLoaded, workLifeData, itemOrder: workLifeData.itemOrder });
+            const itemOrder = workLifeData.itemOrder || ['item1', 'item2', 'item3', 'item4'];
+            console.log('사용할 itemOrder:', itemOrder);
+            
+            return dataLoaded && itemOrder.map((itemKey, index) => {
+              const itemData = workLifeData[itemKey];
+              console.log(`${itemKey} 데이터:`, itemData);
+              if (!itemData) {
+                console.warn(`${itemKey} 데이터가 없습니다`);
+                return null;
+              }
+              const itemIndex = index + 1;
+              return (
               <div key={itemKey} className={`${styles.gridItem} ${itemStates[itemIndex]?.isExpanded ? styles.expanded : ''}`} data-item={itemIndex}>
                 <div className={styles.itemContent}>
                   <div className={`${styles.textWrapper} ${itemStates[itemIndex]?.isExpanded ? styles.hidden : ''}`}>
@@ -231,8 +327,9 @@ const Section10 = () => {
                   />
                 </div>
               </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
       </div>
     </section>
