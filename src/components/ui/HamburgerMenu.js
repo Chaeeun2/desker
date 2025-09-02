@@ -1,10 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './HamburgerMenu.module.css';
 import SurveyModal from './SurveyModal';
 
 const HamburgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // 간단한 섹션 기반 가시성 제어
+  useEffect(() => {
+    const handleScroll = () => {
+      const appElement = document.querySelector('.App');
+      const scrollY = appElement?.scrollTop || 0;
+      console.log('📍 App 스크롤 위치:', scrollY);
+      
+      // 모든 섹션 위치 확인
+      const section1 = document.querySelector('section:nth-child(1)');
+      const section2 = document.querySelector('section:nth-child(2)');
+      const section3 = document.querySelector('section:nth-child(3)');
+      const section4 = document.querySelector('section:nth-child(4)');
+      const section5 = document.querySelector('section:nth-child(5)');
+      const section6 = document.querySelector('section:nth-child(6)');
+      
+      console.log('📊 섹션 위치들:', {
+        section1: section1?.offsetTop,
+        section2: section2?.offsetTop,
+        section3: section3?.offsetTop,
+        section4: section4?.offsetTop,
+        section5: section5?.offsetTop,
+        section6: section6?.offsetTop
+      });
+      
+      // 현재 섹션 확인
+      let currentSection = 1;
+      if (section6 && scrollY >= section6.offsetTop - 100) currentSection = 6;
+      else if (section5 && scrollY >= section5.offsetTop - 100) currentSection = 5;
+      else if (section4 && scrollY >= section4.offsetTop - 100) currentSection = 4;
+      else if (section3 && scrollY >= section3.offsetTop - 100) currentSection = 3;
+      else if (section2 && scrollY >= section2.offsetTop - 100) currentSection = 2;
+      
+      console.log('🎯 현재 섹션:', currentSection);
+      
+      // 섹션 1,2,3,4에서는 숨김, 섹션 5부터 표시
+      if (currentSection <= 4) {
+        console.log('❌ 섹션 1-4 - 햄버거 버튼 숨김');
+        setIsVisible(false);
+      } else {
+        console.log('✅ 섹션 5+ - 햄버거 버튼 표시');
+        setIsVisible(true);
+      }
+    };
+
+    // App 요소의 스크롤 이벤트 추가
+    const appElement = document.querySelector('.App');
+    if (appElement) {
+      appElement.addEventListener('scroll', handleScroll);
+    }
+    
+    // 초기 상태 확인
+    handleScroll();
+
+    return () => {
+      if (appElement) {
+        appElement.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -57,21 +118,18 @@ const HamburgerMenu = () => {
     <>
       {/* 햄버거 메뉴 버튼 */}
       <button 
-        className={`${styles.hamburgerButton} ${isOpen ? styles.open : ''}`}
+        className={`${styles.hamburgerButton} ${isOpen ? styles.open : ''} ${isVisible ? styles.visible : styles.hidden}`}
         onClick={toggleMenu}
-        aria-label="메뉴"
       >
         <span className={styles.line}></span>
         <span className={styles.line}></span>
         <span className={styles.line}></span>
       </button>
 
-      {/* 메뉴 오버레이 */}
-      {isOpen && (
-        <div className={styles.overlay} onClick={toggleMenu}></div>
-      )}
+      {/* 오버레이 */}
+      {isOpen && <div className={styles.overlay} onClick={toggleMenu}></div>}
 
-      {/* 메뉴 컨텐츠 */}
+      {/* 메뉴 콘텐츠 */}
       <div className={`${styles.menuContent} ${isOpen ? styles.show : ''}`}>
         <nav className={styles.navigation}>
           <ul className={styles.menuList}>
@@ -94,7 +152,7 @@ const HamburgerMenu = () => {
           </ul>
         </nav>
       </div>
-      
+
       {/* 설문 모달 */}
       <SurveyModal isOpen={isSurveyModalOpen} onClose={() => setIsSurveyModalOpen(false)} />
     </>
