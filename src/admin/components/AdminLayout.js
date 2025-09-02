@@ -37,6 +37,11 @@ const AdminLayout = ({ children, title }) => {
               이메일 템플릿
             </Link>
           </li>
+            <li className={isActive('gallery') ? 'active' : ''}>
+            <Link to="/admin/gallery">
+              갤러리 관리
+            </Link>
+          </li>
 
           </ul>
         </nav>

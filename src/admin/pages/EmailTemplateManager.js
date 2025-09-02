@@ -68,7 +68,7 @@ const EmailTemplateManager = () => {
                   <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
                     <p style="color: #6c757d; font-size: 14px;">
                       본 메일은 발신 전용입니다.<br>
-                      문의사항은 hello@deskerworkation.com으로 연락주세요.
+                      문의사항은 ${process.env.REACT_APP_FROM_EMAIL?.match(/<(.+)>/)?.[1] || 'hello@deskerworkation.com'}으로 연락주세요.
                     </p>
                   </div>
                 </div>

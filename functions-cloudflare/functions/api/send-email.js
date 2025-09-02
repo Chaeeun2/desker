@@ -49,7 +49,7 @@ export async function onRequest(context) {
       const processedHtml = processTemplate(template.content, testData);
       
       const emailPayload = {
-        from: 'Desker Workation <hello@deskerworkation.com>',
+        from: context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>',
         to: to,
         subject: template.subject,
         html: processedHtml
@@ -58,7 +58,7 @@ export async function onRequest(context) {
       const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer re_7YoLNzPF_GuLbGgM2AvJpHiyK6tkyLpE8',
+          'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(emailPayload)
@@ -159,7 +159,7 @@ export async function onRequest(context) {
       }
 
       const emailPayload = {
-        from: 'Desker Workation <hello@deskerworkation.com>',
+        from: context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>',
         to: recipientEmail,
         subject: subject,
         html: htmlBody
@@ -169,7 +169,7 @@ export async function onRequest(context) {
       const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer re_7YoLNzPF_GuLbGgM2AvJpHiyK6tkyLpE8',
+          'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(emailPayload)

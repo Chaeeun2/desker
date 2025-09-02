@@ -172,7 +172,6 @@ const Section7 = () => {
       const sectionTop = sectionRef.current.offsetTop;
       const viewportHeight = window.innerHeight;
       
-      
       // 섹션7보다 위로 스크롤하면 무조건 리셋
       // fixed 상태일 때 sectionTop이 제대로 안 읽힐 수 있으므로 여러 값 체크
       let actualSectionTop = sectionTop;
@@ -360,7 +359,6 @@ const Section7 = () => {
           // 위로 스크롤
           if (currentPanel === 0) {
             // 패널1에서 위로 스크롤 시 무조건 섹션7 리셋
-            
             // 먼저 리셋 실행
             resetSection7();
             
@@ -389,88 +387,6 @@ const Section7 = () => {
     };
   }, [isInSection, currentPanel, isTransitioning, isMobile]);
 
-  // 터치 이벤트 처리 비활성화 - 모바일에서는 일반 스크롤 사용
-  /*
-  useEffect(() => {
-    const handleTouchStart = (e) => {
-      if (!isInSection) return;
-      touchStartY = e.touches[0].clientY;
-    };
-    
-    const handleTouchMove = (e) => {
-      if (scrollLocked.current && isInSection) {
-        e.preventDefault();
-      }
-    };
-    
-    const handleTouchEnd = (e) => {
-      if (!isInSection || isTransitioning) return;
-      
-      touchEndY = e.changedTouches[0].clientY;
-      const deltaY = touchStartY - touchEndY;
-      
-      if (Math.abs(deltaY) > 50) { // 최소 스와이프 거리
-        if (deltaY > 0) {
-          // 위로 스와이프
-          if (currentPanel < 3) {
-            // 패널 1,2,3에서는 다음 패널로
-            moveToPanel(currentPanel + 1);
-          }
-          // 패널4에서 위로 스와이프는 무시 (탈출 안됨)
-        } else if (deltaY < 0) {
-          // 아래로 스와이프
-          if (currentPanel > 0 && currentPanel < 3) {
-            // 패널 2,3에서는 이전 패널로
-            moveToPanel(currentPanel - 1);
-          } else if (currentPanel === 3) {
-            // 패널4에서 아래로 스와이프 - 다음 섹션으로 탈출
-            exitingSection.current = true;
-            scrollLocked.current = false;
-            setIsInSection(false);
-            
-            if (sectionRef.current) {
-              sectionRef.current.style.position = 'relative';
-              sectionRef.current.style.top = 'auto';
-            }
-            
-            const appElement = document.querySelector('.App');
-            if (appElement) {
-              appElement.scrollTop = lockPosition.current + window.innerHeight + 10;
-            }
-          } else if (currentPanel === 0) {
-            // 패널1에서 아래로 스와이프 - 이전 섹션으로 탈출
-            scrollLocked.current = false;
-            setIsInSection(false);
-            
-            if (sectionRef.current) {
-              sectionRef.current.style.position = 'relative';
-              sectionRef.current.style.top = 'auto';
-            }
-            
-            const appElement = document.querySelector('.App');
-            if (appElement) {
-              appElement.scrollTop = lockPosition.current - 10;
-            }
-          }
-        }
-      }
-    };
-    
-    if (sectionRef.current) {
-      sectionRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
-      sectionRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
-      sectionRef.current.addEventListener('touchend', handleTouchEnd, { passive: false });
-      
-      return () => {
-        if (sectionRef.current) {
-          sectionRef.current.removeEventListener('touchstart', handleTouchStart);
-          sectionRef.current.removeEventListener('touchmove', handleTouchMove);
-          sectionRef.current.removeEventListener('touchend', handleTouchEnd);
-        }
-      };
-    }
-  }, [isInSection, currentPanel, isTransitioning, isMobile]);
-  */
 
   // 키보드 이벤트 처리
   useEffect(() => {
@@ -673,7 +589,7 @@ const Section7 = () => {
                 >
                   <div className={styles.textOverlay}>
                     <h2 className={styles.panelTitle} style={{ lineHeight: '1.2', fontSize: '7rem' }}>
-                      <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/logo.png" style={{width: "350px"}} alt="logo" /><br/>환기의 정원
+                      <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 201.png" style={{width: "350px"}} alt="logo" /><br/>환기의 정원
                     </h2>
                     <p className={styles.panelSubtitle}>자연으로 가득 채운 워크라운지</p>
                   </div>
@@ -765,7 +681,7 @@ const Section7 = () => {
                 >
                   <div className={styles.textOverlay}>
                     <h2 className={styles.panelTitle} style={{ lineHeight: '1.2', fontSize: '7rem' }}>워케이션 공간 속<br/>즐거움을 더하다</h2>
-                    <p className={styles.panelSubtitle}>특별한 경험을 위한 협업</p>
+                    <p className={styles.panelSubtitle}>더욱 특별한 워케이션 경험을 위한 협업</p>
                   </div>
                 </div>
               </div>

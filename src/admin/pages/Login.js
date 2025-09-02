@@ -29,7 +29,7 @@ const Login = () => {
       await updateAuthState(result.user, result.isAdmin);
       
       
-      navigate('/admin/overview');
+      navigate('/admin/survey');
     } catch (error) {
       // console.error('로그인 오류:', error);
       setError(error.message);

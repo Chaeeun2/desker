@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import SurveyManager from './pages/SurveyManager';
 import EmailTemplateManager from './pages/EmailTemplateManager';
+import GalleryManager from './pages/GalleryManager';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext'
 import './styles/admin.css'
@@ -25,6 +26,11 @@ function AdminApp() {
         <Route path="email-templates" element={
           <ProtectedRoute>
             <EmailTemplateManager />
+          </ProtectedRoute>
+        } />
+        <Route path="gallery" element={
+          <ProtectedRoute>
+            <GalleryManager />
           </ProtectedRoute>
         } />
       </Routes>

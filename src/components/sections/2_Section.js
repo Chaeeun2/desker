@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { db } from '../../admin/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import styles from './2_Section.module.css';
 
 const Section2 = () => {
@@ -12,16 +14,45 @@ const Section2 = () => {
   const marqueeRef = useRef(null);
   const cloneRef = useRef(null);
   const containerRef = useRef(null);
+  const [galleryImages, setGalleryImages] = useState([]);
 
-  // 원본 이미지 데이터
-  const originalImages = [
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-1.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-2.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-3.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-4.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-5.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-6.jpg'
-  ];
+  // Firebase에서 갤러리 이미지 로드
+  useEffect(() => {
+    const loadGalleryImages = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'gallery');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          setGalleryImages(docSnap.data().images || []);
+        } else {
+          // 기본 이미지들
+          const defaultImages = [
+            'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-1.jpg',
+            'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-2.jpg',
+            'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-3.jpg',
+            'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-4.jpg',
+            'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-5.jpg',
+            'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-6.jpg'
+          ];
+          setGalleryImages(defaultImages);
+        }
+      } catch (error) {
+        // Firebase 접근 실패 시 기본 이미지 사용
+        const defaultImages = [
+          'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-1.jpg',
+          'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-2.jpg',
+          'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-3.jpg',
+          'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-4.jpg',
+          'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-5.jpg',
+          'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S2-6.jpg'
+        ];
+        setGalleryImages(defaultImages);
+      }
+    };
+
+    loadGalleryImages();
+  }, []);
 
   // RunningMessage 스타일의 부드러운 무한 스크롤 애니메이션
   useEffect(() => {
@@ -55,7 +86,7 @@ const Section2 = () => {
   }, []);
 
   const renderImages = () =>
-    originalImages.map((image, index) => (
+    galleryImages.map((image, index) => (
       <div key={index} className={styles.imageWrapper}>
         <img src={image} alt={`Slide ${index + 1}`} />
       </div>
