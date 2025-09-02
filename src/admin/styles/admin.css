@@ -25,6 +25,13 @@
   padding: 0px;
   margin-left: 230px;
   background: #f2f2f2;
+  min-height: 100vh;
+}
+
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .admin-header h1 {
@@ -121,10 +128,7 @@ select.admin-input,
 
 /* 콘텐츠 관리 스타일 */
 .admin-content-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  padding: 30px;
+  min-height: 100vh;
 }
 
 .admin-content-nav {
@@ -135,6 +139,7 @@ select.admin-input,
   border-radius: 10px;
   padding: 25px;
   height: 100%;
+  position: fixed;
 }
 
 .admin-content-nav h3 {
@@ -1235,7 +1240,6 @@ select.admin-input,
   font-weight: 400;
   cursor: pointer;
   color: black;
-  padding: 0;
   width: 35px;
   height: 35px;
   display: flex;
@@ -1666,7 +1670,7 @@ small {
   margin-bottom: 0.5rem;
   font-weight: 600;
   color: black;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
 }
 
 /* 스크롤바 스타일링 (갤러리용) */
@@ -2864,7 +2868,7 @@ label.admin-checkbox-label {
 
 .admin-table-container {
   overflow-y: scroll;
-  max-height: calc(100vh - 230px);
+  max-height: calc(100vh - 130px);
   margin: 30px;
   background: #fff;
   border-radius: 10px;
@@ -3004,10 +3008,9 @@ label.admin-checkbox-label {
 .admin-modal-close {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 40px;
   cursor: pointer;
-  color: #666;
-  padding: 8px;
+  color: black;
   border-radius: 4px;
   transition: all 0.2s ease;
   display: flex;
@@ -3015,15 +3018,6 @@ label.admin-checkbox-label {
   justify-content: center;
   width: 32px;
   height: 32px;
-}
-
-.admin-modal-close:hover {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.admin-modal-close:active {
-  background-color: #e0e0e0;
 }
 
 .admin-modal-body {
@@ -3452,4 +3446,22 @@ label.admin-checkbox-label {
   margin-top: 10px;
   background: #ededed;
   color: black;
+}
+
+.survey-list {
+  padding: 30px;
+}
+
+.survey-list .btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: black;
+  font-weight: 700;
+  transition: all 0.2s;
+
+  background: black;
+  color: white;
 }

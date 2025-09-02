@@ -172,15 +172,6 @@ const Section7 = () => {
       const sectionTop = sectionRef.current.offsetTop;
       const viewportHeight = window.innerHeight;
       
-      // 디버깅 로그 추가
-      console.log('스크롤 이벤트 발생', {
-        scrollTop,
-        sectionTop,
-        lockPosition: lockPosition.current,
-        isInSection,
-        currentPanel,
-        position: sectionRef.current.style.position
-      });
       
       // 섹션7보다 위로 스크롤하면 무조건 리셋
       // fixed 상태일 때 sectionTop이 제대로 안 읽힐 수 있으므로 여러 값 체크
@@ -193,21 +184,9 @@ const Section7 = () => {
       
       // 섹션7이 화면 아래에 있을 때 무조건 리셋
       const threshold = actualSectionTop - viewportHeight;
-      console.log('리셋 체크', {
-        scrollTop,
-        threshold,
-        shouldReset: scrollTop < threshold,
-        conditions: {
-          scrollLocked: scrollLocked.current,
-          isInSection,
-          currentPanel,
-          isFixed: sectionRef.current.style.position === 'fixed'
-        }
-      });
       
       // 섹션7보다 위로 올라가면 무조건 리셋
       if (scrollTop < threshold) {
-        console.log('🔴 섹션7보다 위로 스크롤 - 무조건 리셋 실행!');
         
         // 강제로 모든 상태 초기화
         scrollLocked.current = false;
@@ -381,11 +360,6 @@ const Section7 = () => {
           // 위로 스크롤
           if (currentPanel === 0) {
             // 패널1에서 위로 스크롤 시 무조건 섹션7 리셋
-            console.log('🔴 패널1에서 위로 스크롤 - 섹션7 리셋 실행!', {
-              currentPanel,
-              scrollLocked: scrollLocked.current,
-              isInSection
-            });
             
             // 먼저 리셋 실행
             resetSection7();

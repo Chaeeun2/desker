@@ -1,0 +1,15 @@
+{
+  "name": "desker-email-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev functions",
+    "deploy": "wrangler pages deploy functions"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "resend": "^3.5.0"
+  }
+}

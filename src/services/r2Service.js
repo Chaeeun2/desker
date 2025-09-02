@@ -21,14 +21,6 @@ const s3Client = new S3Client({
   forcePathStyle: true, // R2에 필요한 설정
 });
 
-console.log('R2 Config:', {
-  endpoint: R2_ENDPOINT,
-  bucket: R2_BUCKET_NAME,
-  publicUrl: R2_PUBLIC_URL,
-  hasAccessKey: !!R2_ACCESS_KEY_ID,
-  hasSecretKey: !!R2_SECRET_ACCESS_KEY,
-});
-
 // 파일명 생성 함수
 const generateFileName = (originalName) => {
   const timestamp = Date.now();
@@ -70,13 +62,11 @@ export const uploadImageToR2 = async (file) => {
         ContentType: file.type,
       };
       
-      console.log('Uploading to R2:', fileName, 'Size:', file.size);
       const command = new PutObjectCommand(uploadParams);
       await s3Client.send(command);
       
       // Public URL 생성
       const publicUrl = `${R2_PUBLIC_URL}/${fileName}`;
-      console.log('Upload successful:', publicUrl);
       
       return {
         success: true,
@@ -86,8 +76,6 @@ export const uploadImageToR2 = async (file) => {
       };
       
     } catch (uploadError) {
-      console.error('R2 upload failed:', uploadError);
-      console.error('Fallback to base64 encoding');
       
       // R2 업로드 실패 시 base64 fallback
       return new Promise((resolve) => {
@@ -112,7 +100,6 @@ export const uploadImageToR2 = async (file) => {
     }
     
   } catch (error) {
-    console.error('R2 upload error:', error);
     return {
       success: false,
       error: '이미지 업로드 중 오류가 발생했습니다.'
@@ -156,7 +143,6 @@ export const deleteImageFromR2 = async (fileName) => {
     
     return { success: true };
   } catch (error) {
-    console.error('R2 delete error:', error);
     return { success: false, error: error.message };
   }
 };

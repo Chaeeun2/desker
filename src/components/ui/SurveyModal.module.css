@@ -95,8 +95,8 @@
 }
 
 .modalBodyImg img {
-  transform: rotate(9deg);
-  width: 280px;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .title {
@@ -378,6 +378,60 @@
 
 .removePhoto:hover {
   background-color: #cc0000;
+}
+
+/* 입력 필드 래퍼 */
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 에러 상태 입력 필드 */
+.errorInput {
+  border-color: #ff4444 !important;
+}
+
+/* 에러 툴팁 */
+.errorTooltip {
+  position: absolute;
+  top: calc(100% + 15px);
+  width: 420px;
+  left: 0;
+  right: 0;
+  background-color: #ff4444;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: var(--font-pret);
+  z-index: 10;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* 툴팁 화살표 */
+.errorTooltip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #ff4444;
+}
+
+/* 페이드인 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 완료 메시지 */
@@ -730,8 +784,8 @@
   }
 
   .uploadIcon {
-    width: 35px;
-    height: 35px;
+    width: 20px;
+    height: 20px;
   }
 
   .progressIndicator::before {
@@ -745,5 +799,13 @@
   .formGrid {
     grid-template-columns: 1fr;
     margin-top: 10px;
+  }
+
+  .uploadStatus {
+    font-size: 16px;
+  }
+
+  .photoPreview {
+    max-width: 100%;
   }
 }

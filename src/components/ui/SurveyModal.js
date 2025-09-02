@@ -3,12 +3,15 @@ import styles from './SurveyModal.module.css';
 import { saveSurveyResponse } from '../../services/surveyService';
 import { uploadImageToR2 } from '../../services/r2Service';
 import { uploadImageToR2Direct } from '../../services/r2DirectUpload';
+import { sendSurveyConfirmationEmail, sendAdminNotificationEmail } from '../../services/emailService';
 
 const SurveyModal = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0); // 0: 인트로, 1-5: 설문 단계
   const [indicatorStep, setIndicatorStep] = useState(0);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [emailError, setEmailError] = useState(''); // 이메일 에러 메시지
+  const [emailForPrizesError, setEmailForPrizesError] = useState(''); // 경품용 이메일 에러
   const [surveyAnswers, setSurveyAnswers] = useState({
     hasExperienced: '', // 양양 워케이션 경험 여부
     goodPoints: '', // 좋았던 점
@@ -109,6 +112,8 @@ const SurveyModal = ({ isOpen, onClose }) => {
       setIndicatorStep(0);
       setPhotoPreview(null);
       setUploadingPhoto(false);
+      setEmailError('');
+      setEmailForPrizesError('');
       setSurveyAnswers({
         hasExperienced: '',
         goodPoints: '',
@@ -202,6 +207,12 @@ const SurveyModal = ({ isOpen, onClose }) => {
     }
   };
 
+  // 이메일 형식 검증 함수
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleAnswerChange = (question, value) => {
     setSurveyAnswers(prev => ({
       ...prev,
@@ -245,19 +256,15 @@ const SurveyModal = ({ isOpen, onClose }) => {
       
       // SDK 업로드 실패시 직접 업로드 시도
       if (!uploadResult.success || uploadResult.fallback) {
-        console.log('Trying direct upload method...');
         uploadResult = await uploadImageToR2Direct(file);
       }
       
       if (uploadResult.success) {
-        console.log('Upload result:', uploadResult);
-        console.log('Setting photoUrl to:', uploadResult.url);
         setSurveyAnswers(prev => {
           const newState = {
             ...prev,
             photoUrl: uploadResult.url
           };
-          console.log('New surveyAnswers state:', newState);
           return newState;
         });
       } else {
@@ -280,8 +287,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
       }
 
       // Firebase에 설문 데이터 저장
-      console.log('Current surveyAnswers before submission:', surveyAnswers);
-      console.log('photoUrl value:', surveyAnswers.photoUrl);
       
       const surveyData = {
         // 개인정보
@@ -320,17 +325,32 @@ const SurveyModal = ({ isOpen, onClose }) => {
         privacyAgreement: surveyAnswers.privacyAgreement
       };
 
-      console.log('Submitting surveyData to Firebase:', surveyData);
       const result = await saveSurveyResponse(surveyData);
       
       if (result.success) {
-        alert('설문에 참여해주셔서 감사합니다!');
+        // 이메일 발송 (실패해도 설문 제출은 성공으로 처리)
+        try {
+          // 사용자에게 확인 이메일 발송
+          const emailResult = await sendSurveyConfirmationEmail(surveyData);
+          
+          // 관리자에게 알림 이메일 발송
+          const adminEmailResult = await sendAdminNotificationEmail(surveyData);
+          
+          // 이메일 발송 상태에 관계없이 설문 제출은 성공
+          alert('설문에 참여해주셔서 감사합니다.');
+          
+          // 이메일 발송 성공 시 추가 안내 (콘솔에만 로그)
+          if (emailResult.success) {
+          }
+        } catch (emailError) {
+          alert('설문에 참여해주셔서 감사합니다.');
+        }
+        
         onClose();
       } else {
         throw new Error(result.error || '설문 저장에 실패했습니다.');
       }
     } catch (error) {
-      console.error('Survey submission error:', error);
       alert('설문 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
       
       // 버튼 원래 상태로 복구
@@ -368,7 +388,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
         return (
           <>
             <div className={styles.modalBodyImg}>
-              <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/modal.png" alt="데스커" />
+              <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/coupons.png" alt="데스커" />
             </div>
             
             <div className={styles.modalBody}>
@@ -494,7 +514,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
                           // surveyAnswers에서 photoUrl 제거
                           setSurveyAnswers(prev => ({ ...prev, photoUrl: '' }));
                           // 파일 input 리셋을 위해 key가 변경되도록 함
-                          console.log('Photo removed, input will be reset');
                         }}
                       >
                         ✕
@@ -729,13 +748,30 @@ const SurveyModal = ({ isOpen, onClose }) => {
                     
                     <div className={styles.formGroup}>
                       <label className={styles.formLabel}>이메일</label>
-                      <input
-                        type="email"
-                        className={styles.formInput}
-                        value={surveyAnswers.email}
-                        onChange={(e) => handleAnswerChange('email', e.target.value)}
-                        placeholder="이메일을 입력해주세요"
-                      />
+                      <div className={styles.inputWrapper}>
+                        <input
+                          type="email"
+                          className={`${styles.formInput} ${emailError ? styles.errorInput : ''}`}
+                          value={surveyAnswers.email}
+                          onChange={(e) => {
+                            handleAnswerChange('email', e.target.value);
+                            if (emailError) setEmailError(''); // 입력 시 에러 초기화
+                          }}
+                          onBlur={(e) => {
+                            if (e.target.value && !validateEmail(e.target.value)) {
+                              setEmailError('올바른 이메일 형식이 아닙니다. (예: example@email.com)');
+                            } else {
+                              setEmailError('');
+                            }
+                          }}
+                          placeholder="이메일을 입력해주세요"
+                        />
+                        {emailError && (
+                          <div className={styles.errorTooltip}>
+                            {emailError}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     <div className={styles.formGroup}>
@@ -1061,30 +1097,45 @@ const SurveyModal = ({ isOpen, onClose }) => {
                 <h3 className={styles.questionTitle}>연락처</h3>
                 <div className={styles.phoneInputGroup}>
                   <input
-                    type="text"
+                    type="tel"
                     className={`${styles.formInput} ${styles.half}`}
                     value={surveyAnswers.phoneFirst || ''}
-                    onChange={(e) => handleAnswerChange('phoneFirst', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                      handleAnswerChange('phoneFirst', value);
+                    }}
                     placeholder="010"
                     maxLength={3}
+                    pattern="[0-9]*"
+                    inputMode="numeric"
                   />
                   <span className={styles.phoneSeparator}>-</span>
                   <input
-                    type="text"
+                    type="tel"
                     className={`${styles.formInput} ${styles.half}`}
                     value={surveyAnswers.phoneSecond || ''}
-                    onChange={(e) => handleAnswerChange('phoneSecond', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                      handleAnswerChange('phoneSecond', value);
+                    }}
                     placeholder="XXXX"
                     maxLength={4}
+                    pattern="[0-9]*"
+                    inputMode="numeric"
                   />
                   <span className={styles.phoneSeparator}>-</span>
                   <input
-                    type="text"
+                    type="tel"
                     className={`${styles.formInput} ${styles.half}`}
                     value={surveyAnswers.phoneThird || ''}
-                    onChange={(e) => handleAnswerChange('phoneThird', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                      handleAnswerChange('phoneThird', value);
+                    }}
                     placeholder="XXXX"
                     maxLength={4}
+                    pattern="[0-9]*"
+                    inputMode="numeric"
                   />
                 </div>
               </div>
@@ -1104,13 +1155,30 @@ const SurveyModal = ({ isOpen, onClose }) => {
               
               <div className={styles.questionWrap}>
                 <h3 className={styles.questionTitle}>이메일을 남겨주시면 설문 참여 경품 및 데스커 소식을 보내드립니다.</h3>
-                <input
-                  type="email"
-                  className={styles.formInput}
-                  value={surveyAnswers.emailForPrizes || ''}
-                  onChange={(e) => handleAnswerChange('emailForPrizes', e.target.value)}
-                  placeholder="이메일을 입력해주세요"
-                />
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="email"
+                    className={`${styles.formInput} ${emailForPrizesError ? styles.errorInput : ''}`}
+                    value={surveyAnswers.emailForPrizes || ''}
+                    onChange={(e) => {
+                      handleAnswerChange('emailForPrizes', e.target.value);
+                      if (emailForPrizesError) setEmailForPrizesError(''); // 입력 시 에러 초기화
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value && !validateEmail(e.target.value)) {
+                        setEmailForPrizesError('올바른 이메일 형식이 아닙니다. (예: example@email.com)');
+                      } else {
+                        setEmailForPrizesError('');
+                      }
+                    }}
+                    placeholder="이메일을 입력해주세요"
+                  />
+                  {emailForPrizesError && (
+                    <div className={styles.errorTooltip}>
+                      {emailForPrizesError}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className={styles.questionWrap}>

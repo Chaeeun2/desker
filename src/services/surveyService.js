@@ -22,10 +22,8 @@ export const saveSurveyResponse = async (surveyData) => {
       submittedAt: serverTimestamp(),
       createdAt: new Date().toISOString()
     });
-    console.log('Survey saved with ID: ', docRef.id);
     return { success: true, id: docRef.id };
   } catch (error) {
-    console.error('Error saving survey: ', error);
     return { success: false, error: error.message };
   }
 };
@@ -41,7 +39,6 @@ export const getAllSurveys = async () => {
     });
     return surveys;
   } catch (error) {
-    console.error('Error getting surveys: ', error);
     return [];
   }
 };
@@ -52,7 +49,6 @@ export const deleteSurvey = async (surveyId) => {
     await deleteDoc(doc(db, 'surveys', surveyId));
     return { success: true };
   } catch (error) {
-    console.error('Error deleting survey: ', error);
     return { success: false, error: error.message };
   }
 };
@@ -97,7 +93,6 @@ export const getSurveyStats = async () => {
 
     return stats;
   } catch (error) {
-    console.error('Error getting survey stats: ', error);
     return null;
   }
 };

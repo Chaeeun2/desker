@@ -18,7 +18,6 @@ const MobileFloatingMenu = () => {
     const handleSection3SpacerChange = (event) => {
       const { showSpacer } = event.detail;
       setSection3SpacerActive(showSpacer);
-      console.log("Section 3 Spacer State Changed:", showSpacer);
     };
 
     window.addEventListener("section3SpacerChange", handleSection3SpacerChange);
@@ -36,7 +35,6 @@ const MobileFloatingMenu = () => {
     const handleScroll = () => {
       // 1단계: 섹션 3의 스페이서 상태 체크 (이벤트 기반)
       if (section3SpacerActive) {
-        console.log("Section 3 Spacer Active (Event) - Hiding menu");
         setIsVisible(false);
         setIsExpanded(false); // hide될 때 expanded 클래스도 제거
         return;
@@ -107,7 +105,6 @@ const MobileFloatingMenu = () => {
   };
 
   const handleMenuClick = (tab) => {
-    console.log(`${tab} 메뉴 클릭됨`);
     
     // 메뉴 접기
     setIsExpanded(false);

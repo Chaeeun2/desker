@@ -33,7 +33,6 @@ export const uploadImageToR2Direct = async (file) => {
     // 실제 프로덕션에서는 백엔드에서 presigned URL을 받아와야 함
     // 현재는 임시로 public bucket을 사용한다고 가정
     
-    console.log('Direct upload attempt for:', fileName);
     
     // R2 Public Bucket에 직접 PUT 요청 (Public Write 권한이 있어야 함)
     const uploadUrl = `${R2_PUBLIC_URL}/${fileName}`;
@@ -48,7 +47,6 @@ export const uploadImageToR2Direct = async (file) => {
       });
       
       if (response.ok) {
-        console.log('Direct upload successful:', uploadUrl);
         return {
           success: true,
           url: uploadUrl,
@@ -59,7 +57,6 @@ export const uploadImageToR2Direct = async (file) => {
         throw new Error(`Upload failed: ${response.status}`);
       }
     } catch (fetchError) {
-      console.error('Direct upload failed:', fetchError);
       
       // 직접 업로드 실패 시 base64 fallback
       return new Promise((resolve) => {
@@ -85,7 +82,6 @@ export const uploadImageToR2Direct = async (file) => {
     }
     
   } catch (error) {
-    console.error('R2 upload error:', error);
     return {
       success: false,
       error: '이미지 업로드 중 오류가 발생했습니다.'
