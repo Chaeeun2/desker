@@ -1,21 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import styles from './SurveyModal.module.css';
+import { saveSurveyResponse } from '../../services/surveyService';
+import { uploadImageToR2 } from '../../services/r2Service';
+import { uploadImageToR2Direct } from '../../services/r2DirectUpload';
 
 const SurveyModal = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0); // 0: 인트로, 1-5: 설문 단계
   const [indicatorStep, setIndicatorStep] = useState(0);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [surveyAnswers, setSurveyAnswers] = useState({
     hasExperienced: '', // 양양 워케이션 경험 여부
     goodPoints: '', // 좋았던 점
-    photoUpload: null, // 사진 업로드
+    photoUrl: '', // 업로드된 사진 URL
     siteDiscovery: [], // 사이트를 어떤 경로로 알게 되셨나요
+    siteDiscoverySearch: '', // 검색 선택 시 검색어
+    siteDiscoveryOther: '', // 기타 선택 시 내용
     visitPurpose: [], // 사이트 방문 목적
+    visitPurposeOther: '', // 방문 목적 기타 내용
     companyName: '', // 회사명
     contactPerson: '', // 담당자명
     phoneNumber: '', // 전화번호
+    phoneFirst: '', // 전화번호 첫 번째 부분
+    phoneSecond: '', // 전화번호 두 번째 부분
+    phoneThird: '', // 전화번호 세 번째 부분
     email: '', // 이메일
+    emailForPrizes: '', // 경품용 이메일
+    fullName: '', // 이름
+    address: '', // 주소
     collaborationTitle: '', // 제목
-    collaborationContent: '' // 협업제안내용
+    collaborationContent: '', // 협업제안내용
+    workType: '', // 업무 유형
+    importantSpace: [], // 중요한 공간
+    importantSpaceOther: '', // 중요한 공간 기타
+    discomfortPoints: '', // 불편한 점
+    workEnvironment: [], // 업무 환경
+    workEnvironmentOther: '', // 업무 환경 기타
+    expectedActivities: [], // 기대 활동
+    expectedActivitiesOther: '', // 기대 활동 기타
+    privacyAgreement: false // 개인정보 동의
   });
 
   // 모달이 열려있을 때 body 스크롤 방지
@@ -84,10 +107,12 @@ const SurveyModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       setCurrentStep(0);
       setIndicatorStep(0);
+      setPhotoPreview(null);
+      setUploadingPhoto(false);
       setSurveyAnswers({
         hasExperienced: '',
         goodPoints: '',
-        photoUpload: null,
+        photoUrl: '',
         siteDiscovery: [],
         visitPurpose: [],
         siteDiscoverySearch: '',
@@ -172,9 +197,8 @@ const SurveyModal = ({ isOpen, onClose }) => {
     } else if (currentStep === 5) {
       setCurrentStep(6);
     } else if (currentStep === 6) {
-      // '보내기' 버튼 클릭 시 alert 표시 후 모달 닫기
-      alert('설문에 참여해주셔서 감사합니다.');
-      onClose();
+      // '보내기' 버튼 클릭 시 이메일 발송 및 설문 제출
+      submitSurvey();
     }
   };
 
@@ -204,13 +228,117 @@ const SurveyModal = ({ isOpen, onClose }) => {
     });
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      setSurveyAnswers(prev => ({
-        ...prev,
-        photoUpload: file
-      }));
+      setUploadingPhoto(true);
+      
+      // 미리보기 생성
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      
+      // R2에 업로드 (먼저 SDK 시도, 실패시 직접 업로드)
+      let uploadResult = await uploadImageToR2(file);
+      
+      // SDK 업로드 실패시 직접 업로드 시도
+      if (!uploadResult.success || uploadResult.fallback) {
+        console.log('Trying direct upload method...');
+        uploadResult = await uploadImageToR2Direct(file);
+      }
+      
+      if (uploadResult.success) {
+        console.log('Upload result:', uploadResult);
+        console.log('Setting photoUrl to:', uploadResult.url);
+        setSurveyAnswers(prev => {
+          const newState = {
+            ...prev,
+            photoUrl: uploadResult.url
+          };
+          console.log('New surveyAnswers state:', newState);
+          return newState;
+        });
+      } else {
+        alert(uploadResult.error || '이미지 업로드에 실패했습니다.');
+        setPhotoPreview(null);
+      }
+      
+      setUploadingPhoto(false);
+    }
+  };
+
+  // 설문 제출 및 이메일 발송 함수
+  const submitSurvey = async () => {
+    try {
+      // 로딩 상태 표시 (선택사항)
+      const submitButton = document.querySelector(`.${styles.nextButton}`);
+      if (submitButton) {
+        submitButton.textContent = '전송 중...';
+        submitButton.disabled = true;
+      }
+
+      // Firebase에 설문 데이터 저장
+      console.log('Current surveyAnswers before submission:', surveyAnswers);
+      console.log('photoUrl value:', surveyAnswers.photoUrl);
+      
+      const surveyData = {
+        // 개인정보
+        email: surveyAnswers.emailForPrizes || surveyAnswers.email,
+        fullName: surveyAnswers.fullName,
+        phoneNumber: `${surveyAnswers.phoneFirst}-${surveyAnswers.phoneSecond}-${surveyAnswers.phoneThird}`,
+        address: surveyAnswers.address,
+        
+        // 설문 응답
+        hasExperienced: surveyAnswers.hasExperienced,
+        goodPoints: surveyAnswers.goodPoints,
+        photoUrl: surveyAnswers.photoUrl || '', // 업로드된 사진 URL
+        siteDiscovery: surveyAnswers.siteDiscovery,
+        siteDiscoverySearch: surveyAnswers.siteDiscoverySearch,
+        siteDiscoveryOther: surveyAnswers.siteDiscoveryOther,
+        visitPurpose: surveyAnswers.visitPurpose,
+        visitPurposeOther: surveyAnswers.visitPurposeOther,
+        
+        // 브랜드 협업 (해당하는 경우)
+        companyName: surveyAnswers.companyName,
+        contactPerson: surveyAnswers.contactPerson,
+        collaborationTitle: surveyAnswers.collaborationTitle,
+        collaborationContent: surveyAnswers.collaborationContent,
+        
+        // 업무 환경
+        workType: surveyAnswers.workType,
+        importantSpace: surveyAnswers.importantSpace,
+        importantSpaceOther: surveyAnswers.importantSpaceOther,
+        discomfortPoints: surveyAnswers.discomfortPoints,
+        workEnvironment: surveyAnswers.workEnvironment,
+        workEnvironmentOther: surveyAnswers.workEnvironmentOther,
+        expectedActivities: surveyAnswers.expectedActivities,
+        expectedActivitiesOther: surveyAnswers.expectedActivitiesOther,
+        
+        // 개인정보 동의
+        privacyAgreement: surveyAnswers.privacyAgreement
+      };
+
+      console.log('Submitting surveyData to Firebase:', surveyData);
+      const result = await saveSurveyResponse(surveyData);
+      
+      if (result.success) {
+        alert('설문에 참여해주셔서 감사합니다!');
+        onClose();
+      } else {
+        throw new Error(result.error || '설문 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Survey submission error:', error);
+      alert('설문 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+      
+      // 버튼 원래 상태로 복구
+      const submitButton = document.querySelector(`.${styles.nextButton}`);
+      if (submitButton) {
+        submitButton.textContent = '보내기';
+        submitButton.disabled = false;
+      }
     }
   };
 
@@ -327,6 +455,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                       accept="image/*"
                       onChange={handleFileUpload}
                       style={{ display: 'none' }}
+                      key={photoPreview ? 'has-photo' : 'no-photo'} // key를 변경하여 input을 리셋
                     />
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000" className={styles.uploadIcon}>
                       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -349,8 +478,28 @@ const SurveyModal = ({ isOpen, onClose }) => {
                     <span className={styles.uploadText}>파일 첨부</span>
                   </label>
                   
-                  {surveyAnswers.photoUpload && (
-                    <p className={styles.fileName}>{surveyAnswers.photoUpload.name}</p>
+                  {uploadingPhoto && (
+                    <p className={styles.uploadStatus}>이미지 업로드 중...</p>
+                  )}
+                  
+                  {photoPreview && !uploadingPhoto && (
+                    <div className={styles.photoPreview}>
+                      <img src={photoPreview} alt="업로드된 사진" />
+                      <button 
+                        type="button"
+                        className={styles.removePhoto}
+                        onClick={() => {
+                          // 이미지 미리보기 제거
+                          setPhotoPreview(null);
+                          // surveyAnswers에서 photoUrl 제거
+                          setSurveyAnswers(prev => ({ ...prev, photoUrl: '' }));
+                          // 파일 input 리셋을 위해 key가 변경되도록 함
+                          console.log('Photo removed, input will be reset');
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
@@ -1063,7 +1212,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
     // 작성중인 내용이 있는지 확인
     const hasContent = surveyAnswers.hasExperienced !== '' || 
                       surveyAnswers.goodPoints.trim() !== '' || 
-                      surveyAnswers.photoUpload !== null ||
+                      surveyAnswers.photoUrl !== '' ||
                       surveyAnswers.siteDiscovery.length > 0 ||
                       surveyAnswers.visitPurpose.length > 0 ||
                       surveyAnswers.companyName !== '' ||

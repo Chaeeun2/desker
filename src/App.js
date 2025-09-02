@@ -15,6 +15,7 @@ import Section11 from './components/sections/11_Section';
 import FloatingMenu from './components/ui/FloatingMenu';
 import RightBottomIcon from './components/ui/RightBottomIcon';
 import SurveyModal from './components/ui/SurveyModal';
+import HamburgerMenu from './components/ui/HamburgerMenu';
 
 function App() {
   const [isSection1Visible, setIsSection1Visible] = useState(false);
@@ -54,14 +55,17 @@ function App() {
       <Section11 onVisibilityChange={setIsSection11Visible} />
       {/* 추후 다른 섹션들도 여기에 추가 */}
       
-      {/* 플로팅 메뉴 */}
-      <FloatingMenu />
+      {/* 플로팅 메뉴 - 임시 비활성화 */}
+      {/* <FloatingMenu /> */}
       
       {/* 우측 하단 플로팅 아이콘 */}
       <RightBottomIcon isSection1Visible={isSection1Visible} />
 
       {/* 설문조사 모달 */}
       <SurveyModal isOpen={isSurveyModalOpen} onClose={() => setIsSurveyModalOpen(false)} />
+      
+      {/* PC용 햄버거 메뉴 */}
+      <HamburgerMenu />
     </div>
   );
 }

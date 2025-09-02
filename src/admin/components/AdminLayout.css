@@ -1,0 +1,73 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 230px;
+  background-color: white;
+  color: black;
+  padding: 10px;
+  position: fixed;
+  height: 100%;
+  border-right: 1px solid #eaeaea;
+}
+
+.admin-sidebar h2 {
+  padding: 0px 5px 10px 5px;
+  color: black;
+  font-size: 2rem;
+  font-weight: 700;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.admin-sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.admin-sidebar nav li a {
+  display: block;
+  padding: 8px 10px;
+  color: black;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  font-size: 1.6rem;
+  font-weight: 500;
+  border-radius: 10px;
+  margin: 5px 0 5px 10px;
+}
+
+.admin-sidebar nav li a:hover {
+  background-color: #f2f2f2;
+}
+
+.admin-sidebar nav li.active a {
+  background-color: #efefef;
+}
+
+.admin-content {
+  height: 100vh;
+}
+
+.admin-content-wrapper {
+  flex: 1;
+  background-color: #f2f2f2;
+  margin-left: 230px;
+  height: 100vh;
+}
+
+.depth-1-menu,
+.depth-1-portfolio {
+  font-size: 1.8rem;
+  padding: 8px 10px;
+  font-weight: 600;
+  margin-top: 25px;
+}
+
+.admin-main {
+  width: 100%;
+}
+
+
