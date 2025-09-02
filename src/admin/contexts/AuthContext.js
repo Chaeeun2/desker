@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
           setIsAdmin(false);
         }
       } catch (error) {
-        // console.error('인증 상태 확인 오류:', error);
+
         setError(error.message);
         setCurrentUser(null);
         setIsAdmin(false);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       setIsAdmin(hasPermission);
       return hasPermission;
     } catch (error) {
-      // console.error('권한 확인 오류:', error);
+
       setIsAdmin(false);
       return false;
     }

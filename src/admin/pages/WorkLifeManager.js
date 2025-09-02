@@ -190,15 +190,15 @@ const WorkLifeManager = () => {
   }, []);
 
   const loadWorkLifeData = async () => {
-    console.log('🔄 WorkLife 데이터 로드 시작');
+
     try {
       const docRef = doc(db, 'settings', 'workLifeSection');
       const docSnap = await getDoc(docRef);
-      console.log('📊 Firebase 응답:', docSnap.exists() ? '데이터 있음' : '데이터 없음');
+
       
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log('📦 로드된 WorkLife 데이터:', data);
+
         setWorkLifeData(data);
         
         if (data.itemOrder) {
@@ -221,7 +221,7 @@ const WorkLifeManager = () => {
     setUploading(prev => ({ ...prev, [uploadKey]: true }));
     
     try {
-      console.log('📤 이미지 업로드 시작:', file.name, '크기:', file.size);
+
       
       // imageService를 사용하여 업로드 (GalleryManager와 동일한 방식)
       const result = await imageService.uploadFile(file, { 
@@ -229,14 +229,14 @@ const WorkLifeManager = () => {
         prefix: 'work-life'
       });
       
-      console.log('📥 업로드 결과:', result);
+
       
       if (!result.success) {
-        console.error('❌ 업로드 실패:', result.error);
+
         throw new Error(result.error || 'Upload failed');
       }
       
-      console.log('✅ 업로드 성공! URL:', result.fileUrl);
+
       
       setEditData(prev => ({
         ...prev,
@@ -309,8 +309,7 @@ const WorkLifeManager = () => {
 
   const saveEditedItem = async () => {
     setSaving(true);
-    console.log('💾 저장 시작, 현재 editData:', editData);
-    console.log('📸 이미지 URL:', editData.image);
+
     try {
       let updatedData;
       
@@ -333,9 +332,7 @@ const WorkLifeManager = () => {
         };
       }
       
-      console.log('📝 Firebase에 저장할 데이터:', updatedData);
       await setDoc(doc(db, 'settings', 'workLifeSection'), updatedData);
-      console.log('✅ Firebase 저장 완료');
       
       setWorkLifeData(updatedData);
       closeModal();
@@ -557,7 +554,7 @@ const WorkLifeManager = () => {
                     onChange={(e) => {
                       const file = e.target.files[0];
                       if (file) {
-                        console.log('🖼️ 파일 선택됨:', file.name, '타입:', file.type, '크기:', file.size);
+
                         handleEditImageUpload(file);
                       }
                     }}

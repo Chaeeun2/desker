@@ -63,7 +63,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
       // 표시용 이미지는 Base64도 허용 (미리보기용)
       if (displayImage && typeof displayImage === 'string') {
         if (displayImage.length > 1000000) {
-          // // console.warn('이미지 데이터가 너무 깁니다:', displayImage.length, 'characters');
+
           displayImage = '';
         }
       }
@@ -72,7 +72,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
       // 수정 시에는 기존 이미지를 보존하는 것이 중요
       if (validImage && typeof validImage === 'string') {
         if (validImage.length > 1000000) {
-          // // console.warn('저장용 이미지 데이터가 너무 깁니다:', validImage.length, 'characters');
+
           validImage = '';
         }
       }
@@ -97,7 +97,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
           setPortfolioLabels(result.data.labels);
         }
       } catch (error) {
-        // // console.error('포트폴리오 라벨 로드 오류:', error);
+
         // 기본 라벨 사용
       }
     };
@@ -195,7 +195,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
             throw new Error('이미지 업로드에 실패했습니다.');
           }
         } catch (uploadError) {
-          // // console.error('이미지 업로드 오류:', uploadError);
+
           alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
           return;
         }
@@ -205,7 +205,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
       if (finalImageUrl && typeof finalImageUrl === 'string') {
         // 길이 검증 (Firestore 1MB 제한 대비 안전 마진)
         if (finalImageUrl.length > 1000000) {
-          // // console.error('이미지 데이터가 너무 깁니다:', finalImageUrl.length, 'characters');
+
           alert('이미지 데이터가 너무 깁니다. 다시 시도해주세요.');
           return;
         }
@@ -224,7 +224,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
 
       await onSave(portfolioData);
     } catch (error) {
-      // // console.error('저장 오류:', error);
+
       alert('저장에 실패했습니다.');
     } finally {
       setSaving(false);
@@ -244,7 +244,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, portfolio, categories = [] })
           try {
             await imageService.deleteFromCloudflare(formData.image);
           } catch (error) {
-            // // console.error('Cloudflare 이미지 삭제 실패:', error);
+  
           }
         }
         

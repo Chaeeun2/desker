@@ -43,7 +43,7 @@ export const uploadImageToR2Direct = async (file) => {
       filename: filename
     };
   } catch (error) {
-    console.error('R2 direct upload error:', error);
+
     return {
       success: false,
       error: error.message

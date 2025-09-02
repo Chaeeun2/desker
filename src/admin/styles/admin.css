@@ -310,54 +310,6 @@ select.admin-input,
   gap: 10px;
 }
 
-/* 공지사항 관리 스타일 */
-.admin-notice-controls {
-  margin-bottom: 20px;
-}
-
-.admin-notice-list {
-  margin-top: 20px;
-}
-
-.admin-notice-item {
-  background-color: white;
-  padding: 20px 0 20px 15px;
-  border-radius: 4px;
-  border-bottom: 1px solid #eaeaea;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.admin-notice-info h3 {
-  margin: 0;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.admin-important-badge {
-  background-color: #b1b1b1;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-}
-
-.admin-notice-meta {
-  color: #666;
-  font-size: 0.9em;
-  margin-top: 5px;
-  display: flex;
-  gap: 15px;
-}
-
-.admin-notice-actions {
-  display: flex;
-  gap: 10px;
-}
-
 /* 로그인 페이지 스타일 */
 .admin-login {
   display: flex;
@@ -381,7 +333,7 @@ select.admin-input,
   color: black;
   font-size: 2.8rem;
   border: none;
-  padding: 0px 10px 20px 10px;
+  padding: 0px 10px 10px 10px;
 }
 
 .admin-login-guide {

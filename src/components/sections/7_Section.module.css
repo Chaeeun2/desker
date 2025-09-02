@@ -83,6 +83,7 @@
   line-height: 1;
   font-family: "proxima-nova", Pretendard;
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  line-height: 1.1;
 }
 
 .panelSubtitle {
@@ -352,17 +353,17 @@
     height: auto;
     min-height: 100vh;
   }
-  
+
   /* leftSide는 항상 보이게 */
   .leftSide {
     opacity: 1 !important;
   }
-  
+
   /* rightSide는 기본적으로 보이도록 */
   .rightSide {
     opacity: 1;
   }
-  
+
   /* 각 요소들이 개별적으로 fade-in */
   .description,
   .videoThumbnail,
@@ -370,7 +371,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
-  
+
   /* JavaScript에서 추가되는 visible 클래스 */
   .description.visible,
   .videoThumbnail.visible,
@@ -417,17 +418,17 @@
   .description {
     opacity: 0;
   }
-  
+
   .description p {
     font-size: 1.6rem;
     text-align: center;
   }
-  
+
   .videoThumbnail {
     opacity: 0;
     border-radius: 8px;
   }
-  
+
   .sliderImageItem {
     opacity: 0;
   }

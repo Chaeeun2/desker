@@ -68,7 +68,7 @@ export const dataService = {
         count: documents.length
       };
     } catch (error) {
-      // console.error(`문서 조회 오류 (${collectionName}):`, error);
+
       throw error;
     }
   },
@@ -94,7 +94,7 @@ export const dataService = {
         };
       }
     } catch (error) {
-      // console.error(`문서 조회 오류 (${collectionName}/${docId}):`, error);
+
       throw error;
     }
   },
@@ -116,7 +116,7 @@ export const dataService = {
         }
       };
     } catch (error) {
-      // console.error(`문서 추가 오류 (${collectionName}):`, error);
+
       throw error;
     }
   },
@@ -138,7 +138,7 @@ export const dataService = {
         }
       };
     } catch (error) {
-      // console.error(`문서 설정 오류 (${collectionName}/${docId}):`, error);
+
       throw error;
     }
   },
@@ -160,7 +160,7 @@ export const dataService = {
         }
       };
     } catch (error) {
-      // console.error(`문서 업데이트 오류 (${collectionName}/${docId}):`, error);
+
       throw error;
     }
   },
@@ -176,7 +176,7 @@ export const dataService = {
         message: '문서가 삭제되었습니다.'
       };
     } catch (error) {
-      // console.error(`문서 삭제 오류 (${collectionName}/${docId}):`, error);
+
       throw error;
     }
   },
@@ -198,7 +198,7 @@ export const dataService = {
         message: `${docIds.length}개의 문서가 삭제되었습니다.`
       };
     } catch (error) {
-      // console.error(`여러 문서 삭제 오류 (${collectionName}):`, error);
+
       throw error;
     }
   },
@@ -239,7 +239,7 @@ export const dataService = {
         count: documents.length
       };
     } catch (error) {
-      // console.error(`쿼리 문서 조회 오류 (${collectionName}):`, error);
+
       throw error;
     }
   },
@@ -275,7 +275,7 @@ export const dataService = {
         hasMore: documents.length === pageSize
       };
     } catch (error) {
-      // console.error(`페이지네이션 문서 조회 오류 (${collectionName}):`, error);
+
       throw error;
     }
   },
@@ -310,7 +310,7 @@ export const dataService = {
           count: documents.length
         });
       }, (error) => {
-        // console.error(`실시간 리스너 오류 (${collectionName}):`, error);
+  
         callback({
           success: false,
           error: error.message
@@ -319,7 +319,7 @@ export const dataService = {
       
       return unsubscribe;
     } catch (error) {
-      // console.error(`실시간 리스너 설정 오류 (${collectionName}):`, error);
+
       throw error;
     }
   },
@@ -338,7 +338,7 @@ export const dataService = {
         });
         return documents;
       } catch (error) {
-        // console.error('Overview 데이터 조회 오류:', error);
+
         throw error;
       }
     },
@@ -355,7 +355,7 @@ export const dataService = {
           ...data
         };
       } catch (error) {
-        // console.error('Overview 데이터 추가 오류:', error);
+
         throw error;
       }
     },
@@ -372,7 +372,7 @@ export const dataService = {
           ...data
         };
       } catch (error) {
-        // console.error('Overview 데이터 업데이트 오류:', error);
+
         throw error;
       }
     },
@@ -383,7 +383,7 @@ export const dataService = {
         await deleteDoc(docRef);
         return true;
       } catch (error) {
-        // console.error('Overview 데이터 삭제 오류:', error);
+
         throw error;
       }
     }
@@ -403,7 +403,7 @@ export const dataService = {
         });
         return documents;
       } catch (error) {
-        // console.error('Leadership 데이터 조회 오류:', error);
+
         throw error;
       }
     },
@@ -420,7 +420,7 @@ export const dataService = {
           ...data
         };
       } catch (error) {
-        // console.error('Leadership 데이터 추가 오류:', error);
+
         throw error;
       }
     },
@@ -437,7 +437,7 @@ export const dataService = {
           ...data
         };
       } catch (error) {
-        // console.error('Leadership 데이터 업데이트 오류:', error);
+
         throw error;
       }
     },
@@ -448,7 +448,7 @@ export const dataService = {
         await deleteDoc(docRef);
         return true;
       } catch (error) {
-        // console.error('Leadership 데이터 삭제 오류:', error);
+
         throw error;
       }
     }
@@ -474,7 +474,7 @@ export const dataService = {
           };
         }
       } catch (error) {
-        // console.error('Contact 데이터 조회 오류:', error);
+
         throw error;
       }
     },
@@ -488,7 +488,7 @@ export const dataService = {
         }, { merge: true });
         return data;
       } catch (error) {
-        // console.error('Contact 데이터 업데이트 오류:', error);
+
         throw error;
       }
     }
@@ -561,7 +561,7 @@ export const dataService = {
       }
       return result;
     } catch (error) {
-      // console.error('Portfolio 데이터 조회 오류:', error);
+  
       throw error;
     }
   },
@@ -642,7 +642,7 @@ export const getInvestmentStrategies = async () => {
     });
     return strategies;
   } catch (error) {
-    // console.error('투자 전략 조회 실패:', error);
+
     throw error;
   }
 };
@@ -656,7 +656,7 @@ export const getInvestmentStrategy = async (id) => {
     }
     return null;
   } catch (error) {
-    // console.error('투자 전략 조회 실패:', error);
+
     throw error;
   }
 };
@@ -670,7 +670,7 @@ export const updateInvestmentStrategy = async (id, data) => {
     });
 
   } catch (error) {
-    // console.error('투자 전략 업데이트 실패:', error);
+
     throw error;
   }
 };
@@ -686,7 +686,7 @@ export const createInvestmentStrategy = async (data) => {
 
     return docRef.id;
   } catch (error) {
-    // console.error('투자 전략 생성 실패:', error);
+
     throw error;
   }
 };
@@ -702,7 +702,7 @@ export const getInvestmentProducts = async () => {
     });
     return products;
   } catch (error) {
-    // console.error('투자 상품 조회 실패:', error);
+
     throw error;
   }
 };
@@ -716,7 +716,7 @@ export const getInvestmentProduct = async (id) => {
     }
     return null;
   } catch (error) {
-    // console.error('투자 상품 조회 실패:', error);
+
     throw error;
   }
 };
@@ -730,7 +730,7 @@ export const updateInvestmentProduct = async (id, data) => {
     });
 
   } catch (error) {
-    // console.error('투자 상품 업데이트 실패:', error);
+
     throw error;
   }
 };
@@ -746,7 +746,7 @@ export const createInvestmentProduct = async (data) => {
 
     return docRef.id;
   } catch (error) {
-    // console.error('투자 상품 생성 실패:', error);
+
     throw error;
   }
 };
@@ -838,7 +838,7 @@ export const initializeInvestmentData = async () => {
 
 
   } catch (error) {
-    // console.error('투자 데이터 초기화 실패:', error);
+
     throw error;
   }
 };

@@ -41,7 +41,7 @@ export const loginAdmin = async (email, password) => {
         throw new Error('관리자 권한이 없습니다.');
       }
     } catch (tokenError) {
-      // console.log('⚠️ 커스텀 클레임 확인 실패, 환경변수로만 확인:', tokenError.message);
+
       // 커스텀 클레임이 없어도 환경변수에 있으면 로그인 허용
     }
     
@@ -49,7 +49,7 @@ export const loginAdmin = async (email, password) => {
     return { user, isAdmin: true };
     
   } catch (error) {
-    // console.error('❌ 관리자 로그인 실패:', error);
+
     
     if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
       throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
@@ -69,7 +69,7 @@ export const logoutAdmin = async () => {
     await signOut(auth);
 
   } catch (error) {
-    // console.error('❌ 로그아웃 실패:', error);
+
     throw error;
   }
 };
@@ -114,7 +114,7 @@ export const getCurrentUser = () => {
         
         resolve({ user, isAdmin: true });
       } catch (error) {
-        // console.error('❌ 사용자 상태 확인 실패:', error);
+
         reject(error);
       }
     });
@@ -144,7 +144,7 @@ export const checkAdminPermission = async () => {
       return true; // 커스텀 클레임이 없어도 환경변수에 있으면 허용
     }
   } catch (error) {
-    // console.error('❌ 관리자 권한 확인 실패:', error);
+
     return false;
   }
 };

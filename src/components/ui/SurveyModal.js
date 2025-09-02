@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './SurveyModal.module.css';
 import { saveSurveyResponse } from '../../services/surveyService';
-import { uploadImageToR2 } from '../../services/r2Service';
-import { uploadImageToR2Direct } from '../../services/r2DirectUpload';
+import { imageService } from '../../admin/services/imageService';
 import { sendSurveyConfirmationEmail, sendAdminNotificationEmail } from '../../services/emailService';
 
 const SurveyModal = ({ isOpen, onClose }) => {
@@ -251,22 +250,17 @@ const SurveyModal = ({ isOpen, onClose }) => {
       };
       reader.readAsDataURL(file);
       
-      // R2에 업로드 (먼저 SDK 시도, 실패시 직접 업로드)
-      let uploadResult = await uploadImageToR2(file);
-      
-      // SDK 업로드 실패시 직접 업로드 시도
-      if (!uploadResult.success || uploadResult.fallback) {
-        uploadResult = await uploadImageToR2Direct(file);
-      }
+      // imageService를 사용하여 업로드 (WorkLifeManager와 동일한 방식)
+      const uploadResult = await imageService.uploadFile(file, { 
+        source: 'survey',
+        prefix: 'survey-photos'
+      });
       
       if (uploadResult.success) {
-        setSurveyAnswers(prev => {
-          const newState = {
-            ...prev,
-            photoUrl: uploadResult.url
-          };
-          return newState;
-        });
+        setSurveyAnswers(prev => ({
+          ...prev,
+          photoUrl: uploadResult.fileUrl
+        }));
       } else {
         alert(uploadResult.error || '이미지 업로드에 실패했습니다.');
         setPhotoPreview(null);

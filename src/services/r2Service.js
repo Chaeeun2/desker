@@ -28,7 +28,7 @@ export const uploadImageToR2 = async (file) => {
       filename: filename
     };
   } catch (error) {
-    console.error('R2 upload error:', error);
+
     return {
       success: false,
       error: error.message,

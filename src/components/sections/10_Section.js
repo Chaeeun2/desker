@@ -31,7 +31,7 @@ const Section10 = () => {
           setWorkLifeData(data);
         }
       } catch (error) {
-        console.error('WorkLife 데이터 로드 실패:', error);
+
       } finally {
         setDataLoaded(true);
       }
