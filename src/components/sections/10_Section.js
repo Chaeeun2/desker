@@ -30,6 +30,9 @@ const Section10 = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           console.log('WorkLife 데이터 로드 성공:', data);
+          console.log('데이터 키들:', Object.keys(data));
+          console.log('item1 존재여부:', !!data.item1);
+          console.log('item1 데이터:', data.item1);
           setWorkLifeData(data);
         } else {
           console.log('WorkLife 문서가 존재하지 않습니다.');
@@ -127,8 +130,15 @@ const Section10 = () => {
     loadWorkLifeData();
   }, []);
 
+  // workLifeData 상태 변경 모니터링
+  useEffect(() => {
+    console.log('workLifeData 상태 변경:', workLifeData);
+    console.log('Object.keys(workLifeData):', Object.keys(workLifeData));
+  }, [workLifeData]);
+
   // 동적 CSS 스타일 생성
   useEffect(() => {
+    console.log('CSS 생성 useEffect:', { dataLoaded, hasItem1: !!workLifeData.item1, workLifeData });
     if (!dataLoaded || !workLifeData.item1) return;
 
     const style = document.createElement('style');
