@@ -83,7 +83,15 @@ export async function onRequest(context) {
         });
       }
 
-      return new Response(JSON.stringify({ success: true, messageId: resendData.id }), {
+      return new Response(JSON.stringify({ 
+        success: true, 
+        messageId: resendData.id,
+        debug: {
+          envValue: context.env.REACT_APP_FROM_EMAIL,
+          finalFromEmail: fromEmail,
+          hasEnvVar: !!context.env.REACT_APP_FROM_EMAIL
+        }
+      }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -170,7 +178,15 @@ export async function onRequest(context) {
         });
       }
 
-      return new Response(JSON.stringify({ success: true, messageId: resendData.id }), {
+      return new Response(JSON.stringify({ 
+        success: true, 
+        messageId: resendData.id,
+        debug: {
+          envValue: context.env.REACT_APP_FROM_EMAIL,
+          finalFromEmail: fromEmail,
+          hasEnvVar: !!context.env.REACT_APP_FROM_EMAIL
+        }
+      }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
