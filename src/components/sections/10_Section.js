@@ -23,19 +23,13 @@ const Section10 = () => {
   useEffect(() => {
     const loadWorkLifeData = async () => {
       try {
-        console.log('WorkLife 데이터 로딩 시작...');
         const docRef = doc(db, 'settings', 'workLifeSection');
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log('WorkLife 데이터 로드 성공:', data);
-          console.log('데이터 키들:', Object.keys(data));
-          console.log('item1 존재여부:', !!data.item1);
-          console.log('item1 데이터:', data.item1);
           setWorkLifeData(data);
         } else {
-          console.log('WorkLife 문서가 존재하지 않습니다.');
           // 기본 데이터 설정
           const defaultData = {
             itemOrder: ['item1', 'item2', 'item3', 'item4'],
@@ -77,10 +71,8 @@ const Section10 = () => {
             }
           };
           setWorkLifeData(defaultData);
-          console.log('기본 데이터 설정:', defaultData);
         }
       } catch (error) {
-        console.error('WorkLife 데이터 로드 실패:', error);
         // Firebase 접근 실패 시에도 기본 데이터 제공
         const defaultData = {
           itemOrder: ['item1', 'item2', 'item3', 'item4'],
@@ -132,13 +124,10 @@ const Section10 = () => {
 
   // workLifeData 상태 변경 모니터링
   useEffect(() => {
-    console.log('workLifeData 상태 변경:', workLifeData);
-    console.log('Object.keys(workLifeData):', Object.keys(workLifeData));
   }, [workLifeData]);
 
   // 동적 CSS 스타일 생성
   useEffect(() => {
-    console.log('CSS 생성 useEffect:', { dataLoaded, hasItem1: !!workLifeData.item1, workLifeData });
     if (!dataLoaded || !workLifeData.item1) return;
 
     const style = document.createElement('style');
@@ -281,15 +270,11 @@ const Section10 = () => {
         {/* 2x2 그리드 레이아웃 */}
         <div ref={gridRef} className={`${styles.gridContainer} ${gridHasIntersected ? styles.fadeIn : ''}`}>
           {(() => {
-            console.log('렌더링 상태:', { dataLoaded, workLifeData, itemOrder: workLifeData.itemOrder });
             const itemOrder = workLifeData.itemOrder || ['item1', 'item2', 'item3', 'item4'];
-            console.log('사용할 itemOrder:', itemOrder);
             
             return dataLoaded && itemOrder.map((itemKey, index) => {
               const itemData = workLifeData[itemKey];
-              console.log(`${itemKey} 데이터:`, itemData);
               if (!itemData) {
-                console.warn(`${itemKey} 데이터가 없습니다`);
                 return null;
               }
               const itemIndex = index + 1;

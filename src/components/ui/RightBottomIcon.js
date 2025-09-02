@@ -12,7 +12,6 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible }) => {
   const handleIconClick = () => {
     // 클릭 시 자동 툴팁 숨김
     if (isAutoTooltipVisible) {
-      console.log('클릭으로 자동 툴팁 숨김');
       setIsAutoTooltipVisible(false);
       if (autoTooltipTimeoutRef.current) {
         clearTimeout(autoTooltipTimeoutRef.current);
@@ -28,14 +27,12 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible }) => {
   // Section2 진입 시 자동 툴팁 노출
   useEffect(() => {
     if (isSection2Visible && !hasTriggeredAutoTooltip) {
-      console.log('Section2 진입 - 자동 툴팁 시작');
       // 자동 툴팁 표시
       setIsAutoTooltipVisible(true);
       setHasTriggeredAutoTooltip(true);
       
       // 5초 후 자동으로 숨김
       autoTooltipTimeoutRef.current = setTimeout(() => {
-        console.log('5초 후 자동 툴팁 숨김');
         setIsAutoTooltipVisible(false);
       }, 5000);
     }
@@ -52,10 +49,8 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible }) => {
 
   // 마우스 호버 시 자동 툴팁 숨김
   const handleMouseEnter = () => {
-    console.log('마우스 진입');
     setIsHovered(true);
     if (isAutoTooltipVisible) {
-      console.log('호버로 자동 툴팁 숨김');
       setIsAutoTooltipVisible(false);
       if (autoTooltipTimeoutRef.current) {
         clearTimeout(autoTooltipTimeoutRef.current);
@@ -64,18 +59,11 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible }) => {
   };
 
   const handleMouseLeave = () => {
-    console.log('마우스 떠남');
     setIsHovered(false);
   };
 
   // 디버깅용 로그
   useEffect(() => {
-    console.log('상태 변경:', {
-      isSection2Visible,
-      hasTriggeredAutoTooltip,
-      isAutoTooltipVisible,
-      isHovered
-    });
   }, [isSection2Visible, hasTriggeredAutoTooltip, isAutoTooltipVisible, isHovered]);
 
   return (
