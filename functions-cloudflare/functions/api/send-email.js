@@ -48,8 +48,15 @@ export async function onRequest(context) {
     if (to && template && testData) {
       const processedHtml = processTemplate(template.content, testData);
       
+      const fromEmail = context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>';
+      console.log('🔍 TEST EMAIL FROM DEBUG:', {
+        envValue: context.env.REACT_APP_FROM_EMAIL,
+        finalFromEmail: fromEmail,
+        allEnvVars: Object.keys(context.env)
+      });
+
       const emailPayload = {
-        from: context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>',
+        from: fromEmail,
         to: to,
         subject: template.subject,
         html: processedHtml
@@ -126,8 +133,15 @@ export async function onRequest(context) {
       const htmlBody = processTemplate(template.content, templateData);
       const subject = template.subject || '데스커 워케이션 설문조사 참여 감사합니다 🎉';
 
+      const fromEmail = context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>';
+      console.log('🔍 FROM EMAIL DEBUG:', {
+        envValue: context.env.REACT_APP_FROM_EMAIL,
+        finalFromEmail: fromEmail,
+        allEnvVars: Object.keys(context.env)
+      });
+
       const emailPayload = {
-        from: context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>',
+        from: fromEmail,
         to: recipientEmail,
         subject: subject,
         html: htmlBody
