@@ -48,12 +48,7 @@ export async function onRequest(context) {
     if (to && template && testData) {
       const processedHtml = processTemplate(template.content, testData);
       
-      const fromEmail = context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>';
-      console.log('🔍 TEST EMAIL FROM DEBUG:', {
-        envValue: context.env.REACT_APP_FROM_EMAIL,
-        finalFromEmail: fromEmail,
-        allEnvVars: Object.keys(context.env)
-      });
+      const fromEmail = '데스커 워케이션 <noreply@deskerworkation.com>';
 
       const emailPayload = {
         from: fromEmail,
@@ -76,7 +71,7 @@ export async function onRequest(context) {
       if (!resendResponse.ok) {
         return new Response(JSON.stringify({ 
           success: false, 
-          error: resendData.message || 'Test email failed'
+          error: resendData.message || 'Test email failed',
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -86,11 +81,6 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ 
         success: true, 
         messageId: resendData.id,
-        debug: {
-          envValue: context.env.REACT_APP_FROM_EMAIL,
-          finalFromEmail: fromEmail,
-          hasEnvVar: !!context.env.REACT_APP_FROM_EMAIL
-        }
       }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -141,7 +131,7 @@ export async function onRequest(context) {
       const htmlBody = processTemplate(template.content, templateData);
       const subject = template.subject || '데스커 워케이션 설문조사 참여 감사합니다 🎉';
 
-      const fromEmail = context.env.REACT_APP_FROM_EMAIL || '데스커 워케이션 <noreply@deskerworkation.com>';
+      const fromEmail = '데스커 워케이션 <noreply@deskerworkation.com>';
       console.log('🔍 FROM EMAIL DEBUG:', {
         envValue: context.env.REACT_APP_FROM_EMAIL,
         finalFromEmail: fromEmail,

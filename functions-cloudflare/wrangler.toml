@@ -1,0 +1,10 @@
+name = "desker-email-api"
+pages_build_output_dir = "."
+
+[vars]
+REACT_APP_FROM_EMAIL = "데스커 워케이션 <noreply@deskerworkation.com>"
+RESEND_API_KEY = "re_7YoLNzPF_GuLbGgM2AvJpHiyK6tkyLpE8"
+
+[env.production.vars]
+REACT_APP_FROM_EMAIL = "데스커 워케이션 <noreply@deskerworkation.com>"
+RESEND_API_KEY = "re_7YoLNzPF_GuLbGgM2AvJpHiyK6tkyLpE8"

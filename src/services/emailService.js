@@ -3,7 +3,7 @@ import { db } from '../admin/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 // API 엔드포인트 설정
-const EMAIL_API_ENDPOINT = 'https://fbba34ab.desker-email-api.pages.dev/api/send-email';
+const EMAIL_API_ENDPOINT = 'https://desker-email-api.pages.dev/api/send-email';
 
 // 이메일 발송 함수 (사용자 확인 이메일)
 export const sendSurveyConfirmationEmail = async (surveyData) => {
@@ -36,17 +36,21 @@ export const sendSurveyConfirmationEmail = async (surveyData) => {
       workType: surveyData.workType || ''
     };
     
-    // API 호출
-    const requestBody = template 
-      ? {
-          to: recipientEmail,
-          template: template,
-          testData: templateData
-        }
-      : {
-          type: 'confirmation',
-          surveyData: surveyData
-        };
+    // Firebase 템플릿이 없으면 오류 반환
+    if (!template) {
+      return {
+        success: false,
+        error: 'Email template not found. Please create template in admin panel.',
+        message: '이메일 템플릿이 설정되지 않았습니다. 관리자에게 문의하세요.'
+      };
+    }
+    
+    // API 호출 (Firebase 템플릿만 사용)
+    const requestBody = {
+      to: recipientEmail,
+      template: template,
+      testData: templateData
+    };
     
     const response = await fetch(EMAIL_API_ENDPOINT, {
       method: 'POST',

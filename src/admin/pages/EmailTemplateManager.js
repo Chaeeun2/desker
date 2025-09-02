@@ -31,52 +31,7 @@ const EmailTemplateManager = () => {
       if (docSnap.exists()) {
         setTemplates(docSnap.data());
       } else {
-        // 기본 템플릿 설정
-        const defaultTemplate = {
-          confirmation: {
-            subject: '데스커 워케이션 설문조사 참여 감사합니다 🎉',
-            content: `
-              <div style="font-family: 'Pretendard', -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
-                  <h1>🎉 데스커 워케이션 설문조사 참여 완료</h1>
-                </div>
-                <div style="padding: 30px;">
-                  <p>안녕하세요, <strong>{{fullName}}님</strong>!</p>
-                  <p>데스커 워케이션 설문조사에 참여해 주셔서 감사합니다.</p>
-                  
-                  <div style="background-color: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 8px;">
-                    <h2>📋 제출하신 설문 내용</h2>
-                    <p>양양 워케이션 경험: {{hasExperienced}}</p>
-                    {{#if goodPoints}}
-                    <p>좋았던 점: {{goodPoints}}</p>
-                    {{/if}}
-                    {{#if workType}}
-                    <p>업무 분야: {{workType}}</p>
-                    {{/if}}
-                  </div>
-                  
-                  <div style="background-color: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 8px;">
-                    <h2>🎁 경품 이벤트 안내</h2>
-                    <p>추첨을 통해 다양한 경품을 드립니다!</p>
-                    <ul>
-                      <li>1등: 애플 에어팟 프로</li>
-                      <li>2등: 스타벅스 기프티콘</li>
-                      <li>3등: 편의점 상품권</li>
-                    </ul>
-                  </div>
-                  
-                  <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
-                    <p style="color: #6c757d; font-size: 14px;">
-                      본 메일은 발신 전용입니다.<br>
-                      문의사항은 ${process.env.REACT_APP_FROM_EMAIL?.match(/<(.+)>/)?.[1] || 'hello@deskerworkation.com'}으로 연락주세요.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            `
-          }
-        };
-        setTemplates(defaultTemplate);
+        alert('Firebase에서 이메일 템플릿을 찾을 수 없습니다. 템플릿을 생성해주세요.');
       }
     } catch (error) {
       alert('템플릿 로드 실패: ' + error.message);
@@ -135,7 +90,7 @@ const EmailTemplateManager = () => {
       };
 
       // API 호출
-      const response = await fetch('https://fbba34ab.desker-email-api.pages.dev/api/send-email',
+      const response = await fetch('https://desker-email-api.pages.dev/api/send-email',
         {
           method: 'POST',
           headers: {
