@@ -363,10 +363,6 @@ select.admin-input,
   font-size: 1.6rem;
 }
 
-.add-year-btn {
-  padding: 12px 15px !important;
-}
-
 .admin-form-group input {
   flex: 10;
   font-size: 1.8rem;

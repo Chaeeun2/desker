@@ -19,6 +19,7 @@ import HamburgerMenu from './components/ui/HamburgerMenu';
 
 function App() {
   const [isSection1Visible, setIsSection1Visible] = useState(false);
+  const [isSection2Visible, setIsSection2Visible] = useState(false);
   const [isSection11Visible, setIsSection11Visible] = useState(false);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
   const [hasShownSurvey, setHasShownSurvey] = useState(false); // 최초 실행 여부를 추적하는 상태
@@ -43,7 +44,7 @@ function App() {
     <div className="App">
       <Section0 />
       <Section1 onVisibilityChange={setIsSection1Visible} />
-      <Section2 />
+      <Section2 onVisibilityChange={setIsSection2Visible} />
       <Section3 />
       <Section4 />
       <Section5 />
@@ -59,7 +60,10 @@ function App() {
       {/* <FloatingMenu /> */}
       
       {/* 우측 하단 플로팅 아이콘 */}
-      <RightBottomIcon isSection1Visible={isSection1Visible} />
+      <RightBottomIcon 
+        isSection1Visible={isSection1Visible} 
+        isSection2Visible={isSection2Visible}
+      />
 
       {/* 설문조사 모달 */}
       <SurveyModal isOpen={isSurveyModalOpen} onClose={() => setIsSurveyModalOpen(false)} />

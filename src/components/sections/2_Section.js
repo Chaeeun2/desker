@@ -5,11 +5,18 @@ import { db } from '../../admin/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import styles from './2_Section.module.css';
 
-const Section2 = () => {
+const Section2 = ({ onVisibilityChange }) => {
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
     threshold: 0.3,
     rootMargin: '-50px'
   });
+
+  // 가시성 상태 변경을 부모 컴포넌트에 전달
+  useEffect(() => {
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
 
   const marqueeRef = useRef(null);
   const cloneRef = useRef(null);
