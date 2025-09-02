@@ -425,15 +425,6 @@ const SurveyManager = () => {
                             }}
                           />
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                              <button className="btn btn-sm btn-primary">
-                            <a 
-                              href={selectedSurvey.photoUrl} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                            >
-                              새 탭에서 보기
-                                </a>
-                                </button>
                             <button 
                               className="btn btn-sm btn-secondary"
                               onClick={async () => {
