@@ -69,7 +69,7 @@ app.post('/api/send-email', async (req, res) => {
       `;
 
       const { data, error } = await resend.emails.send({
-        from: process.env.REACT_APP_SENDER_EMAIL || 'Desker Workation <onboarding@resend.dev>',
+        from: process.env.REACT_APP_FROM_EMAIL || 'Desker Workation <onboarding@resend.dev>',
         to: [recipientEmail],
         subject: '데스커 워케이션 설문조사 참여 감사합니다 🎉',
         html: htmlBody
@@ -98,7 +98,7 @@ app.post('/api/send-email', async (req, res) => {
       `;
 
       const { data, error } = await resend.emails.send({
-        from: process.env.REACT_APP_SENDER_EMAIL || 'Desker Workation <onboarding@resend.dev>',
+        from: process.env.REACT_APP_FROM_EMAIL || 'Desker Workation <onboarding@resend.dev>',
         to: [adminEmail],
         subject: `[데스커] 새 설문 응답 - ${surveyData.fullName}`,
         html: htmlBody
