@@ -308,13 +308,36 @@ const Section7 = () => {
       
       // 섹션 7에 있을 때만 처리
       if (scrollLocked.current && isInSection) {
-        // 패널 4에서 rightSide 영역 클릭 시 휠 이벤트 무시
+        // 패널 4에서 rightSide 영역 스크롤 처리
         if (currentPanel === 3) {
           // 이벤트가 rightSide 영역에서 발생했는지 확인
           const rightSideElement = document.querySelector(`.${styles.rightSidePanel4}`);
           if (rightSideElement && rightSideElement.contains(e.target)) {
-            // rightSide 영역에서는 휠 이벤트 무시 (기본 스크롤 허용)
-            return;
+            // rightSide의 스크롤 상태 체크
+            const scrollTop = rightSideElement.scrollTop;
+            const scrollHeight = rightSideElement.scrollHeight;
+            const clientHeight = rightSideElement.clientHeight;
+            const scrollableDistance = scrollHeight - clientHeight;
+            
+            // 스크롤이 맨 위 또는 맨 아래에 있는지 확인
+            const isAtTop = scrollTop <= 0;
+            const isAtBottom = scrollTop >= scrollableDistance - 1; // 1px 여유
+            
+            // 스크롤 가능한 영역이 있으면 rightSide만 스크롤
+            if (e.deltaY < 0 && !isAtTop) {
+              // 위로 스크롤 가능
+              e.preventDefault();
+              e.stopPropagation();
+              rightSideElement.scrollTop = Math.max(0, scrollTop - 100);
+              return;
+            } else if (e.deltaY > 0 && !isAtBottom) {
+              // 아래로 스크롤 가능
+              e.preventDefault();
+              e.stopPropagation();
+              rightSideElement.scrollTop = Math.min(scrollableDistance, scrollTop + 100);
+              return;
+            }
+            // 스크롤이 끝에 도달했으면 패널 이동 로직으로 계속
           }
         }
         
