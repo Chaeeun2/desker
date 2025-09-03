@@ -189,6 +189,23 @@ const Section3 = () => {
     let lastLoggedScroll = 0;
     
     const handleScroll = () => {
+      // 메뉴 스크롤 중이면 애니메이션 건너뛰기
+      if (window.disableStickyScroll || window.section3AnimationComplete) {
+        // 최종 상태로 즉시 설정
+        if (!isAnimationCompleteRef.current) {
+          setIsAnimationComplete(true);
+          isAnimationCompleteRef.current = true;
+          fixFinalState();
+        }
+        // sticky 해제
+        if (sectionRef.current) {
+          sectionRef.current.style.position = 'relative';
+          sectionRef.current.style.top = 'auto';
+          sectionRef.current.style.zIndex = 'auto';
+        }
+        return; // 더 이상 애니메이션 처리하지 않음
+      }
+      
       const appElement = document.querySelector('.App');
       const scrollTop = appElement ? appElement.scrollTop : 0;
       
@@ -655,6 +672,38 @@ const Section3 = () => {
       }
     };
   }, []); // 빈 의존성 배열 - ref 사용으로 클로저 문제 해결
+
+  // 초기 로드 시 window 플래그 체크
+  useEffect(() => {
+    // 메뉴 스크롤 중이면 즉시 최종 상태로
+    if (window.disableStickyScroll || window.section3AnimationComplete) {
+      setIsAnimationComplete(true);
+      isAnimationCompleteRef.current = true;
+      fixFinalState();
+      
+      // sticky 해제
+      if (sectionRef.current) {
+        sectionRef.current.style.position = 'relative';
+        sectionRef.current.style.top = 'auto';
+        sectionRef.current.style.zIndex = 'auto';
+      }
+    }
+  }, []);
+
+  // 메뉴 스크롤 완료 감지하여 플래그 리셋
+  useEffect(() => {
+    const checkMenuScrollEnd = () => {
+      if (!window.isMenuScrolling) {
+        // 메뉴 스크롤이 끝나면 플래그 리셋
+        delete window.disableStickyScroll;
+        delete window.disableSection3Animation;
+        delete window.section3AnimationComplete;
+      }
+    };
+    
+    const interval = setInterval(checkMenuScrollEnd, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>

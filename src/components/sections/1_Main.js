@@ -148,6 +148,7 @@ const Main = ({ onVisibilityChange }) => {
 
   return (
     <section 
+      id="intro"
       ref={ref}
       className={styles.mainSection}
     >

@@ -59,7 +59,7 @@ const Section6 = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className={styles.section6}>
+    <section id="series" ref={sectionRef} className={styles.section6}>
       <div className={styles.content}>
         <div className={styles.mainContent}>
           {/* 모바일에서는 텍스트를 먼저, 데스크톱에서는 비디오를 먼저 */}
