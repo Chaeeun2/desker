@@ -394,7 +394,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
                 데스커는 일하는 사람들의 새로운 가능을 응원하는 워크 앤 라이프스타일 브랜드입니다. 
                 <br/>현재 일하는 환경에 대한 여러분의 생각을 남겨주시면, 앞으로의 활동에 참고하겠습니다.
                 <br/>
-                <br/>설문에 참여해주신 분들께는 하루 선착순 100명에게<br/><span style={{ fontWeight: '700' }}>공식몰 쿠폰북</span>과 <span style={{ fontWeight: '700' }}>워케이션 준비하기 툴킷 패키지(PDF)</span>를 드리며, 
+                <br/>설문에 참여해주신 분들 중 매일 선착순 100분께<br/><span style={{ fontWeight: '700' }}>공식몰 쿠폰북</span>과 <span style={{ fontWeight: '700' }}>워케이션 준비하기 툴킷 패키지(PDF)</span>를 드리며, 
                 <br/>추첨을 통해 <span style={{ fontWeight: '700' }}>데스커 라운지 홍대 1시간 이용권</span>을 드립니다. (매월 추첨 10명)
               </p>
             </div>
