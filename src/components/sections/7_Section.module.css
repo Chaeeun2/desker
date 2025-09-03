@@ -446,4 +446,10 @@
   .panelTitle img {
     zoom: 0.6;
   }
+
+  .rightSidePanel4 :global(.glide__arrow) {
+    width: 45px;
+    height: 45px;
+    padding: 10px;
+  }
 }

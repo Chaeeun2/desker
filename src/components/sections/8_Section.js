@@ -30,11 +30,11 @@ const Section8 = () => {
 
   // 모바일용과 데스크톱용 본문 텍스트
   const getMobileTexts = () => ({
-    mapDescription: `양양의 서핑스쿨, F&B, 공방 등<br/>다양한 로컬 파트너와의 협업을 통해<br/>이용자에게 한층 더 <span class="${styles.highlight}">다채로운 즐거움</span>을,<br/>로컬에는 <span class="${styles.highlight}">지속 가능한 활력</span>을 더해왔습니다.<br/><br/>로컬과 함께 <span class="${styles.highlight}">더 깊고, 더 활기넘친</span> 워케이션.<br/>그것이 바로 데스커가 지향한 방식이었습니다.`
+    mapDescription: `양양의 서핑스쿨, F&B, 공방 등<br/>다양한 로컬 파트너와의 협업을 통해<br/>이용자에게 한층 더 <span style="font-weight: 800; color: var(--color-primary);">다채로운 즐거움</span>을,<br/>로컬에는 <span style="font-weight: 800; color: var(--color-primary);">지속 가능한 활력</span>을 더해왔습니다.<br/><br/>로컬과 함께 <span style="font-weight: 800; color: var(--color-primary);">더 깊고, 더 활기넘친</span> 워케이션.<br/>그것이 바로 데스커가 지향한 방식이었습니다.`
   });
 
   const getDesktopTexts = () => ({
-    mapDescription: `양양의 서핑스쿨, F&B, 공방 등 다양한 로컬 파트너와의 협업을 통해<br/>이용자에게 한층 더 <span className={styles.highlight}>다채로운 즐거움</span>을, 로컬에는 <span className={styles.highlight}>지속 가능한 활력</span>을 더해왔습니다.<br/><br/>로컬과 함께 <span className={styles.highlight}>더 깊고, 더 활기넘친</span> 워케이션. 그것이 바로 데스커가 지향한 방식이었습니다.`
+    mapDescription: `양양의 서핑스쿨, F&B, 공방 등 다양한 로컬 파트너와의 협업을 통해<br/>이용자에게 한층 더 <span style="font-weight: 800; color: var(--color-primary);">다채로운 즐거움</span>을, 로컬에는 <span  style="font-weight: 800; color: var(--color-primary);">지속 가능한 활력</span>을 더해왔습니다.<br/><br/>로컬과 함께 <span style="font-weight: 800; color: var(--color-primary);">더 깊고, 더 활기넘친</span> 워케이션. 그것이 바로 데스커가 지향한 방식이었습니다.`
   });
 
   const currentTexts = isMobile ? getMobileTexts() : getDesktopTexts();

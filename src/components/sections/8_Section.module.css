@@ -72,11 +72,6 @@
   word-break: keep-all;
 }
 
-.highlight {
-  font-weight: 800;
-  color: var(--color-primary);
-}
-
 /* 로고 섹션 */
 .logoSection {
   margin-top: 3rem;

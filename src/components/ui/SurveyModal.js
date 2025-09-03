@@ -404,6 +404,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
       case 1:
         return (
           <div className={styles.modalBody}>
+            
             <div className={styles.questionSection}>
               <div className={styles.questionWrap}>
                 <h3 className={styles.questionTitle}>양양 워케이션을 경험해보셨나요?</h3>
