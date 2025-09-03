@@ -193,6 +193,7 @@
   font-family: var(--font-pret);
   font-weight: 500;
   word-break: keep-all;
+  color: rgba(0, 0, 0, 0.75);
 }
 
 .videoThumbnail {
