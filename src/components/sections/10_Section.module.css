@@ -293,17 +293,13 @@
 }
 
 /* fade in 애니메이션 */
-.header,
-.description,
-.gridContainer {
+.section10 {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.header.fadeIn,
-.description.fadeIn,
-.gridContainer.fadeIn {
+.section10.fadeIn {
   opacity: 1;
   transform: translateY(0);
 }
