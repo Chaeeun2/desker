@@ -131,17 +131,17 @@
 .rightSidePanel4 :global(.glide__arrow) {
   position: absolute;
   top: 50%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 55px;
+  height: 55px;
   font-size: 24px;
   cursor: pointer;
   z-index: 10;
   transition: background 0.3s ease;
-  padding: 10px;
+  padding: 12px;
 }
 
 .rightSidePanel4 :global(.glide__arrow:hover) {
