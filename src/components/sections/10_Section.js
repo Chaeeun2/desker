@@ -116,9 +116,9 @@ const Section10 = () => {
   }
 
   return (
-    <section ref={ref} className={`${styles.section10} ${hasIntersected ? styles.fadeIn : ''}`}>
+    <section ref={ref} className={styles.section10}>
       <div className={styles.content}>
-        <div className={styles.header}>
+        <div className={`${styles.header} ${hasIntersected ? styles.fadeInUp : ''}`} style={{animationDelay: '0.2s'}}>
           <h1>
             데스커가 제안하는
             <br />
@@ -126,7 +126,7 @@ const Section10 = () => {
           </h1>
         </div>
         
-        <div className={styles.description}>
+        <div className={`${styles.description} ${hasIntersected ? styles.fadeInUp : ''}`} style={{animationDelay: '0.4s'}}>
           <p>
             일하는 모든 이들을 위한 새로운 WORK & LIFE의 가능성에 함께하고자
             합니다.
@@ -145,8 +145,10 @@ const Section10 = () => {
               return (
                 <div 
                   key={itemKey} 
-                  className={`${styles.gridItem} ${itemStates[itemIndex]?.isExpanded ? styles.expanded : ''}`} 
+                  className={`${styles.gridItem} ${itemStates[itemIndex]?.isExpanded ? styles.expanded : ''} ${hasIntersected ? styles.fadeInUp : ''}`} 
                   data-item={itemIndex}
+                  style={{ animationDelay: `${0.6 + index * 0.2}s` }}
+                  onClick={() => handleItemClick(itemIndex)}
                 >
                   <div className={styles.itemContent}>
                     <div className={`${styles.textWrapper} ${itemStates[itemIndex]?.isExpanded ? styles.hidden : ''}`}>
@@ -169,8 +171,18 @@ const Section10 = () => {
                     <p className={`${styles.itemContentText2} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`} style={{ whiteSpace: 'pre-line' }}>
                       {itemData.description}
                     </p>
-                    <a href={itemData.link} target="_blank" rel="noopener noreferrer">
-                      <button className={`${styles.ctaButton} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`}>
+                    <a 
+                      href={itemData.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        pointerEvents: itemStates[itemIndex]?.isExpanded ? 'auto' : 'none' 
+                      }}
+                    >
+                      <button 
+                        className={`${styles.ctaButton} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`}
+                        disabled={!itemStates[itemIndex]?.isExpanded}
+                      >
                         {itemData.buttonText}
                       </button>
                     </a>

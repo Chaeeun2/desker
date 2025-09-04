@@ -293,15 +293,27 @@
 }
 
 /* fade in 애니메이션 */
-.section10 {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+/* 개별 요소 fadeIn 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.section10.fadeIn {
-  opacity: 1;
-  transform: translateY(0);
+.header,
+.description,
+.gridItem {
+  opacity: 0;
+}
+
+.fadeInUp {
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0;
 }
 
 /* 설명 섹션 스타일 */
