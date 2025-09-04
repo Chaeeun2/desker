@@ -51,7 +51,8 @@ const Section9 = () => {
   
   // 모바일일 때 스크롤 거리 조정 (절반으로 줄임)
   const getScrollDistance = (desktopDistance) => {
-    return isMobile ? desktopDistance / 2 : desktopDistance;
+    // 애니메이션 속도 절반으로 단축 (PC는 /2, 모바일은 /4)
+    return isMobile ? desktopDistance / 4 : desktopDistance / 2;
   };
   
   useEffect(() => {
@@ -244,7 +245,7 @@ const Section9 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: '300vh', // 2000px 애니메이션에 맞춤 (20단계 * 100px) - 2000px 스크롤로 조정
+            height: '150vh', // 애니메이션 속도 절반으로 단축 (기존 300vh의 절반)
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'

@@ -20,21 +20,36 @@ const Section4 = () => {
   const [videoPlayState, setVideoPlayState] = useState({
     isPlaying: false,
     hasError: false,
-    hasStarted: false
+    hasStarted: false,
+    retryCount: 0
   });
 
-  // 비디오 재생 상태 체크 및 fallback 처리
+  // 비디오 재생 상태 체크 및 재시도 로직
   useEffect(() => {
-    // 콘솔에 비디오 재생 상태 출력
-    const videoElement = document.querySelector('[data-section="section4"]');
-
-    if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
+    // 5회 이상 재시도 실패 시 fallback 표시
+    if (videoPlayState.retryCount >= 10) {
       setShowFallbackImage(true);
+      return;
+    }
+    
+    // 재생 실패 시 500ms 후 재시도
+    if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
+      const retryTimer = setTimeout(() => {
+        console.log(`Section4 video retry attempt ${videoPlayState.retryCount + 1}/10`);
+        attemptAutoplay();
+        setVideoPlayState(prev => ({ 
+          ...prev, 
+          retryCount: prev.retryCount + 1,
+          hasError: false 
+        }));
+      }, 500);
+      
+      return () => clearTimeout(retryTimer);
     }
   }, [videoPlayState]);
   
   // 비디오 소스 URL (mp4 파일로 교체 필요)
-  const videoSource = 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/210810_wsb_desker_Main_%E1%84%8F%E1%85%A5%E1%86%BA%E1%84%91%E1%85%A7%E1%86%AB%E1%84%8C%E1%85%B5%E1%86%B8.mp4';
+  const videoSource = 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S4_final.mp4';
 
   // 모바일 감지 (768px 이하)
   useEffect(() => {

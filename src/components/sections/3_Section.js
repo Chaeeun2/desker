@@ -170,7 +170,8 @@ const Section3 = () => {
 
   // 모바일일 때 스크롤 거리 조정 (절반으로 줄임)
   const getScrollDistance = (desktopDistance) => {
-    return isMobile ? desktopDistance / 2 : desktopDistance;
+    // 애니메이션 속도 절반으로 단축 (PC는 /2, 모바일은 /4)
+    return isMobile ? desktopDistance / 4 : desktopDistance / 2;
   };
 
   // 현재 사용할 텍스트 배열 선택
@@ -961,7 +962,7 @@ const Section3 = () => {
       {showSpacer && (
         <div 
           style={{
-            height: isMobile ? '2000dvh' : '1400dvh', // 모바일에서는 절반으로 줄임 (700vh vs 1400vh)
+            height: isMobile ? '1000dvh' : '700dvh', // 애니메이션 속도 절반으로 단축 (PC: 700dvh, 모바일: 1000dvh)
             width: '100%',
             background: 'transparent',
             pointerEvents: 'none'

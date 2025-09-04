@@ -9,67 +9,82 @@ const Main = ({ onVisibilityChange }) => {
     rootMargin: '-50px'
   });
 
-  // 롤링 텍스트 상태 제거
+  // 디바이스 및 비디오 상태
+  const [isMobile, setIsMobile] = useState(false);
   const [videosLoaded, setVideosLoaded] = useState(false);
+  const [videoFallback, setVideoFallback] = useState(false);
   
-  // 비디오 자동재생 감지 상태
-  const [videoFallbacks, setVideoFallbacks] = useState({
-    left: false,
-    center: false,
-    right: false
-  });
-
-  // 비디오 재생 상태 모니터링
-  const [videoPlayStates, setVideoPlayStates] = useState({
-    left: { isPlaying: false, hasError: false, hasStarted: false },
-    center: { isPlaying: false, hasError: false, hasStarted: false },
-    right: { isPlaying: false, hasError: false, hasStarted: false }
-  });
-
-  // 비디오 재생 상태 체크 및 fallback 처리
+  // 디바이스 감지
   useEffect(() => {
-    const checkVideoPlayback = () => {
-      const newFallbacks = { ...videoFallbacks };
-      let hasChanges = false;
-      
-      Object.keys(videoPlayStates).forEach(key => {
-        const state = videoPlayStates[key];
-        const shouldFallback = state.hasError || (state.hasStarted && !state.isPlaying);
-      
-        
-        if (shouldFallback && !newFallbacks[key]) {
-          newFallbacks[key] = true;
-          hasChanges = true;
-        }
-      });
-      
-      // 변경사항이 있을 때만 상태 업데이트
-      if (hasChanges) {
-        setVideoFallbacks(newFallbacks);
-      }
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      console.log('Device check:', window.innerWidth, 'isMobile:', mobile);
+      setIsMobile(mobile);
     };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // 단일 비디오 재생 상태 모니터링
+  const [videoPlayState, setVideoPlayState] = useState({
+    isPlaying: false,
+    hasError: false,
+    hasStarted: false,
+    retryCount: 0
+  });
 
-    checkVideoPlayback();
-  }, [videoPlayStates]); // videoFallbacks 의존성 제거
+  // 비디오 재생 상태 체크 및 재시도 로직
+  useEffect(() => {
+    // 5회 이상 재시도 실패 시 fallback 표시
+    if (videoPlayState.retryCount >= 5) {
+      setVideoFallback(true);
+      return;
+    }
+    
+    // 재생 실패 시 1초 후 재시도
+    if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
+      const retryTimer = setTimeout(() => {
+        console.log(`Video retry attempt ${videoPlayState.retryCount + 1}/5`);
+        attemptAutoplay();
+        setVideoPlayState(prev => ({ 
+          ...prev, 
+          retryCount: prev.retryCount + 1,
+          hasError: false 
+        }));
+      }, 1000);
+      
+      return () => clearTimeout(retryTimer);
+    }
+  }, [videoPlayState]);
 
 
 
   // 비디오 재생 상태 업데이트 함수
-  const updateVideoPlayState = (section, updates) => {
-    setVideoPlayStates(prev => ({
+  const updateVideoPlayState = (updates) => {
+    setVideoPlayState(prev => ({
       ...prev,
-      [section]: { ...prev[section], ...updates }
+      ...updates
     }));
   };
 
   // 자동재생 강제 시도 함수
-  const attemptAutoplay = (section) => {
-    const videoElement = document.querySelector(`[data-section="${section}"]`);
+  const attemptAutoplay = () => {
+    // PC와 모바일 비디오 모두 시도
+    const pcVideo = document.querySelector('[data-section="main"]');
+    const mobileVideo = document.querySelector('[data-section="main-mobile"]');
+    
+    const videoElement = isMobile ? mobileVideo : pcVideo;
+    
     if (videoElement) {
       videoElement.play().then(() => {
-        updateVideoPlayState(section, { isPlaying: true });
+        console.log('Video play success');
+        updateVideoPlayState({ isPlaying: true });
       }).catch((error) => {
-        updateVideoPlayState(section, { hasError: true });
+        console.log('Video play failed:', error);
+        updateVideoPlayState({ hasError: true });
       });
     }
   };
@@ -77,12 +92,10 @@ const Main = ({ onVisibilityChange }) => {
   // 비디오 로드 완료 후 자동재생 시도
   useEffect(() => {
     const handleVideoLoad = () => {
-      // 모든 비디오가 로드된 후 자동재생 시도
+      // 비디오가 로드된 후 자동재생 시도
       setTimeout(() => {
-        attemptAutoplay('left');
-        attemptAutoplay('center');
-        attemptAutoplay('right');
-      }, 1000); // 1초 후 시도
+        attemptAutoplay();
+      }, 500); // 로딩 시간 단축
     };
 
     if (videosLoaded) {
@@ -94,21 +107,24 @@ const Main = ({ onVisibilityChange }) => {
   useEffect(() => {
     const handleUserInteraction = () => {
       setTimeout(() => {
-        attemptAutoplay('left');
-        attemptAutoplay('center');
-        attemptAutoplay('right');
+        attemptAutoplay();
       }, 100);
     };
 
     // 클릭, 터치, 키보드 입력 등 사용자 상호작용 감지
     document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('touchstart', handleUserInteraction, { once: true, passive: true });
     document.addEventListener('keydown', handleUserInteraction, { once: true });
+    document.addEventListener('scroll', handleUserInteraction, { once: true, passive: true });
+    // 페이지 포커스 시에도 자동재생 시도
+    window.addEventListener('focus', handleUserInteraction, { once: true });
 
     return () => {
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+      window.removeEventListener('focus', handleUserInteraction);
     };
   }, []);
 
@@ -126,11 +142,10 @@ const Main = ({ onVisibilityChange }) => {
 
   // 비디오 재생 상태 업데이트 함수
 
-  // 비디오 소스 URL들 (mp4 파일로 교체 필요)
+  // PC/모바일 다른 비디오 소스 URL들
   const videoSources = {
-    left: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_1_FINAL.mp4', // 실제 mp4 URL로 교체
-    center: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_2_FINAL.mp4', // 실제 mp4 URL로 교체
-    right: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/0605_SOOB_DESKER_15s_3_FINAL.mp4' // 실제 mp4 URL로 교체
+    pc: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_final.mp4',
+    mobile: 'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_final_mo.mp4'
   };
 
   // 5초마다 텍스트 변경 제거
@@ -152,140 +167,114 @@ const Main = ({ onVisibilityChange }) => {
       ref={ref}
       className={styles.mainSection}
     >
-      {/* 3개 분할 배경 */}
-      <div className={styles.backgroundContainer}>
-        {/* 왼쪽 영역 - 쇼츠 */}
-        <div className={styles.leftSection}>
-          <div className={styles.videoContainer}>
-            {!videoFallbacks.left ? (
-              <video
-                data-section="left"
-                className={styles.video}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                onError={() => {
-                  updateVideoPlayState('left', { hasError: true });
-                }}
-                onCanPlay={() => {
-                  updateVideoPlayState('left', { hasStarted: true });
-                }}
-                onPlay={() => {
-                  updateVideoPlayState('left', { isPlaying: true });
-                }}
-                onPause={() => {
-                  updateVideoPlayState('left', { isPlaying: false });
-                }}
-              >
-                <source src={videoSources.left} type="video/mp4" />
-                {/* 비디오 로딩 실패 시 대체 이미지로 fallback */}
-              </video>
-            ) : (
-              <div className={styles.fallbackImage}>
-                <img 
-                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1-1.jpg" 
-                  alt="Left Section Background"
-                  className={styles.video}
-                />
-              </div>
-            )}
-            <div className={styles.textOverlay}>
-              {/* 롤링 텍스트를 "WORK"로 고정 */}
-              <h2 className={styles.overlayText}>WORK</h2>
-              
-              {/* 모바일에서 추가로 표시될 텍스트들 */}
-              <h2 className={styles.overlayText} style={{display: 'none'}}>ON THE</h2>
-              <h2 className={styles.overlayText} style={{display: 'none'}}>BEACH</h2>
-            </div>
+      {/* PC 배경 비디오 */}
+      <div className={`${styles.backgroundContainer} ${styles.pcContainer}`}>
+        {!videoFallback ? (
+          <video
+            data-section="main"
+            className={styles.backgroundVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            loading="lazy"
+            poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
+            style={{ pointerEvents: 'none', width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={() => {
+              updateVideoPlayState({ hasError: true });
+            }}
+            onCanPlay={() => {
+              updateVideoPlayState({ hasStarted: true });
+            }}
+            onPlay={() => {
+              updateVideoPlayState({ isPlaying: true });
+            }}
+            onPause={() => {
+              updateVideoPlayState({ isPlaying: false });
+            }}
+          >
+            <source src={videoSources.pc} type="video/mp4" />
+          </video>
+        ) : (
+          <div className={styles.fallbackImage}>
+            <img 
+              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
+              alt="Main Section Background"
+              className={styles.backgroundVideo}
+            />
           </div>
-        </div>
-
-        {/* 중앙 영역 - 새로운 쇼츠 */}
-        <div className={styles.centerSection}>
-          <div className={styles.videoContainer}>
-            {!videoFallbacks.center ? (
-              <video
-                data-section="center"
-                className={styles.video}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                onError={() => {
-                  updateVideoPlayState('center', { hasError: true });
-                }}
-                onCanPlay={() => {
-                  updateVideoPlayState('center', { hasStarted: true });
-                }}
-                onPlay={() => {
-                  updateVideoPlayState('center', { isPlaying: true });
-                }}
-                onPause={() => {
-                  updateVideoPlayState('center', { isPlaying: false });
-                }}
-              >
-                <source src={videoSources.center} type="video/mp4" />
-              </video>
-            ) : (
-              <div className={styles.fallbackImage}>
-                <img 
-                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1-2.jpg" 
-                  alt="Center Section Background"
-                  className={styles.video}
-                />
-              </div>
-            )}
-            <div className={styles.textOverlay}>
-              <h2 className={styles.overlayText}>ON THE</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* 오른쪽 영역 - 새로운 쇼츠 */}
-        <div className={styles.rightSection}>
-          <div className={styles.videoContainer}>
-            {!videoFallbacks.right ? (
-              <video
-                data-section="right"
-                className={styles.video}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                onError={() => {
-                  updateVideoPlayState('right', { hasError: true });
-                }}
-                onCanPlay={() => {
-                  updateVideoPlayState('right', { hasStarted: true });
-                }}
-                onPlay={() => {
-                  updateVideoPlayState('right', { isPlaying: true });
-                }}
-                onPause={() => {
-                  updateVideoPlayState('right', { isPlaying: false });
-                }}
-              >
-                <source src={videoSources.right} type="video/mp4" />
-              </video>
-            ) : (
-              <div className={styles.fallbackImage}>
-                <img 
-                  src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1-3.jpg" 
-                  alt="Right Section Background"
-                  className={styles.video}
-                />
-              </div>
-            )}
-            <div className={styles.textOverlay}>
-              <h2 className={styles.overlayText}>BEACH</h2>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* 모바일 배경 비디오 */}
+      <div className={`${styles.backgroundContainer} ${styles.mobileContainer}`}>
+        {!videoFallback ? (
+          <video
+            data-section="main-mobile"
+            className={styles.backgroundVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            loading="lazy"
+            poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
+            style={{ pointerEvents: 'none', width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={() => {
+              updateVideoPlayState({ hasError: true });
+            }}
+            onCanPlay={() => {
+              updateVideoPlayState({ hasStarted: true });
+            }}
+            onPlay={() => {
+              updateVideoPlayState({ isPlaying: true });
+            }}
+            onPause={() => {
+              updateVideoPlayState({ isPlaying: false });
+            }}
+          >
+            <source src={videoSources.mobile} type="video/mp4" />
+          </video>
+        ) : (
+          <div className={styles.fallbackImage}>
+            <img 
+              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
+              alt="Main Section Background"
+              className={styles.backgroundVideo}
+            />
+          </div>
+        )}
+      </div>
+        
+        {/* 3분할 텍스트 오버레이 유지 */}
+        <div className={styles.textOverlayContainer}>
+          <div className={styles.leftTextOverlay}>
+            <div className={styles.textOverlay}>
+              <h2 className={styles.overlayText}>WORK</h2>
+              {/* 모바일에서만 추가 텍스트 표시 */}
+              {isMobile && <h2 className={styles.overlayText}>ON THE</h2>}
+              {isMobile && <h2 className={styles.overlayText}>BEACH</h2>}
+            </div>
+          </div>
+          
+          {/* 데스크톱에서만 중앙, 오른쪽 텍스트 표시 */}
+          {!isMobile && (
+            <div className={styles.centerTextOverlay}>
+              <div className={styles.textOverlay}>
+                <h2 className={styles.overlayText}>ON THE</h2>
+              </div>
+            </div>
+          )}
+          
+          {!isMobile && (
+            <div className={styles.rightTextOverlay}>
+              <div className={styles.textOverlay}>
+                <h2 className={styles.overlayText}>BEACH</h2>
+              </div>
+            </div>
+          )}
+        </div>
     </section>
   );
 };

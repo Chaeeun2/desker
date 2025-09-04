@@ -1,7 +1,6 @@
 /* Main Section Styles */
 .mainSection {
   width: 100vw;
-  height: 100dvh;
   margin: 0;
   padding: 0;
   background-color: var(--color-white);
@@ -15,12 +14,116 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100dvh;
   margin: 0;
   padding: 0;
   display: flex;
   z-index: 1;
   pointer-events: none;
+}
+
+@media (min-width: 769px) {
+  .mainSection {
+    aspect-ratio: 16/9;
+  }
+
+  /* 3개 분할 배경 컨테이너 */
+  .backgroundContainer {
+    aspect-ratio: 16/9;
+  }
+}
+
+/* 단일 배경 비디오 */
+.backgroundVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* 3분할 텍스트 오버레이 컨테이너 */
+.textOverlayContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 왼쪽 텍스트 오버레이 */
+.leftTextOverlay {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 중앙 텍스트 오버레이 */
+.centerTextOverlay {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 오른쪽 텍스트 오버레이 */
+.rightTextOverlay {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 대체 이미지 */
+.fallbackImage {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.fallbackImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* PC/모바일 컨테이너 제어 */
+.pcContainer {
+  display: block;
+}
+
+.mobileContainer {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pcContainer {
+    display: none;
+  }
+
+  .mobileContainer {
+    display: block;
+  }
+
+  .mainSection {
+    height: 100dvh;
+  }
+
+  /* 3개 분할 배경 컨테이너 */
+  .backgroundContainer {
+    height: 100dvh;
+  }
 }
 
 /* 왼쪽 영역 */
@@ -187,17 +290,21 @@
   transform: translate(-50%, -50%);
 }
 
+.overlayText {
+  font-size: 8rem;
+}
+
 /* 반응형 디자인 */
 
 @media (max-width: 1200px) {
   .overlayText {
-    font-size: 5rem;
+    font-size: 6rem;
   }
 }
 
 @media (max-width: 1080px) {
   .overlayText {
-    font-size: 7rem;
+    font-size: 5rem;
   }
 
   .backgroundContainer {
