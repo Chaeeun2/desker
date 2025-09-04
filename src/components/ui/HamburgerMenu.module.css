@@ -76,7 +76,7 @@
   top: 0;
   right: -400px;
   width: 400px;
-  height: 100vh;
+  height: 100dvh;
   background: white;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 9998;
@@ -181,6 +181,15 @@
   transform: translate(0px, -6px);
 }
 
+.menuFooter {
+  position: absolute;
+  bottom: 50px;
+}
+.menuFooter img {
+  height: 30px;
+  object-fit: cover;
+}
+
 /* 애니메이션 */
 @keyframes fadeIn {
   from {
@@ -215,21 +224,21 @@
   .hamburgerButton {
     top: 20px;
     right: 20px;
-    width: 20px;
-    height: 20px;
-    gap: 7px;
+    width: 25px;
+    height: 25px;
+    gap: 6px;
   }
 
   /* 햄버거 라인 */
   .line {
-    width: 25px;
+    width: 23px;
     height: 1.5px;
   }
 
   /* 열린 상태에서 X 모양으로 변형 */
   .hamburgerButton.open .line:nth-child(1) {
     transform: translateY(8px) rotate(45deg);
-    width: 30px;
+    width: 26px;
   }
 
   .hamburgerButton.open .line:nth-child(2) {
@@ -238,15 +247,15 @@
   }
 
   .hamburgerButton.open .line:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-    width: 30px;
+    transform: translateY(-7px) rotate(-45deg);
+    width: 26px;
   }
 
   /* 메뉴 컨텐츠 */
   .menuContent {
     right: -70vw;
     width: 70vw;
-    padding: 80px 25px 25px;
+    padding: 70px 25px 25px;
   }
 
   .menuItem button {
@@ -255,5 +264,14 @@
 
   .menuItem {
     margin-bottom: 20px;
+  }
+
+  .menuFooter {
+    position: absolute;
+    bottom: 30px;
+  }
+  .menuFooter img {
+    height: 23px;
+    object-fit: cover;
   }
 }

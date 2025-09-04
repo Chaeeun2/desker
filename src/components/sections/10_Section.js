@@ -6,8 +6,8 @@ import styles from "./10_Section.module.css";
 
 const Section10 = ({ onVisibilityChange }) => {
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
-    threshold: 0.3,
-    rootMargin: '-50px'
+    threshold: 0.1,
+    rootMargin: '-10px'
   });
   
   // 섹션 가시성 변경 시 부모에 알림
@@ -126,7 +126,7 @@ const Section10 = ({ onVisibilityChange }) => {
   return (
     <section ref={ref} className={styles.section10}>
       <div className={styles.content}>
-        <div className={`${styles.header} ${hasIntersected ? styles.fadeInUp : ''}`} style={{animationDelay: '0.2s'}}>
+        <div className={`${styles.header} ${hasIntersected ? styles.fadeInUp : ''}`} >
           <h1>
             데스커가 제안하는
             <br />
@@ -134,7 +134,7 @@ const Section10 = ({ onVisibilityChange }) => {
           </h1>
         </div>
         
-        <div className={`${styles.description} ${hasIntersected ? styles.fadeInUp : ''}`} style={{animationDelay: '0.4s'}}>
+        <div className={`${styles.description} ${hasIntersected ? styles.fadeInUp : ''}`} style={{animationDelay: '0.2s'}}>
           <p>
             일하는 모든 이들을 위한 새로운 WORK & LIFE의 가능성에 함께하고자
             합니다.
@@ -155,7 +155,7 @@ const Section10 = ({ onVisibilityChange }) => {
                   key={itemKey} 
                   className={`${styles.gridItem} ${itemStates[itemIndex]?.isExpanded ? styles.expanded : ''} ${hasIntersected ? styles.fadeInUp : ''}`} 
                   data-item={itemIndex}
-                  style={{ animationDelay: `${0.6 + index * 0.2}s` }}
+                  style={{ animationDelay: `${0.4 + index * 0.1}s` }}
                   onClick={() => handleItemClick(itemIndex)}
                 >
                   <div className={styles.itemContent}>
@@ -170,7 +170,10 @@ const Section10 = ({ onVisibilityChange }) => {
                     <div className={`${styles.iconWrapper} ${itemStates[itemIndex]?.isExpanded ? styles.hidden : ''}`}>
                       <div 
                         className={styles.plusIcon}
-                        onClick={() => handleItemClick(itemIndex)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleItemClick(itemIndex);
+                        }}
                         style={{ cursor: 'pointer' }}
                       >
                         <span>→</span>
@@ -196,7 +199,10 @@ const Section10 = ({ onVisibilityChange }) => {
                     </a>
                     <div 
                       className={`${styles.closeIcon} ${itemStates[itemIndex]?.isExpanded ? styles.visible : ''}`}
-                      onClick={() => handleItemClick(itemIndex)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleItemClick(itemIndex);
+                      }}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>×</span>

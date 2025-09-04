@@ -32,7 +32,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
     });
     
     // 섹션2, 6, 10 중 하나라도 보이면 툴팁 표시
-    if (isSection2Visible || isSection6Visible || isSection10Visible) {
+    if (isSection2Visible || isSection6Visible) {
       console.log('자동 툴팁 트리거!');
       
       // 이전 타이머가 있다면 취소 (새로 진입할 때만)
@@ -50,7 +50,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
       }, 3000);
     }
     // 섹션을 벗어나도 타이머는 유지 (5초간 툴팁 표시 지속)
-  }, [isSection2Visible, isSection6Visible, isSection10Visible]);
+  }, [isSection2Visible, isSection6Visible]);
 
   // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {

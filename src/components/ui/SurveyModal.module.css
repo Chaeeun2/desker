@@ -817,3 +817,9 @@
     max-width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .modalBodyImg img {
+    max-width: 280px;
+  }
+}

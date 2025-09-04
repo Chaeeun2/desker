@@ -107,6 +107,26 @@
   }
 
   .tooltip {
-    display: none;
+    font-size: 1.4rem;
+    padding: 12px 18px;
+    margin-bottom: 15px;
+    width: 100vw;
+    max-width: 205px;
+  }
+
+  .tooltip::after {
+    right: 15px;
+  }
+
+  /* 모바일에서는 호버로 인한 표시 비활성화 */
+  .iconContainer:hover .tooltip {
+    opacity: 0 !important;
+    transform: translateY(5px) !important;
+  }
+
+  /* 자동 툴팁(섹션 진입 시)만 모바일에서 작동 */
+  .tooltip.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
   }
 }

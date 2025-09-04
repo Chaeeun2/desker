@@ -129,7 +129,7 @@ const Section2 = ({ onVisibilityChange }) => {
           className={styles.koreanText}
           initial={{ opacity: 0, y: 30 }}
           animate={hasIntersected ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.5, delay: 0.4, ease: "easeInOut" }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeInOut" }}
         >
           푸른 바다를 마주하며,
 <br/>
@@ -139,7 +139,7 @@ const Section2 = ({ onVisibilityChange }) => {
           className={styles.englishText}
           initial={{ opacity: 0, y: 30 }}
           animate={hasIntersected ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.5, delay: 0.8, ease: "easeInOut" }}
+          transition={{ duration: 0.6, delay: 0.4, ease: "easeInOut" }}
         >
           DESKER WORKATION
         </motion.h2>

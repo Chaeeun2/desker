@@ -149,7 +149,7 @@ const Section4 = () => {
           }
         }
         setAnimationStep(1);
-      }, getAnimationDelay(300)); // 모바일에서는 600ms
+      }, getAnimationDelay(0)); // 모바일에서는 600ms
 
       // 4단계: 오른쪽 텍스트 나타남 (PNG 교체와 동시에)
       setTimeout(() => {
@@ -160,7 +160,7 @@ const Section4 = () => {
           }
         }
         setAnimationStep(4);
-      }, getAnimationDelay(3000)); // 모바일에서는 5200ms
+      }, getAnimationDelay(2700)); // 모바일에서는 5200ms
 
       setGifPlayed(true);
     }

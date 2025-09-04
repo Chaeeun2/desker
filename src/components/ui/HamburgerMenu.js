@@ -189,6 +189,11 @@ const HamburgerMenu = () => {
               </button>
             </li>
           </ul>
+          <div className={styles.menuFooter}>
+            <a href="https://differ.co.kr/" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/differ_menu.png"></img></a>
+            <br/><br/>
+            <a href="https://www.desker.co.kr/" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker_menu.png"></img></a>
+          </div>
         </nav>
       </div>
 

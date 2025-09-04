@@ -75,7 +75,7 @@ const Section5 = ({ onVisibilityChange }) => {
             if (panelContent) {
               panelContent.classList.add(styles.fadeIn);
             }
-          }, 300);
+          }, 200);
           
           // p는 0.6초 후 fade in
           setTimeout(() => {
@@ -85,7 +85,7 @@ const Section5 = ({ onVisibilityChange }) => {
               if (h3) h3.classList.add(styles.fadeIn);
               if (p) p.classList.add(styles.fadeIn);
             }
-          }, 600);
+          }, 400);
           
           // 한 번만 실행되도록 observer 해제
           observer.unobserve(panel);
