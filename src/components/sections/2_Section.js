@@ -101,6 +101,7 @@ const Section2 = ({ onVisibilityChange }) => {
 
   return (
     <section
+      id="section2"
       ref={ref}
       className={styles.section2}
     >

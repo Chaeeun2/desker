@@ -165,6 +165,24 @@ const Section7 = () => {
       // 모바일에서는 스크롤 고정 비활성화
       if (isMobile) return;
       
+      // 햄버거 메뉴로 이동 중일 때는 완전히 비활성화
+      if (window.disableStickyScroll) {
+        if (scrollLocked.current) {
+          scrollLocked.current = false;
+          setIsInSection(false);
+          exitingSection.current = false;
+          
+          // fixed 스타일 제거
+          if (sectionRef.current) {
+            sectionRef.current.style.position = 'relative';
+            sectionRef.current.style.top = 'auto';
+            sectionRef.current.style.left = 'auto';
+            sectionRef.current.style.right = 'auto';
+          }
+        }
+        return;
+      }
+      
       const appElement = document.querySelector('.App');
       if (!appElement || !sectionRef.current) return;
       
@@ -232,7 +250,8 @@ const Section7 = () => {
       const isApproachingSection = scrollTop >= sectionVisibleThreshold && scrollTop < sectionTop + 50;
       
       // 섹션 7에 진입할 때 (접근 중이고, 잠기지 않았을 때만)
-      if (isApproachingSection && !scrollLocked.current && !isAnimating.current) {
+      // 햄버거 메뉴로 이동 중일 때는 sticky 비활성화
+      if (isApproachingSection && !scrollLocked.current && !isAnimating.current && !window.disableStickyScroll) {
         isAnimating.current = true;
         scrollLocked.current = true;
         setIsInSection(true);
@@ -276,7 +295,7 @@ const Section7 = () => {
       
       // 스크롤이 잠겨있을 때 위치 강제 고정 (모바일에서는 비활성화)
       // 애니메이션 중이 아닐 때만 강제 고정
-      if (!isMobile && scrollLocked.current && !isAnimating.current) {
+      if (!isMobile && scrollLocked.current && !isAnimating.current && !window.disableStickyScroll) {
         if (Math.abs(scrollTop - lockPosition.current) > 5) {
           e.preventDefault();
           appElement.scrollTop = lockPosition.current;

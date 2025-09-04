@@ -6,6 +6,44 @@
   overflow-x: hidden;
 }
 
+/* 햄버거 메뉴 클릭 시 sticky 효과 비활성화 */
+body.disable-sticky-scroll [class*="section3"] {
+  position: static !important;
+  top: 0 !important;
+  transform: none !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* 섹션 3을 단순 컨테이너로 만들기 */
+body.disable-sticky-scroll [class*="section3"] > * {
+  display: none !important;
+}
+
+/* 첫번째 텍스트만 보이게 */
+body.disable-sticky-scroll [class*="section3"] [class*="text1"] {
+  display: block !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  opacity: 1 !important;
+}
+
+/* spacer 숨김 */
+body.disable-sticky-scroll [class*="spacer"],
+body.disable-sticky-scroll [class*="Spacer"] {
+  display: none !important;
+}
+
+body.disable-sticky-scroll [class*="section7"],
+body.disable-sticky-scroll [class*="section9"] {
+  position: relative !important;
+  top: auto !important;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

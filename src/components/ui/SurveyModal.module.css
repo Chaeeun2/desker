@@ -46,6 +46,10 @@
   padding: 15px 40px;
 }
 
+.modalBodyContainer:has(img) {
+  padding: 0px 40px 15px 40px;
+}
+
 /* Modal Footer - 하단 고정 */
 .modalFooter {
   position: relative;
@@ -91,12 +95,12 @@
 .modalBodyImg {
   width: 100%;
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 35px;
 }
 
 .modalBodyImg img {
   width: 100%;
-  margin-top: 20px;
+  max-width: 350px;
 }
 
 .title {
@@ -678,6 +682,10 @@
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
+  .modalBodyContainer:has(img) {
+    padding: 10px 0px;
+  }
+
   .modalContent {
     padding: 25px;
     margin: 0px;

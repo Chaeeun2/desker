@@ -4,11 +4,19 @@ import { db } from "../../admin/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import styles from "./10_Section.module.css";
 
-const Section10 = () => {
+const Section10 = ({ onVisibilityChange }) => {
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
     threshold: 0.3,
     rootMargin: '-50px'
   });
+  
+  // 섹션 가시성 변경 시 부모에 알림
+  useEffect(() => {
+    console.log('섹션10 가시성:', isIntersecting);
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
   
   // 각 아이템의 상태 관리
   const [itemStates, setItemStates] = useState({

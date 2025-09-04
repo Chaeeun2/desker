@@ -12,7 +12,6 @@ import Section8 from './components/sections/8_Section';
 import Section9 from './components/sections/9_Section';
 import Section10 from './components/sections/10_Section';
 import Section11 from './components/sections/11_Section';
-import FloatingMenu from './components/ui/FloatingMenu';
 import RightBottomIcon from './components/ui/RightBottomIcon';
 import SurveyModal from './components/ui/SurveyModal';
 import HamburgerMenu from './components/ui/HamburgerMenu';
@@ -20,6 +19,8 @@ import HamburgerMenu from './components/ui/HamburgerMenu';
 function App() {
   const [isSection1Visible, setIsSection1Visible] = useState(false);
   const [isSection2Visible, setIsSection2Visible] = useState(false);
+  const [isSection6Visible, setIsSection6Visible] = useState(false);
+  const [isSection10Visible, setIsSection10Visible] = useState(false);
   const [isSection11Visible, setIsSection11Visible] = useState(false);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
   const [hasShownSurvey, setHasShownSurvey] = useState(false); // 최초 실행 여부를 추적하는 상태
@@ -48,11 +49,17 @@ function App() {
       <Section3 />
       <Section4 />
       <Section5 />
-      <Section6 />
+      <Section6 onVisibilityChange={(visible) => {
+        console.log('App.js - 섹션6 가시성 변경:', visible);
+        setIsSection6Visible(visible);
+      }} />
       <Section7 />
       <Section8 />
       <Section9 />
-      <Section10 />
+      <Section10 onVisibilityChange={(visible) => {
+        console.log('App.js - 섹션10 가시성 변경:', visible);
+        setIsSection10Visible(visible);
+      }} />
       <Section11 onVisibilityChange={setIsSection11Visible} />
       {/* 추후 다른 섹션들도 여기에 추가 */}
       
@@ -63,6 +70,8 @@ function App() {
       <RightBottomIcon 
         isSection1Visible={isSection1Visible} 
         isSection2Visible={isSection2Visible}
+        isSection6Visible={isSection6Visible}
+        isSection10Visible={isSection10Visible}
       />
 
       {/* 설문조사 모달 */}

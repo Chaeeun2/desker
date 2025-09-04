@@ -157,6 +157,33 @@
   color: var(--color-primary);
 }
 
+.arrowDown {
+  animation-duration: 2s;
+  animation-name: arrowdown;
+  animation-iteration-count: infinite;
+  position: absolute;
+  bottom: 4.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  zindex: 2;
+}
+
+@keyframes arrowdown {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
 @media (max-width: 1200px) {
   .centerText {
     font-size: 6rem !important;

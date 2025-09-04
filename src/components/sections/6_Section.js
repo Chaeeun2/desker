@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import styles from './6_Section.module.css';
 
-const Section6 = () => {
+const Section6 = ({ onVisibilityChange }) => {
   const sectionRef = useRef(null);
   const videoSectionRef = useRef(null);
   const campaignTitleRef = useRef(null);
@@ -10,6 +11,20 @@ const Section6 = () => {
   const beachWorkInfoRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // 섹션 가시성 감지
+  const [intersectionRef, isIntersecting] = useIntersectionObserver({
+    threshold: 0.3,
+    rootMargin: '-50px'
+  });
+  
+  // 섹션 가시성 변경 시 부모에 알림
+  useEffect(() => {
+    console.log('섹션6 가시성:', isIntersecting);
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -59,7 +74,10 @@ const Section6 = () => {
   }, []);
 
   return (
-    <section id="series" ref={sectionRef} className={styles.section6}>
+    <section id="series" ref={(el) => {
+      sectionRef.current = el;
+      intersectionRef.current = el;
+    }} className={styles.section6}>
       <div className={styles.content}>
         <div className={styles.mainContent}>
           {/* 모바일에서는 텍스트를 먼저, 데스크톱에서는 비디오를 먼저 */}

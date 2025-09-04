@@ -64,22 +64,13 @@ h2 img {
   color: var(--color-primary);
 }
 
-/* 반응형 디자인 */
-@media (max-width: 1024px) {
-  h2 img {
-    width: 400px;
-  }
-
+@media (max-width: 1200px) {
   .textContainer h2 {
     font-size: 6rem;
   }
 }
 
 @media (max-width: 768px) {
-  h2 img {
-    width: 60vw;
-  }
-
   .textContainer h2 {
     font-size: 3.6rem;
   }

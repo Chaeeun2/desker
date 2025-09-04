@@ -35,6 +35,7 @@ const Intro = () => {
 
   return (
     <motion.section 
+      id="intro"
       ref={ref}
       className={styles.introSection}
       animate={animationComplete ? { y: '-100%' } : { y: 0 }}

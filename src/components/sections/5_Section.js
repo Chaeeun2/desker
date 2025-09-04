@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './5_Section.module.css';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 
-const Section5 = () => {
+const Section5 = ({ onVisibilityChange }) => {
   const panelRefs = useRef([]);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -115,6 +115,14 @@ const Section5 = () => {
     threshold: 0.3,
     rootMargin: '-50px'
   });
+  
+  // 섹션 가시성 변경 시 부모에 알림
+  useEffect(() => {
+    console.log('섹션5 가시성:', isIntersecting);
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
   
   const [videoLoaded, setVideoLoaded] = useState(false);
   
