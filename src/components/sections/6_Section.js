@@ -20,7 +20,6 @@ const Section6 = ({ onVisibilityChange }) => {
   
   // 섹션 가시성 변경 시 부모에 알림
   useEffect(() => {
-    console.log('섹션6 가시성:', isIntersecting);
     if (onVisibilityChange) {
       onVisibilityChange(isIntersecting);
     }

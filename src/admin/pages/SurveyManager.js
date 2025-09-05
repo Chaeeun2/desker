@@ -508,12 +508,19 @@ const SurveyManager = () => {
     
     const workbook = XLSX.utils.book_new();
     
-    // 각 스키마별로 시트 생성 (응답이 없는 스키마도 포함)
+    // 각 스키마별로 시트 생성
+    let createdSheets = 0;
     for (const [schemaKey, surveys] of Object.entries(schemaGroups)) {
-      // 응답이 없는 스키마는 건너뛰기 (옵션: 빈 시트를 만들려면 이 조건 제거)
+      // 응답이 없는 스키마도 빈 시트 생성 (모든 스키마 버전 확인 가능)
+      // 주석 처리하면 응답이 있는 스키마만 표시
+      // 응답이 없는 스키마 처리 옵션
+      const INCLUDE_EMPTY_SCHEMAS = true; // true로 변경하면 모든 스키마의 시트 생성
       if (surveys.length === 0) {
-        console.log(`스키마 ${schemaKey}는 응답이 없어 건너뜀`);
-        continue;
+        if (!INCLUDE_EMPTY_SCHEMAS) {
+          console.log(`스키마 ${schemaKey}는 응답이 없음 (건너뜀)`);
+          continue;
+        }
+        console.log(`스키마 ${schemaKey}는 응답이 없음 (빈 시트 생성)`);
       }
       
       console.log(`스키마 ${schemaKey} 시트 생성 중... (${surveys.length}개 응답)`);
@@ -631,7 +638,9 @@ const SurveyManager = () => {
             // 추가질문 ID인 경우 직접 값 가져오기
             if (questionId.includes('_followUp')) {
               const value = survey[questionId] || '';
-              row.push(value);
+              // 특수문자 제거하여 안전한 문자열로 변환
+              const cleanValue = String(value).replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+              row.push(cleanValue);
             } else {
               // 일반 질문은 getDynamicAnswerValue 사용
               const questionObj = {
@@ -641,17 +650,19 @@ const SurveyManager = () => {
               };
               const value = getDynamicAnswerValue(survey, questionObj);
               
-              // Excel용으로 값 정리
+              // Excel용으로 값 정리 (안전한 문자열 처리)
               if (questionInfo.type === 'file' && value) {
-                if (value.startsWith('data:')) {
+                if (typeof value === 'string' && value.startsWith('data:')) {
                   row.push('[이미지 데이터]');
-                } else if (value.startsWith('http')) {
-                  row.push(value); // URL은 그대로 유지
+                } else if (typeof value === 'string' && value.startsWith('http')) {
+                  row.push(value);
                 } else {
-                  row.push(value || '');
+                  row.push(String(value || ''));
                 }
               } else {
-                row.push(value || '');
+                // 모든 값을 안전한 문자열로 변환
+                const cleanValue = String(value || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+                row.push(cleanValue);
               }
             }
           }
@@ -698,10 +709,14 @@ const SurveyManager = () => {
         if (schemaKey === 'v1.0') {
           sheetName = 'v1.0 (기본)';
         } else if (schema && schema.version) {
-          // 날짜 형식 간소화 (예: v2024.12.19.1543 -> 2024.12.19)
-          const versionMatch = schema.version.match(/v?(\d{4})\.(\d{2})\.(\d{2})/);
+          // 날짜와 시간 포함 (예: v2024.12.19.1543 -> 2024.12.19_15:43)
+          const versionMatch = schema.version.match(/v?(\d{4})\.(\d{2})\.(\d{2})\.?(\d{2})?(\d{2})?/);
           if (versionMatch) {
             sheetName = `${versionMatch[1]}.${versionMatch[2]}.${versionMatch[3]}`;
+            // 시간 정보가 있으면 추가 (콜론은 Excel 시트명에서 허용되지 않으므로 하이픈으로 대체)
+            if (versionMatch[4] && versionMatch[5]) {
+              sheetName += `_${versionMatch[4]}-${versionMatch[5]}`;
+            }
           } else {
             sheetName = schema.version;
           }
@@ -727,6 +742,7 @@ const SurveyManager = () => {
         
         XLSX.utils.book_append_sheet(workbook, worksheet, finalSheetName);
         console.log(`시트 '${finalSheetName}' 생성 완료 (${surveys.length}개 응답)`);
+        createdSheets++;
         
       } catch (error) {
         console.error(`스키마 ${schemaKey} 시트 생성 실패:`, error);
@@ -777,7 +793,7 @@ const SurveyManager = () => {
       console.log(`할당되지 않은 설문 ${unassignedSurveys.length}개 발견`);
     }
     
-    console.log('Excel 워크북 생성 완료');
+    console.log(`Excel 워크북 생성 완료: 총 ${createdSheets}개 시트 생성 (${Object.keys(schemaGroups).length}개 스키마 중)`);
     return workbook;
   };
 

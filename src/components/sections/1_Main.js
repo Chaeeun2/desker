@@ -18,7 +18,6 @@ const Main = ({ onVisibilityChange }) => {
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
-      console.log('Device check:', window.innerWidth, 'isMobile:', mobile);
       setIsMobile(mobile);
     };
     
@@ -47,7 +46,6 @@ const Main = ({ onVisibilityChange }) => {
     // 재생 실패 시 1초 후 재시도
     if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
       const retryTimer = setTimeout(() => {
-        console.log(`Video retry attempt ${videoPlayState.retryCount + 1}/5`);
         attemptAutoplay();
         setVideoPlayState(prev => ({ 
           ...prev, 
@@ -80,10 +78,8 @@ const Main = ({ onVisibilityChange }) => {
     
     if (videoElement) {
       videoElement.play().then(() => {
-        console.log('Video play success');
         updateVideoPlayState({ isPlaying: true });
       }).catch((error) => {
-        console.log('Video play failed:', error);
         updateVideoPlayState({ hasError: true });
       });
     }

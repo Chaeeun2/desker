@@ -95,7 +95,6 @@ const HamburgerMenu = () => {
       
       // section3SpacerChange 이벤트 리스너로 spacer 상태 감지
       const handleSpacerChange = (event) => {
-        console.log('Spacer state changed:', event.detail);
         
         // spacer가 false가 되면 (사라지면) 스크롤 시작
         if (!event.detail.showSpacer) {
@@ -104,8 +103,6 @@ const HamburgerMenu = () => {
           // 레이아웃이 안정되기를 기다림
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              console.log(`Spacer removed, scrolling to ${tab}`);
-              
               // 정확한 위치로 스크롤
               targetElement.scrollIntoView({ 
                 behavior: 'smooth', 

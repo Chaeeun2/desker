@@ -94,17 +94,29 @@ export const getAllSurveySchemas = async () => {
 // 새 설문지 스키마 생성
 export const createSurveySchema = async (schemaData) => {
   try {
-    // 기존 활성 스키마 비활성화
-    await deactivateAllSchemas();
+    // 기존 활성 스키마 비활성화 (오류가 나도 계속 진행)
+    try {
+      await deactivateAllSchemas();
+    } catch (deactivateError) {
+      console.warn('기존 스키마 비활성화 중 오류 (무시하고 계속):', deactivateError);
+    }
     
-    // 새 스키마 생성
-    const docRef = await addDoc(collection(db, 'surveySchemas'), {
+    // 항상 새 스키마 생성 (새로운 문서 ID 자동 생성)
+    const newSchemaData = {
       ...schemaData,
       isActive: true,
       createdAt: serverTimestamp(),
-      version: generateVersion()
-    });
+      version: generateVersion(),
+      // ID는 제거 (Firestore가 자동 생성)
+      id: undefined
+    };
     
+    // 기존 ID 제거
+    delete newSchemaData.id;
+    
+    const docRef = await addDoc(collection(db, 'surveySchemas'), newSchemaData);
+    
+    console.log('새 스키마 생성됨:', docRef.id);
     return { success: true, id: docRef.id };
   } catch (error) {
     console.error('설문지 스키마 생성 오류:', error);
@@ -148,11 +160,30 @@ export const toggleSchemaActive = async (schemaId) => {
 
 // 모든 스키마 비활성화
 const deactivateAllSchemas = async () => {
-  const schemas = await getAllSurveySchemas();
-  const updatePromises = schemas.map(schema => 
-    updateDoc(doc(db, 'surveySchemas', schema.id), { isActive: false })
-  );
-  await Promise.all(updatePromises);
+  try {
+    const schemas = await getAllSurveySchemas();
+    const updatePromises = schemas
+      .filter(schema => schema.isActive) // 활성화된 스키마만 비활성화
+      .map(async (schema) => {
+        try {
+          // 문서가 존재하는지 먼저 확인
+          const docRef = doc(db, 'surveySchemas', schema.id);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            return updateDoc(docRef, { isActive: false });
+          }
+          console.log(`스키마 ${schema.id}가 존재하지 않아 건너뜀`);
+          return Promise.resolve();
+        } catch (error) {
+          console.error(`스키마 ${schema.id} 비활성화 실패:`, error);
+          return Promise.resolve(); // 오류가 나도 계속 진행
+        }
+      });
+    await Promise.all(updatePromises);
+  } catch (error) {
+    console.error('스키마 비활성화 중 오류:', error);
+  }
 };
 
 // 버전 번호 생성

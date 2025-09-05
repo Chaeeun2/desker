@@ -25,15 +25,9 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
 
   // Section2, 6, 10 진입 시 자동 툴팁 노출
   useEffect(() => {
-    console.log('섹션 가시성 상태:', {
-      섹션2: isSection2Visible,
-      섹션6: isSection6Visible,
-      섹션10: isSection10Visible
-    });
     
     // 섹션2, 6, 10 중 하나라도 보이면 툴팁 표시
     if (isSection2Visible || isSection6Visible) {
-      console.log('자동 툴팁 트리거!');
       
       // 이전 타이머가 있다면 취소 (새로 진입할 때만)
       if (autoTooltipTimeoutRef.current) {
@@ -45,7 +39,6 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
       
       // 5초 후 자동으로 숨김
       autoTooltipTimeoutRef.current = setTimeout(() => {
-        console.log('자동 툴팁 숨김');
         setIsAutoTooltipVisible(false);
       }, 3000);
     }

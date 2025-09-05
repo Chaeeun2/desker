@@ -305,19 +305,14 @@ const SurveyModal = ({ isOpen, onClose }) => {
       // 쿠폰 발송용 이메일 주소 찾기
       const findCouponEmail = () => {
         // 모든 스텝의 이메일 타입 질문에서 sendCouponToThisEmail이 true인 것 찾기
-        console.log('쿠폰 이메일 찾기 시작, 스키마:', surveySchema);
         for (const step of surveySchema?.steps || []) {
-          console.log('스텝 확인:', step.id, step.questions);
           for (const question of step.questions || []) {
-            console.log('질문 확인:', question.id, question.type, question.sendCouponToThisEmail);
             if (question.type === 'email' && question.sendCouponToThisEmail) {
               const email = surveyAnswers[question.id];
-              console.log('쿠폰 이메일 발견:', question.id, email);
               return email;
             }
           }
         }
-        console.log('쿠폰 이메일을 찾지 못함. 기본값 사용.');
         return null;
       };
       
@@ -350,9 +345,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
         schemaId: surveySchema?.id || null
       };
 
-      console.log('Setting 제출 전 surveyDataWithSchema:', surveyDataWithSchema);
       const result = await saveSurveyResponse(surveyDataWithSchema);
-      console.log('Setting 제출 결과:', result);
       
       if (result.success) {
         // 이메일 발송 (실패해도 설문 제출은 성공으로 처리)
@@ -742,13 +735,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
 
       case 3:
         // 브랜드 협업 관련 질문들 (조건부 표시)
-        console.log('Case 3 - surveySchema:', surveySchema);
-        console.log('Case 3 - surveySchema.steps:', surveySchema?.steps);
-        surveySchema?.steps?.forEach((step, index) => {
-          console.log(`Step ${index}:`, step.id, step);
-        });
         const brandCollabStep = surveySchema?.steps?.[2];
-        console.log('Case 3 - brandCollabStep:', brandCollabStep);
         
         if (!brandCollabStep || !surveyAnswers.visitPurpose?.includes?.('brand_collaboration')) {
           return null;

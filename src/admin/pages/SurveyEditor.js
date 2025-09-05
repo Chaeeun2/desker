@@ -28,12 +28,18 @@ const SurveyEditor = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    // 현재 활성화된 스키마가 있으면 새 버전 생성, 없으면 첫 스키마 생성
     const result = await createSurveySchema(currentSchema);
     if (result.success) {
-      alert('설문지가 저장되었습니다.');
+      alert('새로운 설문지 버전이 생성되었습니다.');
       await loadData();
+      // 새로 생성된 스키마를 현재 스키마로 설정
+      const newActiveSchema = allSchemas.find(s => s.id === result.id) || await getActiveSurveySchema();
+      if (newActiveSchema) {
+        setCurrentSchema(newActiveSchema);
+      }
     } else {
-      alert('저장 중 오류가 발생했습니다.');
+      alert('저장 중 오류가 발생했습니다: ' + result.error);
     }
     setSaving(false);
   };
@@ -195,8 +201,8 @@ const SurveyEditor = () => {
               </div>
 
             {currentSchema.steps?.map((step, stepIndex) => (
-              <div className="survey-wrap">
-              <div key={step.id} className="survey-step-editor">
+              <div key={step.id || stepIndex} className="survey-wrap">
+              <div className="survey-step-editor">
                 <h3>{step.id}</h3>
                 
 

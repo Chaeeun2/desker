@@ -35,7 +35,6 @@ const Section4 = () => {
     // 재생 실패 시 500ms 후 재시도
     if (videoPlayState.hasError || (videoPlayState.hasStarted && !videoPlayState.isPlaying)) {
       const retryTimer = setTimeout(() => {
-        console.log(`Section4 video retry attempt ${videoPlayState.retryCount + 1}/10`);
         attemptAutoplay();
         setVideoPlayState(prev => ({ 
           ...prev, 
