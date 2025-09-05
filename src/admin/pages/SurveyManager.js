@@ -273,18 +273,7 @@ const SurveyManager = () => {
     
     // 특별 처리가 필요한 필드들
     if (question.id === 'phoneNumber') {
-      // 분할된 전화번호 필드들을 조합 (브랜드 협업용과 개인정보용 구분)
-      const hasPersonalPhone = survey.personalPhoneFirst && survey.personalPhoneSecond && survey.personalPhoneThird;
-      const hasBrandPhone = survey.phoneFirst && survey.phoneSecond && survey.phoneThird;
-      
-      let phone = '';
-      if (hasPersonalPhone) {
-        phone = `${survey.personalPhoneFirst}-${survey.personalPhoneSecond}-${survey.personalPhoneThird}`;
-      } else if (hasBrandPhone) {
-        phone = `${survey.phoneFirst}-${survey.phoneSecond}-${survey.phoneThird}`;
-      }
-      
-      return phone || '';
+      return survey.phoneNumber || '';
     }
     
     if (question.id === 'emailForPrizes') {
@@ -547,19 +536,7 @@ const SurveyManager = () => {
                 options: question.options
               });
               
-              // 추가질문이 있는 옵션들 처리
-              if (question.options && (question.type === 'radio' || question.type === 'checkbox')) {
-                question.options.forEach(option => {
-                  if (option.hasFollowUpQuestion && option.followUpQuestion) {
-                    const followUpId = `${question.id}_${option.value}_followUp`;
-                    schemaQuestions.set(followUpId, {
-                      title: `${question.title} - ${option.label}: ${option.followUpQuestion}`,
-                      type: 'text',
-                      options: null
-                    });
-                  }
-                });
-              }
+              // 추가질문은 별도 열로 추가하지 않음 (괄호로만 표시)
             });
           });
         };
@@ -594,53 +571,36 @@ const SurveyManager = () => {
             survey.fullName || '',
             // 이메일
             survey.email || survey.emailForPrizes || '',
-            // 전화번호 처리
-            (() => {
-              const hasPersonalPhone = survey.personalPhoneFirst && survey.personalPhoneSecond && survey.personalPhoneThird;
-              const hasBrandPhone = survey.phoneFirst && survey.phoneSecond && survey.phoneThird;
-              
-              if (hasPersonalPhone) {
-                return `${survey.personalPhoneFirst}-${survey.personalPhoneSecond}-${survey.personalPhoneThird}`;
-              } else if (hasBrandPhone) {
-                return `${survey.phoneFirst}-${survey.phoneSecond}-${survey.phoneThird}`;
-              }
-              return survey.phoneNumber || '';
-            })(),
+            // 전화번호
+            survey.phoneNumber || '',
             // 주소
             survey.address || ''
           ];
           
           // 각 질문에 대한 답변 추가
           for (const [questionId, questionInfo] of schemaQuestions) {
-            // 추가질문 ID인 경우 직접 값 가져오기
-            if (questionId.includes('_followUp')) {
-              const value = survey[questionId] || '';
-              // 특수문자 제거하여 안전한 문자열로 변환
-              const cleanValue = String(value).replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-              row.push(cleanValue);
-            } else {
-              // 일반 질문은 getDynamicAnswerValue 사용
-              const questionObj = {
-                id: questionId,
-                type: questionInfo.type,
-                options: questionInfo.options
-              };
-              const value = getDynamicAnswerValue(survey, questionObj);
-              
-              // Excel용으로 값 정리 (안전한 문자열 처리)
-              if (questionInfo.type === 'file' && value) {
-                if (typeof value === 'string' && value.startsWith('data:')) {
-                  row.push('[이미지 데이터]');
-                } else if (typeof value === 'string' && value.startsWith('http')) {
-                  row.push(value);
-                } else {
-                  row.push(String(value || ''));
-                }
+            // getDynamicAnswerValue를 사용하여 메인 질문의 답변 가져오기
+            // 추가질문 응답은 자동으로 괄호로 포함됨
+            const questionObj = {
+              id: questionId,
+              type: questionInfo.type,
+              options: questionInfo.options
+            };
+            const value = getDynamicAnswerValue(survey, questionObj);
+            
+            // Excel용으로 값 정리 (안전한 문자열 처리)
+            if (questionInfo.type === 'file' && value) {
+              if (typeof value === 'string' && value.startsWith('data:')) {
+                row.push('[이미지 데이터]');
+              } else if (typeof value === 'string' && value.startsWith('http')) {
+                row.push(value);
               } else {
-                // 모든 값을 안전한 문자열로 변환
-                const cleanValue = String(value || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-                row.push(cleanValue);
+                row.push(String(value || ''));
               }
+            } else {
+              // 모든 값을 안전한 문자열로 변환
+              const cleanValue = String(value || '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+              row.push(cleanValue);
             }
           }
           
@@ -873,18 +833,8 @@ const SurveyManager = () => {
         data.length - index, // 순번
         survey.fullName || '',
         survey.email || survey.emailForPrizes || '',
-        // 전화번호 처리 - step 구분
-        (() => {
-          const hasPersonalPhone = survey.personalPhoneFirst && survey.personalPhoneSecond && survey.personalPhoneThird;
-          const hasBrandPhone = survey.phoneFirst && survey.phoneSecond && survey.phoneThird;
-          
-          if (hasPersonalPhone) {
-            return `${survey.personalPhoneFirst}-${survey.personalPhoneSecond}-${survey.personalPhoneThird}`;
-          } else if (hasBrandPhone) {
-            return `${survey.phoneFirst}-${survey.phoneSecond}-${survey.phoneThird}`;
-          }
-          return survey.phoneNumber || '';
-        })(),
+        // 전화번호
+        survey.phoneNumber || '',
         survey.address || '',
         survey.goodPoints || '',
         // 사진 URL (R2 링크 또는 base64)
@@ -974,8 +924,8 @@ const SurveyManager = () => {
                   <tr key={survey.id}>
                     <td>{surveys.length - (indexOfFirstItem + index)}</td>
                     <td>{survey.fullName}</td>
-                    <td>{survey.email}</td>
-                    <td>{survey.phoneNumber}</td>
+                    <td>{survey.email || survey.emailForPrizes || '-'}</td>
+                    <td>{survey.phoneNumber || '-'}</td>
                     <td>{(() => {
                       const dateStr = survey.createdAt || survey.submittedAt;
                       if (!dateStr) return '';

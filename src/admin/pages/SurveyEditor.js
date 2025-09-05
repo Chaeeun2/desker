@@ -181,7 +181,7 @@ const SurveyEditor = () => {
             <div className="survey-wrap">
             <div className="admin-form-group">
               <label>설문지 제목</label>
-              <input
+              <textarea
                 value={currentSchema.title || ''}
                 onChange={(e) => setCurrentSchema(prev => ({ ...prev, title: e.target.value }))}
                 className="admin-input"

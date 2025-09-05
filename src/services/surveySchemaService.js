@@ -172,7 +172,6 @@ const deactivateAllSchemas = async () => {
           if (docSnap.exists()) {
             return updateDoc(docRef, { isActive: false });
           }
-          console.log(`스키마 ${schema.id}가 존재하지 않아 건너뜀`);
           return Promise.resolve();
         } catch (error) {
           console.error(`스키마 ${schema.id} 비활성화 실패:`, error);

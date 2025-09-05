@@ -374,10 +374,11 @@ const Section7 = () => {
           if (currentPanel < 3) {
             moveToPanel(currentPanel + 1);
           } else {
-            // 마지막 패널에서 아래로 스크롤 시 섹션 7 탈출 (리셋하지 않음)
+            // 마지막 패널에서 아래로 스크롤 시 섹션 7의 시작점으로 돌아가기
             exitingSection.current = true; // 탈출 중 플래그 설정
             scrollLocked.current = false;
             setIsInSection(false);
+            setCurrentPanel(0); // 첫 번째 패널로 리셋
             setPlayingVideos({}); // 모든 비디오 일시정지
             
             // 섹션 고정 해제 전에 정확한 위치 계산
@@ -392,9 +393,9 @@ const Section7 = () => {
               sectionRef.current.style.transition = '';
             }
             
-            // 스크롤 위치를 섹션7 끝으로 설정하여 다음 섹션 표시 (PC에서만)
+            // 섹션 7의 시작 위치로 이동 (PC에서만)
             if (!isMobile) {
-              appElement.scrollTop = sectionTop + window.innerHeight;
+              appElement.scrollTop = sectionTop;
             }
           }
         } else if (e.deltaY < 0) {

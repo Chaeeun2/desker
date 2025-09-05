@@ -53,22 +53,6 @@ const HamburgerMenu = () => {
     // 메뉴 닫기
     setIsOpen(false);
     
-    // intro 탭 클릭 시 맨 위로 스크롤
-    if (tab === 'intro') {
-      const appElement = document.querySelector('.App');
-      if (appElement) {
-        appElement.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      } else {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      }
-      return;
-    }
     
     // 해당 섹션으로 스크롤 이동
     const targetElement = document.getElementById(tab);
@@ -165,7 +149,7 @@ const HamburgerMenu = () => {
         <nav className={styles.navigation}>
           <ul className={styles.menuList}>
             <li className={styles.menuItem}>
-              <button onClick={() => handleMenuClick('intro')}>
+              <button onClick={() => handleMenuClick('main')}>
                 인트로
               </button>
             </li>
@@ -187,7 +171,7 @@ const HamburgerMenu = () => {
             </li>
           </ul>
           <div className={styles.menuFooter}>
-            <a href="https://differ.co.kr/" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/differ_menu.png"></img></a>
+            <a href="https://differ.co.kr/about" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/differ_menu.png"></img></a>
             <br/><br/>
             <a href="https://www.desker.co.kr/" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker_menu.png"></img></a>
           </div>

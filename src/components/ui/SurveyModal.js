@@ -26,9 +26,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
     companyName: '', // 회사명
     contactPerson: '', // 담당자명
     phoneNumber: '', // 전화번호
-    phoneFirst: '', // 전화번호 첫 번째 부분
-    phoneSecond: '', // 전화번호 두 번째 부분
-    phoneThird: '', // 전화번호 세 번째 부분
     email: '', // 이메일
     emailForPrizes: '', // 경품용 이메일
     fullName: '', // 이름
@@ -150,12 +147,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
         expectedActivities: [],
         expectedActivitiesOther: '',
         fullName: '',
-        phoneFirst: '', // 브랜드 협업용 전화번호
-        phoneSecond: '',
-        phoneThird: '',
-        personalPhoneFirst: '', // 개인정보용 전화번호 
-        personalPhoneSecond: '',
-        personalPhoneThird: '',
         address: '',
         emailForPrizes: '',
         privacyAgreement: false
@@ -316,25 +307,30 @@ const SurveyModal = ({ isOpen, onClose }) => {
         return null;
       };
       
+      // 브랜드 협업 선택 여부 확인
+      const isBrandCollaboration = surveyAnswers.visitPurpose && surveyAnswers.visitPurpose.includes('brand_collaboration');
+      
+      // 설문 데이터 생성 (불필요한 필드 제거)
+      const cleanedAnswers = { ...surveyAnswers };
+      
+      // 브랜드 협업을 선택하지 않았으면 브랜드 협업 관련 필드들 제거
+      if (!isBrandCollaboration) {
+        delete cleanedAnswers.email;
+        delete cleanedAnswers.companyName;
+        delete cleanedAnswers.contactPerson;
+        delete cleanedAnswers.collaborationTitle;
+        delete cleanedAnswers.collaborationContent;
+      }
+      
+      
       const surveyData = {
-        // 모든 surveyAnswers 데이터를 포함 (추가질문 답변 포함)
-        ...surveyAnswers,
+        // 정리된 surveyAnswers 데이터를 포함
+        ...cleanedAnswers,
         
         // 개인정보 (재정의)
-        email: findCouponEmail() || surveyAnswers.emailForPrizes || surveyAnswers.email,
+        email: findCouponEmail() || (isBrandCollaboration ? surveyAnswers.email : surveyAnswers.emailForPrizes),
         fullName: surveyAnswers.fullName,
-        phoneNumber: (() => {
-          // 브랜드 협업에서 입력한 경우와 개인정보에서 입력한 경우 구분
-          const hasPersonalPhone = surveyAnswers.personalPhoneFirst && surveyAnswers.personalPhoneSecond && surveyAnswers.personalPhoneThird;
-          const hasBrandPhone = surveyAnswers.phoneFirst && surveyAnswers.phoneSecond && surveyAnswers.phoneThird;
-          
-          if (hasPersonalPhone) {
-            return `${surveyAnswers.personalPhoneFirst}-${surveyAnswers.personalPhoneSecond}-${surveyAnswers.personalPhoneThird}`;
-          } else if (hasBrandPhone) {
-            return `${surveyAnswers.phoneFirst}-${surveyAnswers.phoneSecond}-${surveyAnswers.phoneThird}`;
-          }
-          return '';
-        })(),
+        phoneNumber: surveyAnswers.phoneNumber || '',
         address: surveyAnswers.address
       };
 
@@ -543,56 +539,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
         );
       
       case 'tel':
-        // phoneNumber 필드는 특별 처리 (단계별 분리된 필드 사용)
-        if (fieldName === 'phoneNumber') {
-          // 현재 단계에 따라 다른 필드 프리픽스 사용
-          const phonePrefix = currentStep === 6 ? 'personalPhone' : 'phone';
-          return (
-            <div className={styles.phoneInputGroup}>
-              <input
-                type="tel"
-                className={styles.formInput}
-                value={surveyAnswers[phonePrefix + 'First'] || ''}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                  handleAnswerChange(phonePrefix + 'First', value);
-                }}
-                placeholder="010"
-                maxLength="3"
-                pattern="[0-9]*"
-                inputMode="numeric"
-              />
-              <span className={styles.phoneSeparator}>-</span>
-              <input
-                type="tel"
-                className={styles.formInput}
-                value={surveyAnswers[phonePrefix + 'Second'] || ''}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                  handleAnswerChange(phonePrefix + 'Second', value);
-                }}
-                placeholder="1234"
-                maxLength="4"
-                pattern="[0-9]*"
-                inputMode="numeric"
-              />
-              <span className={styles.phoneSeparator}>-</span>
-              <input
-                type="tel"
-                className={styles.formInput}
-                value={surveyAnswers[phonePrefix + 'Third'] || ''}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                  handleAnswerChange(phonePrefix + 'Third', value);
-                }}
-                placeholder="5678"
-                maxLength="4"
-                pattern="[0-9]*"
-                inputMode="numeric"
-              />
-            </div>
-          );
-        }
         
         // 일반 tel 필드는 단일 입력
         return (
@@ -906,10 +852,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
     if (currentStep === 3) {
       // 브랜드 협업에 체크한 경우에만 브랜드 협업 제안 폼 표시
       if (surveyAnswers.visitPurpose.includes('brand_collaboration')) {
-        const hasPhoneNumber = surveyAnswers.phoneFirst?.trim() !== '' && 
-                               surveyAnswers.phoneSecond?.trim() !== '' && 
-                               surveyAnswers.phoneThird?.trim() !== '';
-        return surveyAnswers.companyName !== '' && surveyAnswers.contactPerson !== '' && hasPhoneNumber && surveyAnswers.email !== '' && surveyAnswers.collaborationTitle !== '' && surveyAnswers.collaborationContent !== '';
+        return surveyAnswers.companyName !== '' && surveyAnswers.contactPerson !== '' && surveyAnswers.phoneNumber?.trim() !== '' && surveyAnswers.email !== '' && surveyAnswers.collaborationTitle !== '' && surveyAnswers.collaborationContent !== '';
       }
       return true; // 브랜드 협업을 체크하지 않은 경우 건너뛰기 메시지 표시이므로 통과
     }
@@ -1018,18 +961,9 @@ const SurveyModal = ({ isOpen, onClose }) => {
         
         // 필수 질문인 경우 값 확인
         if (question.required) {
-          // phoneNumber 필드는 분할된 phone 필드들로 검증 (단계별 구분)
+          // phoneNumber 필드 검증
           if (question.id === 'phoneNumber') {
-            // 6단계는 personalPhone, 나머지는 phone 필드 사용
-            if (currentStep === 6) {
-              return surveyAnswers.personalPhoneFirst?.trim() !== '' && 
-                     surveyAnswers.personalPhoneSecond?.trim() !== '' && 
-                     surveyAnswers.personalPhoneThird?.trim() !== '';
-            } else {
-              return surveyAnswers.phoneFirst?.trim() !== '' && 
-                     surveyAnswers.phoneSecond?.trim() !== '' && 
-                     surveyAnswers.phoneThird?.trim() !== '';
-            }
+            return surveyAnswers.phoneNumber?.trim() !== '';
           }
           
           const fieldValue = surveyAnswers[question.id];
@@ -1081,12 +1015,6 @@ const SurveyModal = ({ isOpen, onClose }) => {
                       surveyAnswers.workEnvironment !== '' ||
                       surveyAnswers.expectedActivities.length > 0 ||
                       surveyAnswers.fullName !== '' ||
-                      surveyAnswers.phoneFirst !== '' ||
-                      surveyAnswers.phoneSecond !== '' ||
-                      surveyAnswers.phoneThird !== '' ||
-                      surveyAnswers.personalPhoneFirst !== '' ||
-                      surveyAnswers.personalPhoneSecond !== '' ||
-                      surveyAnswers.personalPhoneThird !== '' ||
                       surveyAnswers.address !== '' ||
                       surveyAnswers.emailForPrizes !== '' ||
                       surveyAnswers.privacyAgreement === true;
