@@ -32,7 +32,6 @@ export const getActiveSurveySchema = async () => {
     
     return latestSchema;
   } catch (error) {
-    console.error('활성 설문지 스키마 조회 오류:', error);
     return null;
   }
 };
@@ -53,7 +52,6 @@ export const getSurveySchemaByVersion = async (version) => {
     // 해당 버전이 없으면 null 반환
     return null;
   } catch (error) {
-    console.error(`스키마 버전 ${version} 조회 오류:`, error);
     return null;
   }
 };
@@ -70,7 +68,6 @@ export const getSurveySchemaById = async (schemaId) => {
     
     return null;
   } catch (error) {
-    console.error(`스키마 ID ${schemaId} 조회 오류:`, error);
     return null;
   }
 };
@@ -86,7 +83,6 @@ export const getAllSurveySchemas = async () => {
     });
     return schemas;
   } catch (error) {
-    console.error('설문지 스키마 목록 조회 오류:', error);
     return [];
   }
 };
@@ -98,7 +94,6 @@ export const createSurveySchema = async (schemaData) => {
     try {
       await deactivateAllSchemas();
     } catch (deactivateError) {
-      console.warn('기존 스키마 비활성화 중 오류 (무시하고 계속):', deactivateError);
     }
     
     // 항상 새 스키마 생성 (새로운 문서 ID 자동 생성)
@@ -118,7 +113,6 @@ export const createSurveySchema = async (schemaData) => {
     
     return { success: true, id: docRef.id };
   } catch (error) {
-    console.error('설문지 스키마 생성 오류:', error);
     return { success: false, error: error.message };
   }
 };
@@ -133,7 +127,6 @@ export const updateSurveySchema = async (schemaId, updateData) => {
     
     return { success: true };
   } catch (error) {
-    console.error('설문지 스키마 업데이트 오류:', error);
     return { success: false, error: error.message };
   }
 };
@@ -152,7 +145,6 @@ export const toggleSchemaActive = async (schemaId) => {
     
     return { success: true };
   } catch (error) {
-    console.error('스키마 활성화 오류:', error);
     return { success: false, error: error.message };
   }
 };
@@ -174,13 +166,11 @@ const deactivateAllSchemas = async () => {
           }
           return Promise.resolve();
         } catch (error) {
-          console.error(`스키마 ${schema.id} 비활성화 실패:`, error);
           return Promise.resolve(); // 오류가 나도 계속 진행
         }
       });
     await Promise.all(updatePromises);
   } catch (error) {
-    console.error('스키마 비활성화 중 오류:', error);
   }
 };
 
@@ -218,7 +208,6 @@ export const migrateSurveyResponses = async () => {
       message: `${surveysWithoutVersion.length}개의 기존 응답에 버전 정보를 추가했습니다.` 
     };
   } catch (error) {
-    console.error('마이그레이션 오류:', error);
     return { success: false, error: error.message };
   }
 };
@@ -340,7 +329,7 @@ export const createDefaultSurveySchema = async () => {
             required: true
           },
           {
-            id: "phoneNumber",
+            id: "brandPhoneNumber",
             type: "tel",
             title: "전화번호",
             required: true

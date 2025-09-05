@@ -50,14 +50,12 @@ function App() {
       <Section4 />
       <Section5 />
       <Section6 onVisibilityChange={(visible) => {
-        console.log('App.js - 섹션6 가시성 변경:', visible);
         setIsSection6Visible(visible);
       }} />
       <Section7 />
       <Section8 />
       <Section9 />
       <Section10 onVisibilityChange={(visible) => {
-        console.log('App.js - 섹션10 가시성 변경:', visible);
         setIsSection10Visible(visible);
       }} />
       <Section11 onVisibilityChange={setIsSection11Visible} />

@@ -50,16 +50,33 @@ const SurveyManager = () => {
     
     let schema = null;
     
-    // schemaId가 있으면 ID로 조회, 없으면 버전으로 조회
+    // Firebase에서 모든 스키마 가져오기
+    const { getAllSurveySchemas } = await import('../../services/surveySchemaService');
+    const allSchemas = await getAllSurveySchemas();
+    
+    // schemaId가 있으면 ID로 조회
     if (survey.schemaId) {
       schema = await getSurveySchemaById(survey.schemaId);
     } else if (survey.schemaVersion) {
       schema = await getSurveySchemaByVersion(survey.schemaVersion);
+    } else {
+      // schemaId/schemaVersion이 없는 경우 활성 스키마 또는 가장 최근 스키마 사용
+      const activeSchema = allSchemas.find(s => s.isActive);
+      if (activeSchema) {
+        schema = activeSchema;
+      } else if (allSchemas.length > 0) {
+        // 활성 스키마가 없으면 가장 최근 스키마 사용 (생성일 기준 내림차순 정렬)
+        schema = allSchemas.sort((a, b) => {
+          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+          return dateB - dateA;
+        })[0];
+      }
     }
     
-    // 스키마가 없으면 기본 스키마 사용
+    // Firebase에서도 스키마를 찾을 수 없는 경우에만 최소한의 기본 스키마 사용
     if (!schema) {
-      schema = getDefaultSchema();
+      schema = getMinimalDefaultSchema();
     }
     
     // 캐시에 저장
@@ -70,145 +87,25 @@ const SurveyManager = () => {
     return schema;
   };
 
-  // 기본 스키마 정의 (v1.0 - 기존 하드코딩된 구조)
-  const getDefaultSchema = () => {
+  // 최소한의 기본 스키마 (Firebase 스키마를 찾을 수 없는 경우에만 사용)
+  const getMinimalDefaultSchema = () => {
     return {
-      version: 'v1.0',
+      version: 'fallback',
       steps: [
         {
-          id: "yangyang_experience",
-          questions: [
-            { 
-              id: "hasExperienced", 
-              title: "양양 워케이션을 경험해보셨나요?", 
-              type: "radio",
-              options: [
-                { value: "yes", label: "네" },
-                { value: "no", label: "아니오" }
-              ]
-            },
-            { id: "goodPoints", title: "데스커 워케이션을 경험하면서 특별히 좋았던 점이 있다면 알려주세요.", type: "textarea" },
-            { id: "photoUrl", title: "데스커 워케이션을 추억할 수 있는 사진", type: "file" }
-          ]
-        },
-        {
-          id: "site_discovery_purpose", 
-          questions: [
-            { 
-              id: "siteDiscovery", 
-              title: "사이트를 어떤 경로로 알게 되셨나요? (중복 선택 가능)", 
-              type: "checkbox",
-              options: [
-                { value: "desker_homepage", label: "데스커 홈페이지" },
-                { value: "sns", label: "SNS" },
-                { value: "search", label: "검색" },
-                { value: "differ", label: "differ" },
-                { value: "desker_lounge", label: "데스커 라운지" },
-                { value: "other", label: "기타" }
-              ]
-            },
-            { id: "siteDiscoverySearch", title: "검색어", type: "text" },
-            { id: "siteDiscoveryOther", title: "사이트 경로 기타", type: "text" },
-            { 
-              id: "visitPurpose", 
-              title: "사이트 방문 목적이 어떻게 되시나요? (중복 선택 가능)", 
-              type: "checkbox",
-              options: [
-                { value: "curious_activities", label: "데스커의 활동이 궁금해서" },
-                { value: "workation_info", label: "워케이션 정보를 얻고 싶어서" },
-                { value: "brand_collaboration", label: "브랜드 협업을 제안하고 싶어서" },
-                { value: "work_culture", label: "업무 문화나 일하는 방식에 대해 알고 싶어서" },
-                { value: "space_interior", label: "공간, 인테리어에 관심이 있어서" },
-                { value: "other", label: "기타" }
-              ]
-            },
-            { id: "visitPurposeOther", title: "방문 목적 기타", type: "text" }
-          ]
-        },
-        {
-          id: "brand_collaboration",
-          questions: [
-            { id: "companyName", title: "협업 제안 - 회사명", type: "text" },
-            { id: "contactPerson", title: "협업 제안 - 담당자", type: "text" },
-            { id: "phoneNumber", title: "협업 제안 - 전화번호", type: "tel" },
-            { id: "email", title: "협업 제안 - 이메일", type: "email" },
-            { id: "collaborationTitle", title: "협업 제안 - 제목", type: "text" },
-            { id: "collaborationContent", title: "협업 제안 - 내용", type: "textarea" }
-          ]
-        },
-        {
-          id: "work_info",
-          questions: [
-            { id: "workType", title: "어떤 일을 하고 계시나요?", type: "text" },
-            { 
-              id: "importantSpace", 
-              title: "오피스나 일하는 공간에서 가장 중요하게 보는 공간은 무엇인가요?", 
-              type: "radio",
-              options: [
-                { value: "personal_workspace", label: "개인 업무 공간" },
-                { value: "meeting_space", label: "회의 공간" },
-                { value: "lounge", label: "라운지 (휴식 공간)" },
-                { value: "cafe", label: "카페" },
-                { value: "other", label: "기타" }
-              ]
-            },
-            { id: "importantSpaceOther", title: "중요한 공간 기타", type: "text" },
-            { id: "discomfortPoints", title: "업무 공간에서 가장 불편함을 느끼는 부분은 무엇인가요?", type: "textarea" }
-          ]
-        },
-        {
-          id: "work_environment",
-          questions: [
-            { 
-              id: "workEnvironment", 
-              title: "다음 중 가장 관심 있는 업무 환경은 어떤 모습인가요?", 
-              type: "radio",
-              options: [
-                { value: "work_rest_balance", label: "일과 쉼이 자연스럽게 조화되는 환경" },
-                { value: "continuous_motivation", label: "꾸준히 동기부여가 되는 환경" },
-                { value: "nature_worklife", label: "자연 속의 편안한 워크라이프" },
-                { value: "flexible_challenge", label: "새로운 도전이 가능한 유연한 환경" },
-                { value: "other", label: "기타" }
-              ]
-            },
-            { id: "workEnvironmentOther", title: "업무 환경 기타", type: "text" },
-            { 
-              id: "expectedActivities", 
-              title: "데스커에 기대하는 활동이 있나요? (중복 선택 가능)", 
-              type: "checkbox",
-              options: [
-                { value: "growth_content", label: "성장에 도움을 주는 컨텐츠 (ex. 인터뷰 아티클 등)" },
-                { value: "sustainable_culture", label: "지속가능한 업무 문화를 만들기 위한 활동" },
-                { value: "self_exploration", label: "나다움을 찾을 수 있는 자기 탐색 프로그램" },
-                { value: "community_sharing", label: "관심사를 공유할 수 있는 커뮤니티 운영" },
-                { value: "office_furniture", label: "몰입과 편안함을 고려한 사무가구" },
-                { value: "business_support", label: "신규 비즈니스의 성장을 위한 지원" },
-                { value: "other", label: "기타" }
-              ]
-            },
-            { id: "expectedActivitiesOther", title: "기대하는 활동 기타", type: "text" }
-          ]
-        },
-        {
-          id: "personal_info",
+          id: "basic_info",
           questions: [
             { id: "fullName", title: "이름", type: "text" },
+            { id: "email", title: "이메일", type: "email" },
             { id: "phoneNumber", title: "전화번호", type: "tel" },
-            { id: "address", title: "주소", type: "text" },
-            { id: "emailForPrizes", title: "이메일", type: "email" },
-            { 
-              id: "privacyAgreement", 
-              title: "개인정보 동의", 
-              type: "checkbox",
-              options: [
-                { value: "true", label: "동의" }
-              ]
-            }
+            { id: "hasExperienced", title: "양양 워케이션 경험 여부", type: "text" }
           ]
         }
       ]
     };
   };
+
+
 
   const handleDelete = async (id) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
@@ -274,6 +171,10 @@ const SurveyManager = () => {
     // 특별 처리가 필요한 필드들
     if (question.id === 'phoneNumber') {
       return survey.phoneNumber || '';
+    }
+    
+    if (question.id === 'brandPhoneNumber') {
+      return survey.brandPhoneNumber || '';
     }
     
     if (question.id === 'emailForPrizes') {
@@ -510,11 +411,24 @@ const SurveyManager = () => {
             // 버전 형태면 버전으로 조회
             schema = await getSurveySchemaByVersion(schemaKey);
           }
+        } else if (schemaKey === 'v1.0') {
+          // v1.0은 레거시 데이터용 - 활성 스키마나 가장 최근 스키마로 대체
+          const activeSchema = allSchemas.find(s => s.isActive);
+          if (activeSchema) {
+            schema = activeSchema;
+          } else if (allSchemas.length > 0) {
+            // 활성 스키마가 없으면 가장 최근 스키마 사용 (생성일 기준 내림차순 정렬)
+            schema = allSchemas.sort((a, b) => {
+              const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+              const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+              return dateB - dateA;
+            })[0];
+          }
         }
         
-        // 스키마가 없으면 기본 스키마 사용
+        // Firebase에서도 스키마를 찾을 수 없는 경우에만 최소한의 기본 스키마 사용
         if (!schema) {
-          schema = getDefaultSchema();
+          schema = getMinimalDefaultSchema();
         }
         
         
@@ -554,7 +468,7 @@ const SurveyManager = () => {
         ];
         
         // 스키마의 모든 질문을 헤더에 추가
-        for (const [questionId, questionInfo] of schemaQuestions) {
+        for (const [, questionInfo] of schemaQuestions) {
           headers.push(questionInfo.title);
         }
         
@@ -730,167 +644,7 @@ const SurveyManager = () => {
     return workbook;
   };
 
-  const convertToCSV = async (data) => {
-    
-    // 모든 고유한 스키마 ID/버전 수집
-    const uniqueSchemas = new Set();
-    data.forEach(survey => {
-      const schemaKey = survey.schemaId || survey.schemaVersion || 'v1.0';
-      uniqueSchemas.add(schemaKey);
-    });
-    
-    
-    // 모든 스키마의 질문들을 수집
-    const allQuestions = new Map();
-    
-    for (const schemaKey of uniqueSchemas) {
-      try {
-        const schema = await getSchemaForSurvey({schemaId: schemaKey, schemaVersion: schemaKey});
-        if (schema?.sections) {
-          schema.sections.forEach(section => {
-            section.questions?.forEach(question => {
-              if (!allQuestions.has(question.id)) {
-                allQuestions.set(question.id, question.text || question.id);
-              }
-            });
-          });
-        }
-      } catch (error) {
-      }
-    }
-    
-    
-    // 기본 헤더 + 동적 질문 헤더
-    const headers = [
-      '순번',
-      '이름', 
-      '이메일', 
-      '전화번호',
-      '주소',
-      ...Array.from(allQuestions.values()), // 모든 스키마의 질문들
-      '개인정보 동의',
-      '제출 시간'
-    ];
-    
-    // 답변 변환 맵
-    const discoveryMap = {
-      'desker_homepage': '데스커 홈페이지',
-      'sns': 'SNS',
-      'search': '검색',
-      'differ': 'differ',
-      'desker_lounge': '데스커 라운지',
-      'other': '기타'
-    };
-    
-    const purposeMap = {
-      'curious_activities': '데스커의 활동이 궁금해서',
-      'workation_info': '워케이션 정보를 얻고 싶어서',
-      'brand_collaboration': '브랜드 협업을 제안하고 싶어서',
-      'work_culture': '업무 문화나 일하는 방식에 대해 알고 싶어서',
-      'space_interior': '공간, 인테리어에 관심이 있어서',
-      'other': '기타'
-    };
-    
-    const spaceMap = {
-      'personal_workspace': '개인 업무 공간',
-      'meeting_space': '회의 공간',
-      'lounge': '라운지 (휴식 공간)',
-      'cafe': '카페',
-      'other': '기타'
-    };
-    
-    const envMap = {
-      'work_rest_balance': '일과 쉼이 자연스럽게 조화되는 환경',
-      'continuous_motivation': '꾸준히 동기부여가 되는 환경',
-      'nature_worklife': '자연 속의 편안한 워크라이프',
-      'flexible_challenge': '새로운 도전이 가능한 유연한 환경',
-      'other': '기타'
-    };
-    
-    const activityMap = {
-      'growth_content': '성장에 도움을 주는 컨텐츠 (ex. 인터뷰 아티클 등)',
-      'sustainable_culture': '지속가능한 업무 문화를 만들기 위한 활동',
-      'self_exploration': '나다움을 찾을 수 있는 자기 탐색 프로그램',
-      'community_sharing': '관심사를 공유할 수 있는 커뮤니티 운영',
-      'office_furniture': '몰입과 편안함을 고려한 사무가구',
-      'business_support': '신규 비즈니스의 성장을 위한 지원',
-      'other': '기타'
-    };
-    
-    const rows = data.map((survey, index) => {
-      // CSV 셀 내용 이스케이프 처리
-      const escapeCSV = (value) => {
-        if (!value) return '';
-        const str = String(value);
-        // 큰따옴표가 있으면 두 개로 변환하고, 줄바꿈이나 쉼표가 있으면 큰따옴표로 감싸기
-        if (str.includes('"') || str.includes(',') || str.includes('\n')) {
-          return `"${str.replace(/"/g, '""')}"`;
-        }
-        return str;
-      };
-      
-      return [
-        data.length - index, // 순번
-        survey.fullName || '',
-        survey.email || survey.emailForPrizes || '',
-        // 전화번호
-        survey.phoneNumber || '',
-        survey.address || '',
-        survey.goodPoints || '',
-        // 사진 URL (R2 링크 또는 base64)
-        survey.photoUrl || '',
-        // 사이트 경로 - 전체 텍스트로 변환
-        Array.isArray(survey.siteDiscovery) 
-          ? survey.siteDiscovery.map(item => discoveryMap[item] || item).join(', ')
-          : '',
-        survey.siteDiscoverySearch || '',
-        survey.siteDiscoveryOther || '',
-        // 방문 목적 - 전체 텍스트로 변환
-        Array.isArray(survey.visitPurpose)
-          ? survey.visitPurpose.map(item => purposeMap[item] || item).join(', ')
-          : '',
-        survey.visitPurposeOther || '',
-        survey.companyName || '',
-        survey.contactPerson || '',
-        survey.phoneNumber || '',
-        survey.email || survey.emailForPrizes || '',
-        survey.collaborationTitle || '',
-        survey.collaborationContent || '',
-        survey.workType || '',
-        // 중요한 공간 - 전체 텍스트로 변환
-        spaceMap[survey.importantSpace] || survey.importantSpace || '',
-        survey.importantSpaceOther || '',
-        survey.discomfortPoints || '',
-        // 업무 환경 - 전체 텍스트로 변환
-        envMap[survey.workEnvironment] || survey.workEnvironment || '',
-        survey.workEnvironmentOther || '',
-        // 기대하는 활동 - 전체 텍스트로 변환
-        Array.isArray(survey.expectedActivities)
-          ? survey.expectedActivities.map(item => activityMap[item] || item).join(', ')
-          : '',
-        survey.expectedActivitiesOther || '',
-        survey.privacyAgreement ? '동의' : '',
-        (() => {
-          const dateStr = survey.createdAt || survey.submittedAt;
-          if (!dateStr) return '';
-          const date = new Date(dateStr);
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          return `${year}-${month}-${day} ${hours}:${minutes}`;
-        })()
-      ].map(escapeCSV);
-    });
-    
-    const csvContent = [
-      headers.map(h => `"${h}"`).join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
-    
-    return '\uFEFF' + csvContent; // UTF-8 BOM 추가
-  };
+
 
   return (
     <AdminLayout>
@@ -1014,7 +768,7 @@ const SurveyManager = () => {
 
                 {/* 동적 스키마 기반 렌더링 */}
                 {selectedSurveySchema && selectedSurveySchema.steps ? (
-                  selectedSurveySchema.steps.map((step, stepIndex) => (
+                  selectedSurveySchema.steps.map((step) => (
                     <div key={step.id} className="survey-step-manager">
                       <h3>
                         {step.title || step.id}
@@ -1042,7 +796,7 @@ const SurveyManager = () => {
                           
                           return false;
                         })
-                        .map((question, questionIndex) => 
+                        .map((question) => 
                           renderDynamicQuestion(selectedSurvey, question, selectedSurveySchema)
                         )}
                     </div>

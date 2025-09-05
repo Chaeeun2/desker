@@ -1,7 +1,88 @@
 import React, { useState, useEffect } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import AdminLayout from '../components/AdminLayout';
 import { getActiveSurveySchema, createSurveySchema, getAllSurveySchemas, toggleSchemaActive } from '../../services/surveySchemaService';
 import './SurveyEditor.css';
+
+// Sortable question component - 컴포넌트 밖으로 이동하여 리렌더링 방지
+const SortableQuestion = React.memo(({ question, stepIndex, questionIndex, children, expandedQuestions, toggleQuestion, removeQuestion }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ 
+    id: `step-${stepIndex}-question-${question.id}` 
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="question-editor">
+      <div className="question-header clickable">
+        <div 
+          className="question-header-content"
+          onClick={() => toggleQuestion(stepIndex, questionIndex)}
+          style={{ flex: 1, display: 'flex', alignItems: 'center' }}
+        >
+          <div
+            className="drag-handle"
+            {...attributes}
+            {...listeners}
+            style={{
+              cursor: 'grab',
+              padding: '5px 0',
+              marginRight: '5px',
+              color: '#666',
+              fontSize: '16px',
+              width: '25px'
+            }}
+          >
+          </div>
+          <h4>
+            <span className="toggle-icon">
+              {expandedQuestions.has(`${stepIndex}-${question.id}`) ? '▼' : '▶'}
+            </span>
+            {question.title && `${question.title}`}
+          </h4>
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // 토글 방지
+            removeQuestion(stepIndex, questionIndex);
+          }}
+          className="btn btn-danger btn-sm"
+        >
+          삭제
+        </button>
+      </div>
+      {children}
+    </div>
+  );
+});
 
 const SurveyEditor = () => {
   const [currentSchema, setCurrentSchema] = useState(null);
@@ -10,6 +91,14 @@ const SurveyEditor = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('edit'); // 'edit' | 'versions'
   const [expandedQuestions, setExpandedQuestions] = useState(new Set()); // 토글 상태 관리
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     loadData();
@@ -65,9 +154,54 @@ const SurveyEditor = () => {
     }));
   };
 
+  // Drag and drop handler for reordering questions
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const activeId = active.id;
+    const overId = over.id;
+    
+    // Parse stepIndex and question IDs from the drag item IDs (format: "step-{stepIndex}-question-{questionId}")
+    const activeMatch = activeId.match(/step-(\d+)-question-(.+)/);
+    const overMatch = overId.match(/step-(\d+)-question-(.+)/);
+    
+    if (!activeMatch || !overMatch) return;
+    
+    const stepIndex = parseInt(activeMatch[1]);
+    const activeQuestionId = activeMatch[2];
+    const overQuestionId = overMatch[2];
+    
+    // Only allow reordering within the same step
+    if (stepIndex !== parseInt(overMatch[1])) return;
+
+    // Find the actual indices by question ID
+    const questions = currentSchema.steps[stepIndex].questions;
+    const activeIndex = questions.findIndex(q => q.id === activeQuestionId);
+    const overIndex = questions.findIndex(q => q.id === overQuestionId);
+    
+    if (activeIndex === -1 || overIndex === -1) return;
+
+    setCurrentSchema(prev => ({
+      ...prev,
+      steps: prev.steps.map((step, sIndex) => 
+        sIndex === stepIndex 
+          ? {
+              ...step,
+              questions: arrayMove(step.questions, activeIndex, overIndex)
+            }
+          : step
+      )
+    }));
+  };
+
   // 질문 토글 함수
   const toggleQuestion = (stepIndex, questionIndex) => {
-    const questionKey = `${stepIndex}-${questionIndex}`;
+    const question = currentSchema.steps[stepIndex].questions[questionIndex];
+    const questionKey = `${stepIndex}-${question.id}`; // questionIndex 대신 question.id 사용
     setExpandedQuestions(prev => {
       const newSet = new Set(prev);
       if (newSet.has(questionKey)) {
@@ -150,6 +284,8 @@ const SurveyEditor = () => {
     updateQuestion(stepIndex, questionIndex, 'options', updatedOptions);
   };
 
+
+
   if (loading) {
     return (
       <AdminLayout>
@@ -205,34 +341,27 @@ const SurveyEditor = () => {
               <div className="survey-step-editor">
                 <h3>{step.id}</h3>
                 
-
-
-
-
-                {step.questions?.map((question, questionIndex) => (
-                  <div key={question.id} className="question-editor">
-                    <div 
-                      className="question-header clickable"
-                      onClick={() => toggleQuestion(stepIndex, questionIndex)}
-                    >
-                      <h4>
-                        <span className="toggle-icon">
-                          {expandedQuestions.has(`${stepIndex}-${questionIndex}`) ? '▼' : '▶'}
-                        </span>
-                        {question.title && `${question.title}`}
-                      </h4>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // 토글 방지
-                          removeQuestion(stepIndex, questionIndex);
-                        }}
-                        className="btn btn-danger btn-sm"
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext 
+                    items={step.questions?.map((question) => `step-${stepIndex}-question-${question.id}`) || []}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {step.questions?.map((question, questionIndex) => (
+                      <SortableQuestion 
+                        key={question.id} 
+                        question={question} 
+                        stepIndex={stepIndex} 
+                        questionIndex={questionIndex}
+                        expandedQuestions={expandedQuestions}
+                        toggleQuestion={toggleQuestion}
+                        removeQuestion={removeQuestion}
                       >
-                        삭제
-                      </button>
-                    </div>
 
-                    {expandedQuestions.has(`${stepIndex}-${questionIndex}`) && (
+                    {expandedQuestions.has(`${stepIndex}-${question.id}`) && (
                       <div className="question-content">
                         <div className="admin-form-group">
                           <label>질문 타입</label>
@@ -388,8 +517,10 @@ const SurveyEditor = () => {
                     </div>
                       </div>
                     )}
-                  </div>
-                ))}
+                      </SortableQuestion>
+                    ))}
+                  </SortableContext>
+                </DndContext>
 
                 <button
                   onClick={() => addQuestion(stepIndex)}

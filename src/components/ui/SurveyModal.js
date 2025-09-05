@@ -25,7 +25,8 @@ const SurveyModal = ({ isOpen, onClose }) => {
     visitPurposeOther: '', // 방문 목적 기타 내용
     companyName: '', // 회사명
     contactPerson: '', // 담당자명
-    phoneNumber: '', // 전화번호
+    phoneNumber: '', // 전화번호 (개인정보용)
+    brandPhoneNumber: '', // 전화번호 (브랜드 협업용)
     email: '', // 이메일
     emailForPrizes: '', // 경품용 이메일
     fullName: '', // 이름
@@ -139,6 +140,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
         companyName: '',
         contactPerson: '',
         phoneNumber: '',
+        brandPhoneNumber: '',
         email: '',
         collaborationTitle: '',
         collaborationContent: '',
@@ -320,6 +322,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
         delete cleanedAnswers.contactPerson;
         delete cleanedAnswers.collaborationTitle;
         delete cleanedAnswers.collaborationContent;
+        delete cleanedAnswers.brandPhoneNumber;
       }
       
       
@@ -852,7 +855,49 @@ const SurveyModal = ({ isOpen, onClose }) => {
     if (currentStep === 3) {
       // 브랜드 협업에 체크한 경우에만 브랜드 협업 제안 폼 표시
       if (surveyAnswers.visitPurpose.includes('brand_collaboration')) {
-        return surveyAnswers.companyName !== '' && surveyAnswers.contactPerson !== '' && surveyAnswers.phoneNumber?.trim() !== '' && surveyAnswers.email !== '' && surveyAnswers.collaborationTitle !== '' && surveyAnswers.collaborationContent !== '';
+        // 스키마 기반 동적 검증
+        const step3Questions = surveySchema?.steps?.[2]?.questions;
+        if (!step3Questions) return false;
+        
+        return step3Questions.every(question => {
+          // 조건부 질문인 경우 조건 확인
+          if (question.condition) {
+            const { field, value, includes } = question.condition;
+            if (includes && !surveyAnswers[field]?.includes?.(value)) return true; // 조건 미충족시 검증 패스
+            if (value && surveyAnswers[field] !== value) return true; // 조건 미충족시 검증 패스
+          }
+          
+          // 필수 질문인 경우 값 확인
+          if (question.required) {
+            const fieldValue = surveyAnswers[question.id];
+            if (question.type === 'checkbox') {
+              if (!fieldValue || fieldValue.length === 0) return false;
+              
+              // 체크박스 옵션 중 추가 질문이 있는 경우 체크
+              for (const option of question.options || []) {
+                if (option.hasFollowUpQuestion && fieldValue.includes(option.value)) {
+                  const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                  if (!followUpValue || followUpValue.trim() === '') return false;
+                }
+              }
+              return true;
+            } else {
+              if (!fieldValue || fieldValue.trim() === '') return false;
+              
+              // 라디오 옵션 중 추가 질문이 있는 경우 체크
+              if (question.type === 'radio') {
+                for (const option of question.options || []) {
+                  if (option.hasFollowUpQuestion && fieldValue === option.value) {
+                    const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                    if (!followUpValue || followUpValue.trim() === '') return false;
+                  }
+                }
+              }
+              return true;
+            }
+          }
+          return true; // 필수가 아닌 질문은 항상 통과
+        });
       }
       return true; // 브랜드 협업을 체크하지 않은 경우 건너뛰기 메시지 표시이므로 통과
     }
