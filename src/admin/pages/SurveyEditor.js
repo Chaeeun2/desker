@@ -312,6 +312,13 @@ const SurveyEditor = () => {
           </div>
         </div>
 
+        <div style={{ padding: '30px 30px 0 30px', fontSize: '1.6rem', color: '#333' }}>
+          설문지의 질문이나 선택지를 <strong>삭제하면 되돌릴 수 없으니,</strong> 신중하게 수정해주시고 문제가 생겼다면 contact@alolot.kr로 문의해주세요.
+          <br /><strong>아래 질문은 답변에 따라 설문지가 분기되는 질문입니다. 수정하지 않는 것을 권장합니다.</strong>
+          <br /><br />- '양양 워케이션을 경험해보셨나요?' 질문 중, '네' 선택지
+          <br/>- '사이트 방문 목적이 어떻게 되시나요?' 질문 중, '브랜드 협업을 제안하고 싶어서' 선택지
+        </div>
+
         {activeTab === 'edit' && currentSchema && (
           <div className="survey-editor">
             <div className="survey-wrap">
