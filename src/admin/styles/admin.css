@@ -3397,8 +3397,8 @@ label.admin-checkbox-label {
   font-weight: 700;
   transition: all 0.2s;
   margin-top: 10px;
-  background: #ededed;
-  color: black;
+  background: black;
+  color: white;
 }
 
 .survey-list {

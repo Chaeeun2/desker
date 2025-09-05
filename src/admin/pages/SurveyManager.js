@@ -276,7 +276,7 @@ const SurveyManager = () => {
                     document.body.removeChild(link);
                   }}
                 >
-                  이미지 다운로드
+                  다운로드
                 </button>
               </>
             ) : (
@@ -302,22 +302,42 @@ const SurveyManager = () => {
                     className="btn btn-sm btn-secondary"
                     onClick={async () => {
                       try {
-                        const response = await fetch(value);
-                        const blob = await response.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `survey-photo-${survey.id}.jpg`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
+                        // fetch 방식으로 이미지 다운로드 시도
+                        const response = await fetch(value, { 
+                          mode: 'cors'
+                        });
+                        
+                        if (response.ok) {
+                          const blob = await response.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.download = `survey-photo-${survey.id}.jpg`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          window.URL.revokeObjectURL(url);
+                        } else {
+                          throw new Error('Fetch failed');
+                        }
                       } catch (error) {
-                        alert('이미지 다운로드에 실패했습니다.');
+                        // fetch 실패시 직접 링크 방식으로 fallback
+                        try {
+                          const link = document.createElement('a');
+                          link.href = value;
+                          link.download = `survey-photo-${survey.id}.jpg`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        } catch (linkError) {
+                          // 모든 다운로드 방식 실패시만 새 창으로 열기
+                          console.error('All download methods failed:', linkError);
+                          window.open(value, '_blank');
+                        }
                       }
                     }}
                   >
-                    이미지 다운로드
+                    다운로드
                   </button>
                 </div>
               </>
