@@ -123,36 +123,11 @@ const Section5 = ({ onVisibilityChange }) => {
     }
   }, [isIntersecting, onVisibilityChange]);
   
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  
-  // 화면에 보일 때만 동영상 로드
-  useEffect(() => {
-    if (isIntersecting && !videoLoaded) {
-      setVideoLoaded(true);
-    } else if (!isIntersecting && videoLoaded) {
-      // 화면에서 벗어나면 동영상 언로드하여 메모리 절약
-      setVideoLoaded(false);
-    }
-  }, [isIntersecting, videoLoaded]);
 
   return (
     <section ref={ref} className={styles.section5}>
       <div className={styles.content}>
         <div className={styles.mainContent}>
-          {/* 동영상 - 화면에 보일 때만 로드 */}
-          {videoLoaded && (
-            <div className={styles.videoSection}>
-              <iframe
-                src="https://www.youtube.com/embed/-ae3O7u2IZM?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=-ae3O7u2IZM&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1"
-                title="DESKER Section 5 Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className={styles.video}
-                loading="lazy"
-              />
-            </div>
-          )}
           {/* 4개 패널 그리드 */}
           <div className={styles.panelGrid}>
             {/* 패널 1: 바다가 보이는 오피스 (유튜브 영상) */}

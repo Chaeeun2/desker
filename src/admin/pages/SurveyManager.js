@@ -270,7 +270,6 @@ const SurveyManager = () => {
   // 동적 응답 값 가져오기 (스키마에 따라)
   const getDynamicAnswerValue = (survey, question) => {
     const value = survey[question.id];
-    console.log(`Question ${question.id}: value =`, value, 'type =', question.type);
     
     // 특별 처리가 필요한 필드들
     if (question.id === 'phoneNumber') {
@@ -305,7 +304,6 @@ const SurveyManager = () => {
           if (option) {
             const followUpKey = `${question.id}_${option.value}_followUp`;
             const followUpValue = survey[followUpKey];
-            console.log(`추가질문 확인 - Key: ${followUpKey}, Value:`, followUpValue, 'Survey keys:', Object.keys(survey).filter(k => k.includes('followUp')));
             if (followUpValue && followUpValue.trim() !== '') {
               result += ` (${followUpValue})`;
             }
@@ -327,7 +325,6 @@ const SurveyManager = () => {
             if (option) {
               const followUpKey = `${question.id}_${option.value}_followUp`;
               const followUpValue = survey[followUpKey];
-              console.log(`체크박스 추가질문 확인 - Key: ${followUpKey}, Value:`, followUpValue);
               if (followUpValue && followUpValue.trim() !== '') {
                 result += ` (${followUpValue})`;
               }
@@ -351,7 +348,6 @@ const SurveyManager = () => {
   // 동적 질문 렌더링
   const renderDynamicQuestion = (survey, question, schema) => {
     const value = getDynamicAnswerValue(survey, question);
-    console.log(`Rendering question ${question.id}: value =`, value, 'question =', question);
     
     // 모든 질문을 표시하되, 값이 없으면 '-' 표시
     
@@ -447,7 +443,6 @@ const SurveyManager = () => {
   };
 
   const handleExport = async () => {
-    console.log('Excel 내보내기 시작...');
     const workbook = await createExcelWorkbook(surveys);
     
     // Excel 파일 생성 및 다운로드
@@ -466,13 +461,10 @@ const SurveyManager = () => {
 
 
   const createExcelWorkbook = async (data) => {
-    console.log('Excel 워크북 생성 중...');
-    console.log('전체 설문 데이터:', data);
     
     // 먼저 모든 스키마를 가져오기
     const { getAllSurveySchemas } = await import('../../services/surveySchemaService');
     const allSchemas = await getAllSurveySchemas();
-    console.log('전체 스키마 목록:', allSchemas);
     
     // 스키마별로 데이터 그룹화 - schemaId를 우선 사용
     const schemaGroups = {};
@@ -491,20 +483,14 @@ const SurveyManager = () => {
     data.forEach(survey => {
       // schemaId를 우선 사용, 없으면 schemaVersion, 그것도 없으면 v1.0
       const schemaKey = survey.schemaId || survey.schemaVersion || 'v1.0';
-      console.log(`설문 ${survey.id}의 스키마 키:`, schemaKey, '- schemaId:', survey.schemaId, ', schemaVersion:', survey.schemaVersion);
       
       if (schemaGroups[schemaKey]) {
         schemaGroups[schemaKey].push(survey);
       } else {
         // 해당 스키마 그룹이 없으면 v1.0에 추가
-        console.log(`스키마 ${schemaKey}를 찾을 수 없어 v1.0에 추가`);
         schemaGroups['v1.0'].push(survey);
       }
     });
-    
-    console.log('스키마별 그룹:', Object.entries(schemaGroups).map(([key, surveys]) => 
-      `${key}: ${surveys.length}개 응답`
-    ));
     
     const workbook = XLSX.utils.book_new();
     
@@ -517,13 +503,10 @@ const SurveyManager = () => {
       const INCLUDE_EMPTY_SCHEMAS = true; // true로 변경하면 모든 스키마의 시트 생성
       if (surveys.length === 0) {
         if (!INCLUDE_EMPTY_SCHEMAS) {
-          console.log(`스키마 ${schemaKey}는 응답이 없음 (건너뜀)`);
           continue;
         }
-        console.log(`스키마 ${schemaKey}는 응답이 없음 (빈 시트 생성)`);
       }
       
-      console.log(`스키마 ${schemaKey} 시트 생성 중... (${surveys.length}개 응답)`);
       
       try {
         // 해당 스키마 가져오기
@@ -542,23 +525,19 @@ const SurveyManager = () => {
         
         // 스키마가 없으면 기본 스키마 사용
         if (!schema) {
-          console.log(`스키마 ${schemaKey}를 찾을 수 없어 기본 스키마 사용`);
           schema = getDefaultSchema();
         }
         
-        console.log(`스키마 ${schemaKey} 로드 완료:`, schema.version || schemaKey);
         
         // 스키마의 모든 질문 수집 (추가질문 포함)
         const schemaQuestions = new Map();
         const collectQuestions = (schema) => {
           if (!schema || !schema.steps) {
-            console.log('스키마에 steps가 없음');
             return;
           }
           
           schema.steps.forEach(step => {
             // 조건부 스텝도 포함
-            console.log(`스텝 ${step.id} 처리 중...`);
             
             step.questions?.forEach(question => {
               // 기본 질문 추가
@@ -587,7 +566,6 @@ const SurveyManager = () => {
         
         collectQuestions(schema);
         
-        console.log(`스키마 ${schemaKey}의 질문 수: ${schemaQuestions.size}`);
         
         // 헤더 생성
         const headers = [
@@ -606,7 +584,6 @@ const SurveyManager = () => {
         // 메타 정보 헤더 추가
         headers.push('스키마 버전', '개인정보 동의', '제출 시간');
         
-        console.log(`헤더 생성 완료 (${headers.length}개 컬럼)`);
         
         // 데이터 행 생성
         const rows = surveys.map((survey, index) => {
@@ -741,11 +718,9 @@ const SurveyManager = () => {
         }
         
         XLSX.utils.book_append_sheet(workbook, worksheet, finalSheetName);
-        console.log(`시트 '${finalSheetName}' 생성 완료 (${surveys.length}개 응답)`);
         createdSheets++;
         
       } catch (error) {
-        console.error(`스키마 ${schemaKey} 시트 생성 실패:`, error);
         
         // 오류 발생 시 기본 형식으로 시트 생성
         const headers = [
@@ -790,15 +765,12 @@ const SurveyManager = () => {
     });
     
     if (unassignedSurveys.length > 0) {
-      console.log(`할당되지 않은 설문 ${unassignedSurveys.length}개 발견`);
     }
     
-    console.log(`Excel 워크북 생성 완료: 총 ${createdSheets}개 시트 생성 (${Object.keys(schemaGroups).length}개 스키마 중)`);
     return workbook;
   };
 
   const convertToCSV = async (data) => {
-    console.log('동적 헤더 생성 중...');
     
     // 모든 고유한 스키마 ID/버전 수집
     const uniqueSchemas = new Set();
@@ -807,7 +779,6 @@ const SurveyManager = () => {
       uniqueSchemas.add(schemaKey);
     });
     
-    console.log('발견된 스키마 버전들:', Array.from(uniqueSchemas));
     
     // 모든 스키마의 질문들을 수집
     const allQuestions = new Map();
@@ -825,11 +796,9 @@ const SurveyManager = () => {
           });
         }
       } catch (error) {
-        console.log(`스키마 ${schemaKey} 로드 실패:`, error);
       }
     }
     
-    console.log('전체 질문 목록:', Array.from(allQuestions.keys()));
     
     // 기본 헤더 + 동적 질문 헤더
     const headers = [
@@ -1118,10 +1087,6 @@ const SurveyManager = () => {
                           );
                           
                           if (hasFollowUp) {
-                            console.log(`질문 ${question.id}에 추가질문 답변 발견:`, 
-                              surveyKeys.filter(k => k.startsWith(`${question.id}_`) && k.endsWith('_followUp'))
-                                .map(k => ({ key: k, value: selectedSurvey[k] }))
-                            );
                             return true;
                           }
                           

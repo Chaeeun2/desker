@@ -116,7 +116,6 @@ export const createSurveySchema = async (schemaData) => {
     
     const docRef = await addDoc(collection(db, 'surveySchemas'), newSchemaData);
     
-    console.log('새 스키마 생성됨:', docRef.id);
     return { success: true, id: docRef.id };
   } catch (error) {
     console.error('설문지 스키마 생성 오류:', error);

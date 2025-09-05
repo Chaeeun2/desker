@@ -44,12 +44,15 @@
 }
 
 .mapImage img {
-  height: 90vh;
+  max-height: 90vh;
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
   display: block;
 }
 
 .mapDescription {
-  max-width: 1080px;
+  max-width: 1350px;
   margin: 0 auto;
   opacity: 0;
   transform: translateY(30px);
