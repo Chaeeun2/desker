@@ -3,6 +3,7 @@ import styles from './SurveyModal.module.css';
 import { saveSurveyResponse } from '../../services/surveyService';
 import { imageService } from '../../admin/services/imageService';
 import { sendSurveyConfirmationEmail, sendAdminNotificationEmail } from '../../services/emailService';
+import { getActiveSurveySchema } from '../../services/surveySchemaService';
 
 const SurveyModal = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0); // 0: 인트로, 1-5: 설문 단계
@@ -11,6 +12,8 @@ const SurveyModal = ({ isOpen, onClose }) => {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [emailError, setEmailError] = useState(''); // 이메일 에러 메시지
   const [emailForPrizesError, setEmailForPrizesError] = useState(''); // 경품용 이메일 에러
+  const [surveySchema, setSurveySchema] = useState(null);
+  const [schemaLoading, setSchemaLoading] = useState(true);
   const [surveyAnswers, setSurveyAnswers] = useState({
     hasExperienced: '', // 양양 워케이션 경험 여부
     goodPoints: '', // 좋았던 점
@@ -42,6 +45,20 @@ const SurveyModal = ({ isOpen, onClose }) => {
     expectedActivitiesOther: '', // 기대 활동 기타
     privacyAgreement: false // 개인정보 동의
   });
+
+  // 스키마 로드
+  useEffect(() => {
+    if (isOpen && !surveySchema) {
+      loadSurveySchema();
+    }
+  }, [isOpen]);
+
+  const loadSurveySchema = async () => {
+    setSchemaLoading(true);
+    const schema = await getActiveSurveySchema();
+    setSurveySchema(schema);
+    setSchemaLoading(false);
+  };
 
   // 모달이 열려있을 때 body 스크롤 방지
   useEffect(() => {
@@ -133,9 +150,12 @@ const SurveyModal = ({ isOpen, onClose }) => {
         expectedActivities: [],
         expectedActivitiesOther: '',
         fullName: '',
-        phoneFirst: '',
+        phoneFirst: '', // 브랜드 협업용 전화번호
         phoneSecond: '',
         phoneThird: '',
+        personalPhoneFirst: '', // 개인정보용 전화번호 
+        personalPhoneSecond: '',
+        personalPhoneThird: '',
         address: '',
         emailForPrizes: '',
         privacyAgreement: false
@@ -238,7 +258,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
     });
   };
 
-  const handleFileUpload = async (event) => {
+  const handleFileUpload = async (event, fieldName = 'photoUrl') => {
     const file = event.target.files[0];
     if (file) {
       setUploadingPhoto(true);
@@ -259,7 +279,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
       if (uploadResult.success) {
         setSurveyAnswers(prev => ({
           ...prev,
-          photoUrl: uploadResult.fileUrl
+          [fieldName]: uploadResult.fileUrl
         }));
       } else {
         alert(uploadResult.error || '이미지 업로드에 실패했습니다.');
@@ -282,44 +302,57 @@ const SurveyModal = ({ isOpen, onClose }) => {
 
       // Firebase에 설문 데이터 저장
       
+      // 쿠폰 발송용 이메일 주소 찾기
+      const findCouponEmail = () => {
+        // 모든 스텝의 이메일 타입 질문에서 sendCouponToThisEmail이 true인 것 찾기
+        console.log('쿠폰 이메일 찾기 시작, 스키마:', surveySchema);
+        for (const step of surveySchema?.steps || []) {
+          console.log('스텝 확인:', step.id, step.questions);
+          for (const question of step.questions || []) {
+            console.log('질문 확인:', question.id, question.type, question.sendCouponToThisEmail);
+            if (question.type === 'email' && question.sendCouponToThisEmail) {
+              const email = surveyAnswers[question.id];
+              console.log('쿠폰 이메일 발견:', question.id, email);
+              return email;
+            }
+          }
+        }
+        console.log('쿠폰 이메일을 찾지 못함. 기본값 사용.');
+        return null;
+      };
+      
       const surveyData = {
-        // 개인정보
-        email: surveyAnswers.emailForPrizes || surveyAnswers.email,
+        // 모든 surveyAnswers 데이터를 포함 (추가질문 답변 포함)
+        ...surveyAnswers,
+        
+        // 개인정보 (재정의)
+        email: findCouponEmail() || surveyAnswers.emailForPrizes || surveyAnswers.email,
         fullName: surveyAnswers.fullName,
-        phoneNumber: `${surveyAnswers.phoneFirst}-${surveyAnswers.phoneSecond}-${surveyAnswers.phoneThird}`,
-        address: surveyAnswers.address,
-        
-        // 설문 응답
-        hasExperienced: surveyAnswers.hasExperienced,
-        goodPoints: surveyAnswers.goodPoints,
-        photoUrl: surveyAnswers.photoUrl || '', // 업로드된 사진 URL
-        siteDiscovery: surveyAnswers.siteDiscovery,
-        siteDiscoverySearch: surveyAnswers.siteDiscoverySearch,
-        siteDiscoveryOther: surveyAnswers.siteDiscoveryOther,
-        visitPurpose: surveyAnswers.visitPurpose,
-        visitPurposeOther: surveyAnswers.visitPurposeOther,
-        
-        // 브랜드 협업 (해당하는 경우)
-        companyName: surveyAnswers.companyName,
-        contactPerson: surveyAnswers.contactPerson,
-        collaborationTitle: surveyAnswers.collaborationTitle,
-        collaborationContent: surveyAnswers.collaborationContent,
-        
-        // 업무 환경
-        workType: surveyAnswers.workType,
-        importantSpace: surveyAnswers.importantSpace,
-        importantSpaceOther: surveyAnswers.importantSpaceOther,
-        discomfortPoints: surveyAnswers.discomfortPoints,
-        workEnvironment: surveyAnswers.workEnvironment,
-        workEnvironmentOther: surveyAnswers.workEnvironmentOther,
-        expectedActivities: surveyAnswers.expectedActivities,
-        expectedActivitiesOther: surveyAnswers.expectedActivitiesOther,
-        
-        // 개인정보 동의
-        privacyAgreement: surveyAnswers.privacyAgreement
+        phoneNumber: (() => {
+          // 브랜드 협업에서 입력한 경우와 개인정보에서 입력한 경우 구분
+          const hasPersonalPhone = surveyAnswers.personalPhoneFirst && surveyAnswers.personalPhoneSecond && surveyAnswers.personalPhoneThird;
+          const hasBrandPhone = surveyAnswers.phoneFirst && surveyAnswers.phoneSecond && surveyAnswers.phoneThird;
+          
+          if (hasPersonalPhone) {
+            return `${surveyAnswers.personalPhoneFirst}-${surveyAnswers.personalPhoneSecond}-${surveyAnswers.personalPhoneThird}`;
+          } else if (hasBrandPhone) {
+            return `${surveyAnswers.phoneFirst}-${surveyAnswers.phoneSecond}-${surveyAnswers.phoneThird}`;
+          }
+          return '';
+        })(),
+        address: surveyAnswers.address
       };
 
-      const result = await saveSurveyResponse(surveyData);
+      // 스키마 버전 정보 추가
+      const surveyDataWithSchema = {
+        ...surveyData,
+        schemaVersion: surveySchema?.version || 'v1.0',
+        schemaId: surveySchema?.id || null
+      };
+
+      console.log('Setting 제출 전 surveyDataWithSchema:', surveyDataWithSchema);
+      const result = await saveSurveyResponse(surveyDataWithSchema);
+      console.log('Setting 제출 결과:', result);
       
       if (result.success) {
         // 이메일 발송 (실패해도 설문 제출은 성공으로 처리)
@@ -378,6 +411,256 @@ const SurveyModal = ({ isOpen, onClose }) => {
     );
   };
 
+  // 동적 질문 렌더링 함수
+  const renderDynamicQuestion = (question) => {
+    const fieldName = question.id;
+    
+    switch (question.type) {
+      case 'radio':
+        return (
+          <div className={styles.radioGroup}>
+            {question.options?.map((option) => (
+              <div key={option.value}>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name={fieldName}
+                    value={option.value}
+                    checked={surveyAnswers[fieldName] === option.value}
+                    onChange={(e) => handleAnswerChange(fieldName, e.target.value)}
+                  />
+                  <span className={styles.radioText}>{option.label}</span>
+                </label>
+                
+                {/* 동적 추가 질문 처리 */}
+                {option.hasFollowUpQuestion && surveyAnswers[fieldName] === option.value && (
+                  <input
+                    type="text"
+                    className={styles.otherInput}
+                    placeholder={option.followUpQuestion || '추가 정보를 입력해주세요'}
+                    value={surveyAnswers[`${fieldName}_${option.value}_followUp`] || ''}
+                    onChange={(e) => handleAnswerChange(`${fieldName}_${option.value}_followUp`, e.target.value)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      
+      case 'checkbox':
+        return (
+          <div className={styles.checkboxGroup}>
+            {question.options?.map((option) => (
+              <div key={option.value}>
+                <label className={styles.checkboxLabel}>
+                <input
+                    type="checkbox"
+                    
+                  value={option.value}
+                  checked={surveyAnswers[fieldName]?.includes?.(option.value)}
+                  onChange={(e) => {
+                    const currentValues = surveyAnswers[fieldName] || [];
+                    const newValues = e.target.checked 
+                      ? [...currentValues, option.value]
+                      : currentValues.filter(v => v !== option.value);
+                    handleAnswerChange(fieldName, newValues);
+                  }}
+                />
+                <span className={styles.checkboxText}>{option.label}</span>
+                </label>
+                
+                {/* 동적 추가 질문 처리 */}
+                {option.hasFollowUpQuestion && surveyAnswers[fieldName]?.includes(option.value) && (
+                  <input
+                    type="text"
+                    className={styles.otherInput}
+                    placeholder={option.followUpQuestion || '추가 정보를 입력해주세요'}
+                    value={surveyAnswers[`${fieldName}_${option.value}_followUp`] || ''}
+                    onChange={(e) => handleAnswerChange(`${fieldName}_${option.value}_followUp`, e.target.value)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      
+      case 'textarea':
+        return (
+          <textarea
+            className={styles.formTextarea}
+            value={surveyAnswers[fieldName] || ''}
+            onChange={(e) => handleAnswerChange(fieldName, e.target.value)}
+            placeholder={question.placeholder || ''}
+            rows={4}
+          />
+        );
+      
+      case 'file':
+        return (
+          <div className={styles.fileUploadSection}>
+            <label className={styles.fileUploadButton}>
+              <input
+                type="file"
+                accept={question.accept || '*'}
+                onChange={(e) => handleFileUpload(e, fieldName)}
+                style={{ display: 'none' }}
+                key={photoPreview ? 'has-photo' : 'no-photo'}
+              />
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000" className={styles.uploadIcon}>
+                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <title></title>
+                  <g id="Complete">
+                    <g id="upload">
+                      <g>
+                        <path d="M3,12.3v7a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2v-7" fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+                        <g>
+                          <polyline data-name="Right" fill="none" id="Right-2" points="7.9 6.7 12 2.7 16.1 6.7" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline>
+                          <line fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="16.3" y2="4.8"></line>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+              <span className={styles.uploadText}>파일 첨부</span>
+            </label>
+            
+            {uploadingPhoto && (
+              <p className={styles.uploadStatus}>이미지 업로드 중...</p>
+            )}
+            
+            {photoPreview && !uploadingPhoto && (
+              <div className={styles.photoPreview}>
+                <img src={photoPreview} alt="업로드된 사진" />
+                <button 
+                  type="button"
+                  className={styles.removePhoto}
+                  onClick={() => {
+                    setPhotoPreview(null);
+                    setSurveyAnswers(prev => ({ ...prev, photoUrl: '' }));
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      
+      case 'tel':
+        // phoneNumber 필드는 특별 처리 (단계별 분리된 필드 사용)
+        if (fieldName === 'phoneNumber') {
+          // 현재 단계에 따라 다른 필드 프리픽스 사용
+          const phonePrefix = currentStep === 6 ? 'personalPhone' : 'phone';
+          return (
+            <div className={styles.phoneInputGroup}>
+              <input
+                type="tel"
+                className={styles.formInput}
+                value={surveyAnswers[phonePrefix + 'First'] || ''}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                  handleAnswerChange(phonePrefix + 'First', value);
+                }}
+                placeholder="010"
+                maxLength="3"
+                pattern="[0-9]*"
+                inputMode="numeric"
+              />
+              <span className={styles.phoneSeparator}>-</span>
+              <input
+                type="tel"
+                className={styles.formInput}
+                value={surveyAnswers[phonePrefix + 'Second'] || ''}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                  handleAnswerChange(phonePrefix + 'Second', value);
+                }}
+                placeholder="1234"
+                maxLength="4"
+                pattern="[0-9]*"
+                inputMode="numeric"
+              />
+              <span className={styles.phoneSeparator}>-</span>
+              <input
+                type="tel"
+                className={styles.formInput}
+                value={surveyAnswers[phonePrefix + 'Third'] || ''}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+                  handleAnswerChange(phonePrefix + 'Third', value);
+                }}
+                placeholder="5678"
+                maxLength="4"
+                pattern="[0-9]*"
+                inputMode="numeric"
+              />
+            </div>
+          );
+        }
+        
+        // 일반 tel 필드는 단일 입력
+        return (
+          <input
+            type="tel"
+            className={styles.formInput}
+            value={surveyAnswers[fieldName] || ''}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+              handleAnswerChange(fieldName, value);
+            }}
+            placeholder={question.placeholder || ''}
+            pattern="[0-9]*"
+            inputMode="numeric"
+          />
+        );
+      
+      case 'email':
+        return (
+          <div className={styles.inputWrapper}>
+            <input
+              type="email"
+              className={`${styles.formInput} ${surveyAnswers[`${fieldName}Error`] ? styles.errorInput : ''}`}
+              value={surveyAnswers[fieldName] || ''}
+              onChange={(e) => {
+                handleAnswerChange(fieldName, e.target.value);
+                if (surveyAnswers[`${fieldName}Error`]) {
+                  handleAnswerChange(`${fieldName}Error`, ''); // 입력 시 에러 초기화
+                }
+              }}
+              onBlur={(e) => {
+                if (e.target.value && !validateEmail(e.target.value)) {
+                  handleAnswerChange(`${fieldName}Error`, '올바른 이메일 형식이 아닙니다. (예: example@email.com)');
+                } else {
+                  handleAnswerChange(`${fieldName}Error`, '');
+                }
+              }}
+              placeholder={question.placeholder || ''}
+            />
+            {surveyAnswers[`${fieldName}Error`] && (
+              <div className={styles.errorTooltip}>
+                {surveyAnswers[`${fieldName}Error`]}
+              </div>
+            )}
+          </div>
+        );
+      
+      case 'text':
+      default:
+        return (
+          <input
+            type="text"
+            className={styles.formInput}
+            value={surveyAnswers[fieldName] || ''}
+            onChange={(e) => handleAnswerChange(fieldName, e.target.value)}
+            placeholder={question.placeholder || ''}
+          />
+        );
+    }
+  };
+
   const renderSurveyStep = () => {
     switch (currentStep) {
       case 0:
@@ -388,16 +671,10 @@ const SurveyModal = ({ isOpen, onClose }) => {
             </div>
             
             <div className={styles.modalBody}>
-              <h2 className={styles.title}>
-                <span style={{ color: 'var(--color-primary)' }}>더 나은 워크라이프</span>를 꿈꾸는<br/>여러분의 이야기를 들려주세요.
+              <h2 className={styles.title} dangerouslySetInnerHTML={{ __html: surveySchema?.title?.replace(/\n/g, '<br/>') }}>
               </h2>
               
-              <p className={styles.description}>
-                데스커는 일하는 사람들의 새로운 가능을 응원하는 워크 앤 라이프스타일 브랜드입니다. 
-                <br/>현재 일하는 환경에 대한 여러분의 생각을 남겨주시면, 앞으로의 활동에 참고하겠습니다.
-                <br/>
-                <br/>설문에 참여해주신 분들께는<br/><span style={{ fontWeight: '700' }}>공식몰 쿠폰북</span>과 <span style={{ fontWeight: '700' }}>워케이션 준비하기 툴킷 패키지(PDF)</span>를 드리며, 
-                <br/>추첨을 통해 <span style={{ fontWeight: '700' }}>데스커 라운지 홍대 1시간 이용권</span>을 드립니다. (매월 추첨 10명)
+              <p className={styles.description} dangerouslySetInnerHTML={{ __html: surveySchema?.description?.replace(/\n/g, '<br/>') }}>
               </p>
             </div>
           </>
@@ -406,119 +683,32 @@ const SurveyModal = ({ isOpen, onClose }) => {
       case 1:
         return (
           <div className={styles.modalBody}>
-            
             <div className={styles.questionSection}>
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>양양 워케이션을 경험해보셨나요?</h3>
+              {surveySchema?.steps?.[0]?.questions?.map((question, questionIndex) => {
+                // 조건부 표시 처리
+                if (question.condition) {
+                  const { field, value, includes } = question.condition;
+                  if (includes && !surveyAnswers[field]?.includes?.(value)) return null;
+                  if (value && surveyAnswers[field] !== value) return null;
+                }
                 
-                <div className={styles.radioGroup}>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="hasExperienced"
-                      value="yes"
-                      checked={surveyAnswers.hasExperienced === 'yes'}
-                      onChange={(e) => handleAnswerChange('hasExperienced', e.target.value)}
-                    />
-                    <span className={styles.radioText}>네</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="hasExperienced"
-                      value="no"
-                      checked={surveyAnswers.hasExperienced === 'no'}
-                      onChange={(e) => handleAnswerChange('hasExperienced', e.target.value)}
-                    />
-                    <span className={styles.radioText}>아니오</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* 2번째 질문 - '네' 선택 시에만 표시 */}
-              {surveyAnswers.hasExperienced === 'yes' && (
-                <div className={styles.questionWrap}>
-                  <h3 className={styles.questionTitle}>
-                    데스커 워케이션을 경험하면서 특별히 좋았던 점이 있다면 알려주세요.
-                  </h3>
-                  
-                  <textarea
-                    className={styles.textArea}
-                    value={surveyAnswers.goodPoints}
-                    onChange={(e) => handleAnswerChange('goodPoints', e.target.value)}
-                    placeholder="좋았던 점을 자유롭게 작성해주세요."
-                    rows={4}
-                  />
-                </div>
-              )}
-
-              {/* 3번째 질문 - '네' 선택 시에만 표시 */}
-              {surveyAnswers.hasExperienced === 'yes' && (
-                <div className={styles.questionWrap}>
-                  <h3 className={styles.questionTitle}>
-                    데스커 워케이션을 추억할 수 있는 사진을 남겨주세요.
-                  </h3>
-                  
-                  <p className={styles.uploadInfo}>
-                    ∙ 사진을 남겨주신 분들께는 데스커 워케이션 키트를 보내드립니다.
-                    <br />
-                    ∙ 남겨주신 사진은 마케팅 용도로 활용될 수 있습니다.
-                  </p>
-                  
-                  <label className={styles.fileUploadButton}>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      style={{ display: 'none' }}
-                      key={photoPreview ? 'has-photo' : 'no-photo'} // key를 변경하여 input을 리셋
-                    />
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000" className={styles.uploadIcon}>
-                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                      <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-                      <g id="SVGRepo_iconCarrier">
-                        <title></title>
-                        <g id="Complete">
-                          <g id="upload">
-                            <g>
-                              <path d="M3,12.3v7a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2v-7" fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                              <g>
-                                <polyline data-name="Right" fill="none" id="Right-2" points="7.9 6.7 12 2.7 16.1 6.7" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline>
-                                <line fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="16.3" y2="4.8"></line>
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                      </g>
-                    </svg>
-                    <span className={styles.uploadText}>파일 첨부</span>
-                  </label>
-                  
-                  {uploadingPhoto && (
-                    <p className={styles.uploadStatus}>이미지 업로드 중...</p>
-                  )}
-                  
-                  {photoPreview && !uploadingPhoto && (
-                    <div className={styles.photoPreview}>
-                      <img src={photoPreview} alt="업로드된 사진" />
-                      <button 
-                        type="button"
-                        className={styles.removePhoto}
-                        onClick={() => {
-                          // 이미지 미리보기 제거
-                          setPhotoPreview(null);
-                          // surveyAnswers에서 photoUrl 제거
-                          setSurveyAnswers(prev => ({ ...prev, photoUrl: '' }));
-                          // 파일 input 리셋을 위해 key가 변경되도록 함
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+                return (
+                  <div key={question.id} className={styles.questionWrap}>
+                    <h3 className={styles.questionTitle}>
+                      {question.title}
+                      {question.subtitle && <span className={styles.subtitle}>{question.subtitle}</span>}
+                    </h3>
+                    
+                    {question.description && (
+                      <div className={styles.uploadInfo}>
+                        {question.description}
+                      </div>
+                    )}
+                    
+                    {renderDynamicQuestion(question)}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -526,388 +716,93 @@ const SurveyModal = ({ isOpen, onClose }) => {
       case 2:
         return (
           <div className={styles.modalBody}>
-                <div className={styles.questionSection}>
-                    <div className={styles.questionWrap}>
-              <h3 className={styles.questionTitle}>사이트를 어떤 경로로 알게 되셨나요? (중복 선택 가능)</h3>
-              
-              <div className={styles.checkboxGroup}>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="desker_homepage"
-                    checked={surveyAnswers.siteDiscovery.includes('desker_homepage')}
-                    onChange={() => handleCheckboxChange('siteDiscovery', 'desker_homepage')}
-                  />
-                  <span className={styles.checkboxText}>데스커 홈페이지</span>
-                </label>
+            <div className={styles.questionSection}>
+              {surveySchema?.steps?.[1]?.questions?.map((question, questionIndex) => {
+                // 조건부 표시 처리
+                if (question.condition) {
+                  const { field, value, includes } = question.condition;
+                  if (includes && !surveyAnswers[field]?.includes?.(value)) return null;
+                  if (value && surveyAnswers[field] !== value) return null;
+                }
                 
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="sns"
-                    checked={surveyAnswers.siteDiscovery.includes('sns')}
-                    onChange={() => handleCheckboxChange('siteDiscovery', 'sns')}
-                  />
-                  <span className={styles.checkboxText}>SNS</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="search"
-                    checked={surveyAnswers.siteDiscovery.includes('search')}
-                    onChange={() => handleCheckboxChange('siteDiscovery', 'search')}
-                  />
-                  <span className={styles.checkboxText}>검색</span>
-                </label>
-                
-                {surveyAnswers.siteDiscovery.includes('search') && (
-                  <input
-                    type="text"
-                    className={styles.otherInput}
-                    placeholder="어떤 검색어로 검색하셨나요?"
-                    value={surveyAnswers.siteDiscoverySearch || ''}
-                    onChange={(e) => setSurveyAnswers(prev => ({
-                      ...prev,
-                      siteDiscoverySearch: e.target.value
-                    }))}
-                  />
-                )}
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="differ"
-                    checked={surveyAnswers.siteDiscovery.includes('differ')}
-                    onChange={() => handleCheckboxChange('siteDiscovery', 'differ')}
-                  />
-                  <span className={styles.checkboxText}>differ</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="desker_lounge"
-                    checked={surveyAnswers.siteDiscovery.includes('desker_lounge')}
-                    onChange={() => handleCheckboxChange('siteDiscovery', 'desker_lounge')}
-                  />
-                  <span className={styles.checkboxText}>데스커 라운지</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="other"
-                    checked={surveyAnswers.siteDiscovery.includes('other')}
-                    onChange={() => handleCheckboxChange('siteDiscovery', 'other')}
-                  />
-                  <span className={styles.checkboxText}>기타</span>
-                </label>
-                
-                {surveyAnswers.siteDiscovery.includes('other') && (
-                  <input
-                    type="text"
-                    className={styles.otherInput}
-                    placeholder="사이트를 알게 되신 경로를 자유롭게 작성해 주세요."
-                    value={surveyAnswers.siteDiscoveryOther || ''}
-                    onChange={(e) => setSurveyAnswers(prev => ({
-                      ...prev,
-                      siteDiscoveryOther: e.target.value
-                    }))}
-                  />
-                )}
-              </div>
+                return (
+                  <div key={question.id} className={styles.questionWrap}>
+                    <h3 className={styles.questionTitle}>
+                      {question.title}
+                      {question.subtitle && <span className={styles.subtitle}> {question.subtitle}</span>}
+                    </h3>
+                    
+                    {renderDynamicQuestion(question)}
+                  </div>
+                );
+              })}
             </div>
-<div className={styles.questionWrap}>
-              <h3 className={styles.questionTitle}>사이트 방문 목적이 어떻게 되시나요? (중복 선택 가능)</h3>
-              
-              <div className={styles.checkboxGroup}>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="curious_activities"
-                    checked={surveyAnswers.visitPurpose.includes('curious_activities')}
-                    onChange={() => handleCheckboxChange('visitPurpose', 'curious_activities')}
-                  />
-                  <span className={styles.checkboxText}>데스커의 활동이 궁금해서</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="workation_info"
-                    checked={surveyAnswers.visitPurpose.includes('workation_info')}
-                    onChange={() => handleCheckboxChange('visitPurpose', 'workation_info')}
-                  />
-                  <span className={styles.checkboxText}>워케이션 정보를 얻고 싶어서</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="brand_collaboration"
-                    checked={surveyAnswers.visitPurpose.includes('brand_collaboration')}
-                    onChange={() => handleCheckboxChange('visitPurpose', 'brand_collaboration')}
-                  />
-                  <span className={styles.checkboxText}>브랜드 협업을 제안하고 싶어서</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="work_culture"
-                    checked={surveyAnswers.visitPurpose.includes('work_culture')}
-                    onChange={() => handleCheckboxChange('visitPurpose', 'work_culture')}
-                  />
-                  <span className={styles.checkboxText}>업무 문화나 일하는 방식에 대해 알고 싶어서</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="space_interior"
-                    checked={surveyAnswers.visitPurpose.includes('space_interior')}
-                    onChange={() => handleCheckboxChange('visitPurpose', 'space_interior')}
-                  />
-                  <span className={styles.checkboxText}>공간, 인테리어에 관심이 있어서</span>
-                </label>
-                
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    value="other"
-                    checked={surveyAnswers.visitPurpose.includes('other')}
-                    onChange={() => handleCheckboxChange('visitPurpose', 'other')}
-                  />
-                  <span className={styles.checkboxText}>기타</span>
-                </label>
-              </div>
-              
-              {surveyAnswers.visitPurpose.includes('other') && (
-                <input
-                  type="text"
-                  className={styles.otherInput}
-                  placeholder="사이트 방문 목적을 자유롭게 작성해 주세요."
-                  value={surveyAnswers.visitPurposeOther || ''}
-                  onChange={(e) => setSurveyAnswers(prev => ({
-                    ...prev,
-                    visitPurposeOther: e.target.value
-                  }))}
-                />
-              )}
-            </div>
-                </div>
-                </div>
+          </div>
         );
 
       case 3:
-        // 브랜드 협업에 체크한 경우에만 브랜드 협업 제안 폼 표시
-        if (surveyAnswers.visitPurpose.includes('brand_collaboration')) {
-          return (
-            <div className={styles.modalBody}>
-              <div className={styles.questionSection}>
-                <div className={styles.questionWrap}>
-                  <h3 className={styles.questionTitle}>브랜드 협업 제안</h3>
-                  
-                  <div className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>회사명</label>
-                      <input
-                        type="text"
-                        className={styles.formInput}
-                        value={surveyAnswers.companyName}
-                        onChange={(e) => handleAnswerChange('companyName', e.target.value)}
-                        placeholder="회사명을 입력해주세요"
-                      />
-                    </div>
-                    
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>담당자명</label>
-                      <input
-                        type="text"
-                        className={styles.formInput}
-                        value={surveyAnswers.contactPerson}
-                        onChange={(e) => handleAnswerChange('contactPerson', e.target.value)}
-                        placeholder="담당자명을 입력해주세요"
-                      />
-                    </div>
-                    
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>전화번호</label>
-                      <input
-                        type="tel"
-                        className={styles.formInput}
-                        value={surveyAnswers.phoneNumber}
-                        onChange={(e) => handleAnswerChange('phoneNumber', e.target.value)}
-                        placeholder="전화번호를 입력해주세요"
-                      />
-                    </div>
-                    
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>이메일</label>
-                      <div className={styles.inputWrapper}>
-                        <input
-                          type="email"
-                          className={`${styles.formInput} ${emailError ? styles.errorInput : ''}`}
-                          value={surveyAnswers.email}
-                          onChange={(e) => {
-                            handleAnswerChange('email', e.target.value);
-                            if (emailError) setEmailError(''); // 입력 시 에러 초기화
-                          }}
-                          onBlur={(e) => {
-                            if (e.target.value && !validateEmail(e.target.value)) {
-                              setEmailError('올바른 이메일 형식이 아닙니다. (예: example@email.com)');
-                            } else {
-                              setEmailError('');
-                            }
-                          }}
-                          placeholder="이메일을 입력해주세요"
-                        />
-                        {emailError && (
-                          <div className={styles.errorTooltip}>
-                            {emailError}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>제목</label>
-                      <input
-                        type="text"
-                        className={styles.formInput}
-                        value={surveyAnswers.collaborationTitle}
-                        onChange={(e) => handleAnswerChange('collaborationTitle', e.target.value)}
-                        placeholder="협업 제안 제목을 입력해주세요"
-                      />
-                    </div>
-                    
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>협업 제안 내용</label>
-                      <textarea
-                        className={styles.formTextarea}
-                        value={surveyAnswers.collaborationContent}
-                        onChange={(e) => handleAnswerChange('collaborationContent', e.target.value)}
-                        placeholder="제안 내용 및 기대효과를 작성해주세요"
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        } else {
-          // 브랜드 협업을 체크하지 않은 경우 건너뛰기 메시지 표시
-          return (
-            <div className={styles.modalBody}>
-              <div className={styles.questionSection}>
-                <div className={styles.questionWrap}>
-                  <h3 className={styles.questionTitle}>브랜드 협업</h3>
-                  <p className={styles.skipMessage}>
-                    브랜드 협업을 선택하지 않으셨습니다. 다음 단계로 진행합니다.
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
+        // 브랜드 협업 관련 질문들 (조건부 표시)
+        console.log('Case 3 - surveySchema:', surveySchema);
+        console.log('Case 3 - surveySchema.steps:', surveySchema?.steps);
+        surveySchema?.steps?.forEach((step, index) => {
+          console.log(`Step ${index}:`, step.id, step);
+        });
+        const brandCollabStep = surveySchema?.steps?.[2];
+        console.log('Case 3 - brandCollabStep:', brandCollabStep);
+        
+        if (!brandCollabStep || !surveyAnswers.visitPurpose?.includes?.('brand_collaboration')) {
+          return null;
         }
+        
+        return (
+          <div className={styles.modalBody}>
+            <div className={styles.questionSection}>
+              {brandCollabStep.questions?.map((question, questionIndex) => {
+                // 조건부 표시 처리
+                if (question.condition) {
+                  const { field, value, includes } = question.condition;
+                  if (includes && !surveyAnswers[field]?.includes?.(value)) return null;
+                  if (value && surveyAnswers[field] !== value) return null;
+                }
+                
+                return (
+                  <div key={question.id} className={styles.questionWrap}>
+                    <h3 className={styles.questionTitle}>
+                      {question.title}
+                      {question.subtitle && <span className={styles.subtitle}> {question.subtitle}</span>}
+                    </h3>
+                    
+                    {renderDynamicQuestion(question)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
 
       case 4:
         return (
           <div className={styles.modalBody}>
             <div className={styles.questionSection}>
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>어떤 일을 하고 계시나요?</h3>
-                <input
-                  type="text"
-                  className={styles.formInput}
-                  value={surveyAnswers.workType || ''}
-                  onChange={(e) => handleAnswerChange('workType', e.target.value)}
-                  placeholder="ex) 가구회사 브랜드 마케터"
-                />
-              </div>
-              
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>오피스나 일하는 공간에서 가장 중요하게 보는 공간은 무엇인가요?</h3>
-                <div className={styles.radioGroup}>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="importantSpace"
-                      value="personal_workspace"
-                      checked={surveyAnswers.importantSpace === 'personal_workspace'}
-                      onChange={(e) => handleAnswerChange('importantSpace', e.target.value)}
-                    />
-                    <span className={styles.radioText}>개인 업무 공간</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="importantSpace"
-                      value="meeting_space"
-                      checked={surveyAnswers.importantSpace === 'meeting_space'}
-                      onChange={(e) => handleAnswerChange('importantSpace', e.target.value)}
-                    />
-                    <span className={styles.radioText}>회의 공간</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="importantSpace"
-                      value="lounge"
-                      checked={surveyAnswers.importantSpace === 'lounge'}
-                      onChange={(e) => handleAnswerChange('importantSpace', e.target.value)}
-                    />
-                    <span className={styles.radioText}>라운지 (휴식 공간)</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="importantSpace"
-                      value="cafe"
-                      checked={surveyAnswers.importantSpace === 'cafe'}
-                      onChange={(e) => handleAnswerChange('importantSpace', e.target.value)}
-                    />
-                    <span className={styles.radioText}>카페</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="importantSpace"
-                      value="other"
-                      checked={surveyAnswers.importantSpace === 'other'}
-                      onChange={(e) => handleAnswerChange('importantSpace', e.target.value)}
-                    />
-                    <span className={styles.radioText}>기타</span>
-                  </label>
-                </div>
+              {surveySchema?.steps?.[3]?.questions?.map((question, questionIndex) => {
+                // 조건부 표시 처리
+                if (question.condition) {
+                  const { field, value, includes } = question.condition;
+                  if (includes && !surveyAnswers[field]?.includes?.(value)) return null;
+                  if (value && surveyAnswers[field] !== value) return null;
+                }
                 
-                {surveyAnswers.importantSpace === 'other' && (
-                  <input
-                    type="text"
-                    className={styles.otherInput}
-                    placeholder="가장 중요하게 보는 공간을 자유롭게 작성해 주세요."
-                    value={surveyAnswers.importantSpaceOther || ''}
-                    onChange={(e) => handleAnswerChange('importantSpaceOther', e.target.value)}
-                  />
-                )}
-              </div>
-              
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>업무 공간에서 가장 불편함을 느끼는 부분은 무엇인가요?</h3>
-                <textarea
-                  className={styles.formTextarea}
-                  value={surveyAnswers.discomfortPoints || ''}
-                  onChange={(e) => handleAnswerChange('discomfortPoints', e.target.value)}
-                  placeholder="ex) 레이아웃, 가구, 실내 공기질 등"
-                  rows={4}
-                />
-              </div>
+                return (
+                  <div key={question.id} className={styles.questionWrap}>
+                    <h3 className={styles.questionTitle}>
+                      {question.title}
+                      {question.subtitle && <span className={styles.subtitle}> {question.subtitle}</span>}
+                    </h3>
+                    
+                    {renderDynamicQuestion(question)}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -916,160 +811,25 @@ const SurveyModal = ({ isOpen, onClose }) => {
         return (
           <div className={styles.modalBody}>
             <div className={styles.questionSection}>
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>다음 중 가장 관심 있는 업무 환경은 어떤 모습인가요?</h3>
-                <div className={styles.radioGroup}>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="workEnvironment"
-                      value="work_rest_balance"
-                      checked={surveyAnswers.workEnvironment === 'work_rest_balance'}
-                      onChange={(e) => handleAnswerChange('workEnvironment', e.target.value)}
-                    />
-                    <span className={styles.radioText}>일과 쉼이 자연스럽게 조화되는 환경</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="workEnvironment"
-                      value="continuous_motivation"
-                      checked={surveyAnswers.workEnvironment === 'continuous_motivation'}
-                      onChange={(e) => handleAnswerChange('workEnvironment', e.target.value)}
-                    />
-                    <span className={styles.radioText}>꾸준히 동기부여가 되는 환경</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="workEnvironment"
-                      value="nature_worklife"
-                      checked={surveyAnswers.workEnvironment === 'nature_worklife'}
-                      onChange={(e) => handleAnswerChange('workEnvironment', e.target.value)}
-                    />
-                    <span className={styles.radioText}>자연 속의 편안한 워크라이프</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="workEnvironment"
-                      value="flexible_challenge"
-                      checked={surveyAnswers.workEnvironment === 'flexible_challenge'}
-                      onChange={(e) => handleAnswerChange('workEnvironment', e.target.value)}
-                    />
-                    <span className={styles.radioText}>새로운 도전이 가능한 유연한 환경</span>
-                  </label>
-                  
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="workEnvironment"
-                      value="other"
-                      checked={surveyAnswers.workEnvironment === 'other'}
-                      onChange={(e) => handleAnswerChange('workEnvironment', e.target.value)}
-                    />
-                    <span className={styles.radioText}>기타</span>
-                  </label>
-                </div>
+              {surveySchema?.steps?.[4]?.questions?.map((question, questionIndex) => {
+                // 조건부 표시 처리
+                if (question.condition) {
+                  const { field, value, includes } = question.condition;
+                  if (includes && !surveyAnswers[field]?.includes?.(value)) return null;
+                  if (value && surveyAnswers[field] !== value) return null;
+                }
                 
-                {surveyAnswers.workEnvironment === 'other' && (
-                  <input
-                    type="text"
-                    className={styles.otherInput}
-                    placeholder="가장 관심 있는 업무 환경을 자유롭게 작성해 주세요."
-                    value={surveyAnswers.workEnvironmentOther || ''}
-                    onChange={(e) => handleAnswerChange('workEnvironmentOther', e.target.value)}
-                  />
-                )}
-              </div>
-              
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>데스커에 기대하는 활동이 있나요? (중복 선택 가능)</h3>
-                <div className={styles.checkboxGroup}>
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="growth_content"
-                      checked={surveyAnswers.expectedActivities.includes('growth_content')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'growth_content')}
-                    />
-                    <span className={styles.checkboxText}>성장에 도움을 주는 컨텐츠 (ex. 인터뷰 아티클 등)</span>
-                  </label>
-                  
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="sustainable_culture"
-                      checked={surveyAnswers.expectedActivities.includes('sustainable_culture')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'sustainable_culture')}
-                    />
-                    <span className={styles.checkboxText}>지속가능한 업무 문화를 만들기 위한 활동</span>
-                  </label>
-                  
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="self_exploration"
-                      checked={surveyAnswers.expectedActivities.includes('self_exploration')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'self_exploration')}
-                    />
-                    <span className={styles.checkboxText}>나다움을 찾을 수 있는 자기 탐색 프로그램</span>
-                  </label>
-                  
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="community_sharing"
-                      checked={surveyAnswers.expectedActivities.includes('community_sharing')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'community_sharing')}
-                    />
-                    <span className={styles.checkboxText}>관심사를 공유할 수 있는 커뮤니티 운영</span>
-                  </label>
-                  
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="office_furniture"
-                      checked={surveyAnswers.expectedActivities.includes('office_furniture')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'office_furniture')}
-                    />
-                    <span className={styles.checkboxText}>몰입과 편안함을 고려한 사무가구</span>
-                  </label>
-                  
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="business_support"
-                      checked={surveyAnswers.expectedActivities.includes('business_support')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'business_support')}
-                    />
-                    <span className={styles.checkboxText}>신규 비즈니스의 성장을 위한 지원</span>
-                  </label>
-                  
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      value="other"
-                      checked={surveyAnswers.expectedActivities.includes('other')}
-                      onChange={() => handleCheckboxChange('expectedActivities', 'other')}
-                    />
-                    <span className={styles.checkboxText}>기타</span>
-                  </label>
-                </div>
-                
-                {surveyAnswers.expectedActivities.includes('other') && (
-                  <input
-                    type="text"
-                    className={styles.otherInput}
-                    placeholder="데스커에 기대하는 활동을 자유롭게 작성해 주세요."
-                    value={surveyAnswers.expectedActivitiesOther || ''}
-                    onChange={(e) => handleAnswerChange('expectedActivitiesOther', e.target.value)}
-                  />
-                )}
-              </div>
+                return (
+                  <div key={question.id} className={styles.questionWrap}>
+                    <h3 className={styles.questionTitle}>
+                      {question.title}
+                      {question.subtitle && <span className={styles.subtitle}> {question.subtitle}</span>}
+                    </h3>
+                    
+                    {renderDynamicQuestion(question)}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -1078,116 +838,25 @@ const SurveyModal = ({ isOpen, onClose }) => {
         return (
           <div className={styles.modalBody}>
             <div className={styles.questionSection}>
-              
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>성함</h3>
-                <input
-                  type="text"
-                  className={`${styles.formInput} ${styles.half}`}
-                  value={surveyAnswers.fullName || ''}
-                  onChange={(e) => handleAnswerChange('fullName', e.target.value)}
-                  placeholder="성함을 입력해주세요"
-                />
-              </div>
-              
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>연락처</h3>
-                <div className={styles.phoneInputGroup}>
-                  <input
-                    type="tel"
-                    className={`${styles.formInput} ${styles.half}`}
-                    value={surveyAnswers.phoneFirst || ''}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                      handleAnswerChange('phoneFirst', value);
-                    }}
-                    placeholder="010"
-                    maxLength={3}
-                    pattern="[0-9]*"
-                    inputMode="numeric"
-                  />
-                  <span className={styles.phoneSeparator}>-</span>
-                  <input
-                    type="tel"
-                    className={`${styles.formInput} ${styles.half}`}
-                    value={surveyAnswers.phoneSecond || ''}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                      handleAnswerChange('phoneSecond', value);
-                    }}
-                    placeholder="XXXX"
-                    maxLength={4}
-                    pattern="[0-9]*"
-                    inputMode="numeric"
-                  />
-                  <span className={styles.phoneSeparator}>-</span>
-                  <input
-                    type="tel"
-                    className={`${styles.formInput} ${styles.half}`}
-                    value={surveyAnswers.phoneThird || ''}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-                      handleAnswerChange('phoneThird', value);
-                    }}
-                    placeholder="XXXX"
-                    maxLength={4}
-                    pattern="[0-9]*"
-                    inputMode="numeric"
-                  />
-                </div>
-              </div>
-              
-              {surveyAnswers.hasExperienced === 'yes' && (
-                <div className={styles.questionWrap}>
-                  <h3 className={styles.questionTitle}>주소</h3>
-                  <input
-                    type="text"
-                    className={styles.formInput}
-                    value={surveyAnswers.address || ''}
-                    onChange={(e) => handleAnswerChange('address', e.target.value)}
-                    placeholder="주소를 입력해주세요"
-                  />
-                </div>
-              )}
-              
-              <div className={styles.questionWrap}>
-                <h3 className={styles.questionTitle}>이메일을 남겨주시면 설문 참여 경품 및 데스커 소식을 보내드립니다.</h3>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="email"
-                    className={`${styles.formInput} ${emailForPrizesError ? styles.errorInput : ''}`}
-                    value={surveyAnswers.emailForPrizes || ''}
-                    onChange={(e) => {
-                      handleAnswerChange('emailForPrizes', e.target.value);
-                      if (emailForPrizesError) setEmailForPrizesError(''); // 입력 시 에러 초기화
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value && !validateEmail(e.target.value)) {
-                        setEmailForPrizesError('올바른 이메일 형식이 아닙니다. (예: example@email.com)');
-                      } else {
-                        setEmailForPrizesError('');
-                      }
-                    }}
-                    placeholder="이메일을 입력해주세요"
-                  />
-                  {emailForPrizesError && (
-                    <div className={styles.errorTooltip}>
-                      {emailForPrizesError}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className={styles.questionWrap}>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={surveyAnswers.privacyAgreement || false}
-                    onChange={(e) => handleAnswerChange('privacyAgreement', e.target.checked)}
-                  />
-                  <span className={styles.checkboxText}>개인정보 수집/이용 및 마케팅 활용에 동의합니다.</span>
-                </label>
-              </div>
+              {surveySchema?.steps?.[5]?.questions?.map((question, questionIndex) => {
+                // 조건부 표시 처리
+                if (question.condition) {
+                  const { field, value, includes } = question.condition;
+                  if (includes && !surveyAnswers[field]?.includes?.(value)) return null;
+                  if (value && surveyAnswers[field] !== value) return null;
+                }
+                
+                return (
+                  <div key={question.id} className={styles.questionWrap}>
+                    <h3 className={styles.questionTitle}>
+                      {question.title}
+                      {question.subtitle && <span className={styles.subtitle}> {question.subtitle}</span>}
+                    </h3>
+                    
+                    {renderDynamicQuestion(question)}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -1201,67 +870,190 @@ const SurveyModal = ({ isOpen, onClose }) => {
     if (currentStep === 0) return true;
     if (currentStep === 1) return surveyAnswers.hasExperienced !== '';
     if (currentStep === 2) {
-      // 기본 조건: 각 질문에 최소 하나 이상 선택
-      const hasDiscovery = surveyAnswers.siteDiscovery.length > 0;
-      const hasPurpose = surveyAnswers.visitPurpose.length > 0;
+      // 스키마 기반 동적 검증
+      const step2Questions = surveySchema?.steps?.[1]?.questions;
+      if (!step2Questions) return false;
       
-      // '검색' 선택 시 입력란 필수
-      const discoverySearchValid = !surveyAnswers.siteDiscovery.includes('search') || 
-                                   (surveyAnswers.siteDiscoverySearch && surveyAnswers.siteDiscoverySearch.trim() !== '');
-      
-      // '기타' 선택 시 입력란 필수
-      const discoveryOtherValid = !surveyAnswers.siteDiscovery.includes('other') || 
-                                   (surveyAnswers.siteDiscoveryOther && surveyAnswers.siteDiscoveryOther.trim() !== '');
-      const purposeOtherValid = !surveyAnswers.visitPurpose.includes('other') || 
-                                (surveyAnswers.visitPurposeOther && surveyAnswers.visitPurposeOther.trim() !== '');
-      
-      return hasDiscovery && hasPurpose && discoverySearchValid && discoveryOtherValid && purposeOtherValid;
+      return step2Questions.every(question => {
+        // 조건부 질문인 경우 조건 확인
+        if (question.condition) {
+          const { field, value, includes } = question.condition;
+          if (includes && !surveyAnswers[field]?.includes?.(value)) return true; // 조건 미충족시 검증 패스
+          if (value && surveyAnswers[field] !== value) return true; // 조건 미충족시 검증 패스
+        }
+        
+        // 필수 질문인 경우 값 확인
+        if (question.required) {
+          const fieldValue = surveyAnswers[question.id];
+          if (question.type === 'checkbox') {
+            // 체크박스는 배열이고 최소 하나 선택 필요
+            if (!fieldValue || fieldValue.length === 0) return false;
+            
+            // 체크박스 옵션 중 추가 질문이 있는 경우 체크
+            for (const option of question.options || []) {
+              if (option.hasFollowUpQuestion && fieldValue.includes(option.value)) {
+                const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                if (!followUpValue || followUpValue.trim() === '') return false;
+              }
+            }
+            return true;
+          } else {
+            // 일반 필드는 값이 있어야 함
+            if (!fieldValue || fieldValue.trim() === '') return false;
+            
+            // 라디오 옵션 중 추가 질문이 있는 경우 체크
+            if (question.type === 'radio') {
+              for (const option of question.options || []) {
+                if (option.hasFollowUpQuestion && fieldValue === option.value) {
+                  const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                  if (!followUpValue || followUpValue.trim() === '') return false;
+                }
+              }
+            }
+            return true;
+          }
+        }
+        return true; // 필수가 아닌 질문은 항상 통과
+      });
     }
     if (currentStep === 3) {
       // 브랜드 협업에 체크한 경우에만 브랜드 협업 제안 폼 표시
       if (surveyAnswers.visitPurpose.includes('brand_collaboration')) {
-        return surveyAnswers.companyName !== '' && surveyAnswers.contactPerson !== '' && surveyAnswers.phoneNumber !== '' && surveyAnswers.email !== '' && surveyAnswers.collaborationTitle !== '' && surveyAnswers.collaborationContent !== '';
+        const hasPhoneNumber = surveyAnswers.phoneFirst?.trim() !== '' && 
+                               surveyAnswers.phoneSecond?.trim() !== '' && 
+                               surveyAnswers.phoneThird?.trim() !== '';
+        return surveyAnswers.companyName !== '' && surveyAnswers.contactPerson !== '' && hasPhoneNumber && surveyAnswers.email !== '' && surveyAnswers.collaborationTitle !== '' && surveyAnswers.collaborationContent !== '';
       }
       return true; // 브랜드 협업을 체크하지 않은 경우 건너뛰기 메시지 표시이므로 통과
     }
     if (currentStep === 4) {
-      // 기본 필수 필드
-      const hasWorkType = surveyAnswers.workType !== '';
-      const hasImportantSpace = surveyAnswers.importantSpace !== '';
-      const hasDiscomfortPoints = surveyAnswers.discomfortPoints !== '';
+      // 스키마 기반 동적 검증
+      const step4Questions = surveySchema?.steps?.[3]?.questions;
+      if (!step4Questions) return false;
       
-      // '기타' 선택 시 입력란 필수
-      const importantSpaceOtherValid = surveyAnswers.importantSpace !== 'other' || 
-                                       (surveyAnswers.importantSpaceOther && surveyAnswers.importantSpaceOther.trim() !== '');
-      
-      return hasWorkType && hasImportantSpace && hasDiscomfortPoints && importantSpaceOtherValid;
+      return step4Questions.every(question => {
+        // 조건부 질문인 경우 조건 확인
+        if (question.condition) {
+          const { field, value, includes } = question.condition;
+          if (includes && !surveyAnswers[field]?.includes?.(value)) return true; // 조건 미충족시 검증 패스
+          if (value && surveyAnswers[field] !== value) return true; // 조건 미충족시 검증 패스
+        }
+        
+        // 필수 질문인 경우 값 확인
+        if (question.required) {
+          const fieldValue = surveyAnswers[question.id];
+          if (question.type === 'checkbox') {
+            if (!fieldValue || fieldValue.length === 0) return false;
+            
+            // 체크박스 옵션 중 추가 질문이 있는 경우 체크
+            for (const option of question.options || []) {
+              if (option.hasFollowUpQuestion && fieldValue.includes(option.value)) {
+                const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                if (!followUpValue || followUpValue.trim() === '') return false;
+              }
+            }
+            return true;
+          } else {
+            if (!fieldValue || fieldValue.trim() === '') return false;
+            
+            // 라디오 옵션 중 추가 질문이 있는 경우 체크
+            if (question.type === 'radio') {
+              for (const option of question.options || []) {
+                if (option.hasFollowUpQuestion && fieldValue === option.value) {
+                  const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                  if (!followUpValue || followUpValue.trim() === '') return false;
+                }
+              }
+            }
+            return true;
+          }
+        }
+        return true; // 필수가 아닌 질문은 항상 통과
+      });
     }
     if (currentStep === 5) {
-      // 기본 필수 필드
-      const hasEnvironment = surveyAnswers.workEnvironment !== '';
-      const hasActivities = surveyAnswers.expectedActivities.length > 0;
+      // 스키마 기반 동적 검증
+      const step5Questions = surveySchema?.steps?.[4]?.questions;
+      if (!step5Questions) return false;
       
-      // '기타' 선택 시 입력란 필수
-      const environmentOtherValid = surveyAnswers.workEnvironment !== 'other' || 
-                                   (surveyAnswers.workEnvironmentOther && surveyAnswers.workEnvironmentOther.trim() !== '');
-      const activitiesOtherValid = !surveyAnswers.expectedActivities.includes('other') || 
-                                   (surveyAnswers.expectedActivitiesOther && surveyAnswers.expectedActivitiesOther.trim() !== '');
-      
-      return hasEnvironment && hasActivities && environmentOtherValid && activitiesOtherValid;
+      return step5Questions.every(question => {
+        // 조건부 질문인 경우 조건 확인
+        if (question.condition) {
+          const { field, value, includes } = question.condition;
+          if (includes && !surveyAnswers[field]?.includes?.(value)) return true; // 조건 미충족시 검증 패스
+          if (value && surveyAnswers[field] !== value) return true; // 조건 미충족시 검증 패스
+        }
+        
+        // 필수 질문인 경우 값 확인
+        if (question.required) {
+          const fieldValue = surveyAnswers[question.id];
+          if (question.type === 'checkbox') {
+            if (!fieldValue || fieldValue.length === 0) return false;
+            
+            // 체크박스 옵션 중 추가 질문이 있는 경우 체크
+            for (const option of question.options || []) {
+              if (option.hasFollowUpQuestion && fieldValue.includes(option.value)) {
+                const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                if (!followUpValue || followUpValue.trim() === '') return false;
+              }
+            }
+            return true;
+          } else {
+            if (!fieldValue || fieldValue.trim() === '') return false;
+            
+            // 라디오 옵션 중 추가 질문이 있는 경우 체크
+            if (question.type === 'radio') {
+              for (const option of question.options || []) {
+                if (option.hasFollowUpQuestion && fieldValue === option.value) {
+                  const followUpValue = surveyAnswers[`${question.id}_${option.value}_followUp`];
+                  if (!followUpValue || followUpValue.trim() === '') return false;
+                }
+              }
+            }
+            return true;
+          }
+        }
+        return true; // 필수가 아닌 질문은 항상 통과
+      });
     }
     if (currentStep === 6) {
-      const requiredFields = surveyAnswers.fullName !== '' && 
-                           surveyAnswers.phoneFirst !== '' && 
-                           surveyAnswers.phoneSecond !== '' && 
-                           surveyAnswers.phoneThird !== '' && 
-                           surveyAnswers.privacyAgreement === true;
+      // 스키마 기반 동적 검증
+      const step6Questions = surveySchema?.steps?.[5]?.questions;
+      if (!step6Questions) return true;
       
-      // 주소는 양양 워케이션 참여 시에만 필수
-      if (surveyAnswers.hasExperienced === 'yes') {
-        return requiredFields && surveyAnswers.address !== '';
-      }
-      
-      return requiredFields;
+      return step6Questions.every(question => {
+        // 조건부 질문인 경우 조건 확인
+        if (question.condition) {
+          const { field, value, includes } = question.condition;
+          if (includes && !surveyAnswers[field]?.includes?.(value)) return true; // 조건 미충족시 검증 패스
+          if (value && surveyAnswers[field] !== value) return true; // 조건 미충족시 검증 패스
+        }
+        
+        // 필수 질문인 경우 값 확인
+        if (question.required) {
+          // phoneNumber 필드는 분할된 phone 필드들로 검증 (단계별 구분)
+          if (question.id === 'phoneNumber') {
+            // 6단계는 personalPhone, 나머지는 phone 필드 사용
+            if (currentStep === 6) {
+              return surveyAnswers.personalPhoneFirst?.trim() !== '' && 
+                     surveyAnswers.personalPhoneSecond?.trim() !== '' && 
+                     surveyAnswers.personalPhoneThird?.trim() !== '';
+            } else {
+              return surveyAnswers.phoneFirst?.trim() !== '' && 
+                     surveyAnswers.phoneSecond?.trim() !== '' && 
+                     surveyAnswers.phoneThird?.trim() !== '';
+            }
+          }
+          
+          const fieldValue = surveyAnswers[question.id];
+          if (question.type === 'checkbox') {
+            return fieldValue && fieldValue.length > 0;
+          } else {
+            return fieldValue && fieldValue.trim() !== '';
+          }
+        }
+        return true; // 필수가 아닌 질문은 항상 통과
+      });
     }
     return true;
   };
@@ -1272,6 +1064,19 @@ const SurveyModal = ({ isOpen, onClose }) => {
   };
 
   if (!isOpen) return null;
+
+  // 스키마 로딩 중일 때
+  if (schemaLoading) {
+    return (
+      <div className={styles.modalOverlay}>
+        <div className={styles.modalContent}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.loading}>설문지를 불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleCloseModal = () => {
     // 작성중인 내용이 있는지 확인
@@ -1292,6 +1097,9 @@ const SurveyModal = ({ isOpen, onClose }) => {
                       surveyAnswers.phoneFirst !== '' ||
                       surveyAnswers.phoneSecond !== '' ||
                       surveyAnswers.phoneThird !== '' ||
+                      surveyAnswers.personalPhoneFirst !== '' ||
+                      surveyAnswers.personalPhoneSecond !== '' ||
+                      surveyAnswers.personalPhoneThird !== '' ||
                       surveyAnswers.address !== '' ||
                       surveyAnswers.emailForPrizes !== '' ||
                       surveyAnswers.privacyAgreement === true;

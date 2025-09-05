@@ -85,9 +85,14 @@ const AdminLayout = ({ children, title }) => {
         <h2>데스커워케이션 Admin</h2>
         <nav>
           <ul>
-            <li className={isActive('survey') ? 'active' : ''}>
+            <li className={isActive('survey') && !isActive('survey-editor') ? 'active' : ''}>
             <Link to="/admin/survey">
               설문 응답 관리
+            </Link>
+          </li>
+            <li className={isActive('survey-editor') ? 'active' : ''}>
+            <Link to="/admin/survey-editor">
+              설문지 수정
             </Link>
           </li>
             <li className={isActive('email-templates') ? 'active' : ''}>

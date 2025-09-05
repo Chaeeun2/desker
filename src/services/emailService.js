@@ -6,6 +6,13 @@ import { doc, getDoc } from 'firebase/firestore';
 const EMAIL_API_ENDPOINT = 'https://desker-email-api.pages.dev/api/send-email';
 // 이메일 보안 스타일 추가 함수
 const addSecurityStyles = (htmlTemplate) => {
+  console.log('🔒 보안 스타일 추가 중, 템플릿 타입:', typeof htmlTemplate);
+  
+  // 템플릿이 문자열이 아닌 경우 처리
+  if (typeof htmlTemplate !== 'string') {
+    console.log('⚠️ 템플릿이 문자열이 아님, 변환 시도:', htmlTemplate);
+    htmlTemplate = String(htmlTemplate);
+  }
   const securityStyles = `
     <style>
       /* 텍스트 선택 방지 */
@@ -119,36 +126,59 @@ const addSecurityStyles = (htmlTemplate) => {
 // 이메일 발송 함수 (사용자 확인 이메일)
 export const sendSurveyConfirmationEmail = async (surveyData) => {
   try {
+    console.log('🚀 이메일 발송 시작:', surveyData);
+    
     // 이메일 주소 확인
     const recipientEmail = surveyData.email || surveyData.emailForPrizes;
+    console.log('📧 수신자 이메일:', recipientEmail);
+    
     if (!recipientEmail) {
+      console.log('⚠️ 이메일 주소 없음');
       return { success: true, message: 'No email to send' };
     }
     
     // Firebase에서 이메일 템플릿 가져오기
+    console.log('📋 이메일 템플릿 가져오는 중...');
     let template = null;
     try {
       const docRef = doc(db, 'settings', 'emailTemplates');
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        template = docSnap.data().confirmation;
+        const templateData = docSnap.data().confirmation;
+        console.log('✅ 템플릿 가져오기 성공:', templateData ? '템플릿 존재' : '템플릿 없음');
+        console.log('📝 템플릿 타입:', typeof templateData);
+        console.log('📄 템플릿 내용:', templateData);
+        
+        // 템플릿 객체 전체를 유지 (어드민과 동일)
+        template = templateData;
+        console.log('📋 템플릿 객체 유지');
+      } else {
+        console.log('❌ 템플릿 문서가 존재하지 않음');
       }
     } catch (firebaseError) {
+      console.log('🔥 Firebase 오류:', firebaseError);
       // Firebase 접근 실패 시 기본 동작으로 fallback
     }
     
     // 템플릿 데이터 준비
     const templateData = {
       fullName: surveyData.fullName || '고객',
-      email: recipientEmail,
+      email: recipientEmail || '',
       phoneNumber: surveyData.phoneNumber || '',
       hasExperienced: surveyData.hasExperienced === 'yes' ? '네' : '아니오',
       goodPoints: surveyData.goodPoints || '',
-      workType: surveyData.workType || ''
+      workType: surveyData.workType || '',
+      // API 서버에서 예상할 수 있는 추가 필드들
+      name: surveyData.fullName || '고객',
+      userEmail: recipientEmail || '',
+      phone: surveyData.phoneNumber || ''
     };
     
+    console.log('📋 최종 템플릿 데이터:', templateData);
+    
     // Firebase 템플릿이 없으면 오류 반환
-    if (!template) {
+    if (!template || !template.content) {
+      console.log('❌ 템플릿이 없어서 이메일 발송 중단');
       return {
         success: false,
         error: 'Email template not found. Please create template in admin panel.',
@@ -156,15 +186,21 @@ export const sendSurveyConfirmationEmail = async (surveyData) => {
       };
     }
     
-    // 보안 스타일을 이메일 템플릿에 추가
-    const secureEmailTemplate = addSecurityStyles(template);
+    // 보안 스타일을 content에만 적용
+    const secureTemplate = {
+      ...template,
+      content: addSecurityStyles(template.content)
+    };
     
-    // API 호출 (보안이 적용된 템플릿 사용)
+    // API 호출 (어드민 수동발송과 완전히 동일한 구조)
     const requestBody = {
       to: recipientEmail,
-      template: secureEmailTemplate,
+      template: secureTemplate,  // 객체 전체 구조 유지
       testData: templateData
     };
+    
+    console.log('📤 이메일 API 호출 중...', EMAIL_API_ENDPOINT);
+    console.log('📋 요청 데이터:', { to: recipientEmail, templateData });
     
     const response = await fetch(EMAIL_API_ENDPOINT, {
       method: 'POST',
@@ -174,9 +210,12 @@ export const sendSurveyConfirmationEmail = async (surveyData) => {
       body: JSON.stringify(requestBody)
     });
 
+    console.log('📡 API 응답 상태:', response.status);
     const result = await response.json();
+    console.log('📄 API 응답 데이터:', result);
     
     if (!response.ok) {
+      console.log('❌ API 호출 실패:', response.status, result.error);
       return {
         success: false,
         error: result.error || 'Email sending failed',
@@ -184,6 +223,7 @@ export const sendSurveyConfirmationEmail = async (surveyData) => {
       };
     }
     
+    console.log('✅ 이메일 발송 성공:', result.messageId);
     return {
       success: true,
       messageId: result.messageId,
@@ -191,6 +231,7 @@ export const sendSurveyConfirmationEmail = async (surveyData) => {
     };
     
   } catch (error) {
+    console.log('💥 이메일 발송 오류:', error);
     
     // 이메일 발송 실패해도 설문 제출은 성공으로 처리
     return {

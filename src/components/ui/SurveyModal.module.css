@@ -127,6 +127,15 @@
   text-align: center;
 }
 
+.title strong {
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.description strong {
+  font-weight: 700;
+}
+
 .nextButton {
   background: #007aff;
   color: white;
@@ -244,13 +253,17 @@
   align-items: flex-start;
 }
 
+.radioGroup div {
+  width: 100%;
+}
+
 .radioLabel {
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 200px;
+  width: 100%;
   justify-content: flex-start;
 }
 
@@ -305,6 +318,7 @@
   font-family: var(--font-pret);
   font-weight: 500;
   word-break: keep-all;
+  white-space: pre-line;
 }
 
 .fileUploadButton {
@@ -596,6 +610,7 @@
   font-family: var(--font-pret);
   transition: border-color 0.3s ease;
   margin-left: 30px;
+  margin-top: 10px;
 }
 
 .otherInput.half {

@@ -4,6 +4,7 @@ import { db } from '../admin/lib/firebase';
 // 설문 응답 저장
 export const saveSurveyResponse = async (surveyData) => {
   try {
+    console.log('Firebase 저장 시작, 데이터:', surveyData);
     // undefined 값을 빈 문자열로 변환
     const cleanedData = Object.keys(surveyData).reduce((acc, key) => {
       const value = surveyData[key];
@@ -22,6 +23,7 @@ export const saveSurveyResponse = async (surveyData) => {
       submittedAt: serverTimestamp(),
       createdAt: new Date().toISOString()
     });
+    console.log('Firebase 저장 성공, docRef:', docRef.id);
     return { success: true, id: docRef.id };
   } catch (error) {
     return { success: false, error: error.message };

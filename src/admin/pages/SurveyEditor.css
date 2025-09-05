@@ -1,0 +1,258 @@
+/* Survey Editor 스타일 - 다른 어드민 페이지와 일치 */
+
+.survey-editor {
+  padding: 30px;
+  max-width: none;
+}
+
+.survey-wrap {
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.survey-wrap:last-child {
+  margin-bottom: 0px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.survey-step-editor h3 {
+  font-size: 2rem;
+  font-weight: 800;
+  padding-bottom: 20px;
+}
+
+.question-editor {
+  margin-bottom: 20px;
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.question-editor:first-child {
+  margin-top: 0 !important;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.question-header.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  padding: 5px 10px;
+  margin: -10px -10px -10px -10px;
+  border-radius: 8px;
+}
+
+.question-header.clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.question-header h4 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.question-content {
+  animation: slideDown 0.3s ease;
+  margin-top: 20px;
+}
+
+.options-editor {
+  margin-top: 30px;
+}
+
+.options-editor label {
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  line-height: 1.4;
+  display: block;
+}
+
+.option-row {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 15px;
+  align-items: center;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 10px;
+}
+
+.option-row .form-control {
+  flex: 1;
+}
+
+.versions-manager {
+  padding: 20px;
+  background: white;
+}
+
+.versions-manager h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.versions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.version-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.version-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.version-item.active {
+  border-color: #007bff;
+  background-color: #f8f9ff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.version-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.version-info p {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.version-info small {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.version-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.badge {
+  background: #28a745;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.badge-success {
+  background: #28a745;
+}
+
+/* 폼 요소들 기본 스타일 일치 */
+.survey-editor .form-control,
+.survey-editor .admin-form-group {
+  margin-bottom: 20px;
+}
+
+.survey-editor .admin-form-group label {
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.survey-editor .form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.survey-editor .form-control:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.survey-editor textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.question-header .btn {
+  background: rgb(255, 255, 255) !important;
+  color: black !important;
+}
+
+.survey-editor .btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: black;
+  font-weight: 700;
+  transition: all 0.2s;
+  margin-right: 10px;
+  background: black;
+  color: white;
+}
+
+.survey-wrap input {
+  max-width: 600px;
+}
+
+.survey-wrap select {
+  max-width: 200px;
+}
+
+/* 토글 애니메이션 */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
