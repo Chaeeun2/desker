@@ -195,7 +195,7 @@ const HamburgerMenu = () => {
                 if (typeof window !== 'undefined' && window.gtag) {
                   window.gtag('event', 'click', {
                     event_category: 'external_link',
-                    event_label: 'hamburger_menu_differ_link',
+                    event_label: 'menu_differ',
                     value: 1
                   });
                 }
@@ -212,7 +212,7 @@ const HamburgerMenu = () => {
                 if (typeof window !== 'undefined' && window.gtag) {
                   window.gtag('event', 'click', {
                     event_category: 'external_link',
-                    event_label: 'hamburger_menu_desker_link',
+                    event_label: 'menu_desker',
                     value: 1
                   });
                 }

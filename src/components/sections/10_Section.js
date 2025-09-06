@@ -191,10 +191,10 @@ const Section10 = ({ onVisibilityChange }) => {
                         // Google Analytics 이벤트 전송 (CTA 버튼 클릭)
                         if (typeof window !== 'undefined' && window.gtag) {
                           const ctaLabels = {
-                            1: 'lounge_hongdae',
-                            2: 'lounge_daegu', 
-                            3: 'basecamp',
-                            4: 'differ'
+                            1: 'S10_lounge_hongdae',
+                            2: 'S10_lounge_daegu', 
+                            3: 'S10_basecamp',
+                            4: 'S10_differ'
                           };
                           
                           window.gtag('event', 'click', {
