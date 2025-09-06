@@ -38,6 +38,10 @@ const HamburgerMenu = () => {
     };
   }, []);
 
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   const handleMenuClick = (tab) => {
     // Google Analytics 이벤트 전송 (메뉴 항목 클릭)
     if (typeof window !== 'undefined' && window.gtag) {
