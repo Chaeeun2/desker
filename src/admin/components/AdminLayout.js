@@ -87,10 +87,15 @@ const AdminLayout = ({ children, title }) => {
           <ul>
             <li className={isActive('survey') && !isActive('survey-editor') ? 'active' : ''}>
             <Link to="/admin/survey">
-              설문 응답 관리
+              설문 응답
+            </Link>
+              </li>
+                          <li className={isActive('collaboration') ? 'active' : ''}>
+            <Link to="/admin/collaboration">
+              협업 문의
             </Link>
           </li>
-            <li className={isActive('survey-editor') ? 'active' : ''}>
+              <li className={isActive('survey-editor') ? 'active' : ''}>
             <Link to="/admin/survey-editor">
               설문지 수정
             </Link>

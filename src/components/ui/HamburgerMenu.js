@@ -38,11 +38,23 @@ const HamburgerMenu = () => {
     };
   }, []);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
   const handleMenuClick = (tab) => {
+    // Google Analytics 이벤트 전송 (메뉴 항목 클릭)
+    if (typeof window !== 'undefined' && window.gtag) {
+      const menuLabels = {
+        'main': 'menu_intro',
+        'story': 'menu_reason', 
+        'series': 'menu_activities',
+        'news': 'menu_worklife'
+      };
+      
+      window.gtag('event', 'click', {
+        event_category: 'navigation',
+        event_label: menuLabels[tab] || `hamburger_menu_${tab}`,
+        value: 1
+      });
+    }
+
     // news 탭 클릭 시 모달 열기
     if (tab === 'news') {
       setIsSurveyModalOpen(true);
@@ -171,9 +183,39 @@ const HamburgerMenu = () => {
             </li>
           </ul>
           <div className={styles.menuFooter}>
-            <a href="https://differ.co.kr/about" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/differ_menu.png"></img></a>
+            <a 
+              href="https://differ.co.kr/about" 
+              target="_blank" 
+              rel="noreferrer"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.gtag) {
+                  window.gtag('event', 'click', {
+                    event_category: 'external_link',
+                    event_label: 'hamburger_menu_differ_link',
+                    value: 1
+                  });
+                }
+              }}
+            >
+              <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/differ_menu.png" alt="Differ" />
+            </a>
             <br/><br/>
-            <a href="https://www.desker.co.kr/" target="_blank"><img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker_menu.png"></img></a>
+            <a 
+              href="https://www.desker.co.kr/" 
+              target="_blank" 
+              rel="noreferrer"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.gtag) {
+                  window.gtag('event', 'click', {
+                    event_category: 'external_link',
+                    event_label: 'hamburger_menu_desker_link',
+                    value: 1
+                  });
+                }
+              }}
+            >
+              <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/desker_menu.png" alt="Desker" />
+            </a>
           </div>
         </nav>
       </div>
