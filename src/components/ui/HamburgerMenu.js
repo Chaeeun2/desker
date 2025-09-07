@@ -43,19 +43,20 @@ const HamburgerMenu = () => {
   };
 
   const handleMenuClick = (tab) => {
-    // Google Analytics 이벤트 전송 (메뉴 항목 클릭)
-    if (typeof window !== 'undefined' && window.gtag) {
+    // GTM 이벤트 전송 (메뉴 항목 클릭)
+    if (typeof window !== 'undefined' && window.dataLayer) {
       const menuLabels = {
-        'main': 'menu_intro',
-        'story': 'menu_reason', 
-        'series': 'menu_activities',
-        'news': 'menu_worklife'
+        'main': 'intro',
+        'story': 'workation_reason',
+        'series': 'workation_activities',
+        'news': 'worklife_news'
       };
       
-      window.gtag('event', 'click', {
-        event_category: 'navigation',
-        event_label: menuLabels[tab] || `hamburger_menu_${tab}`,
-        value: 1
+      window.dataLayer.push({
+        event: 'menu_click',
+        navigation_target: menuLabels[tab] || tab,
+        navigation_source: 'hamburger_menu',
+        section_destination: tab
       });
     }
 
@@ -192,11 +193,12 @@ const HamburgerMenu = () => {
               target="_blank" 
               rel="noreferrer"
               onClick={() => {
-                if (typeof window !== 'undefined' && window.gtag) {
-                  window.gtag('event', 'click', {
-                    event_category: 'external_link',
-                    event_label: 'menu_differ',
-                    value: 1
+                if (typeof window !== 'undefined' && window.dataLayer) {
+                  window.dataLayer.push({
+                    event: 'menu_click',
+                    navigation_target: 'differ_about',
+                    navigation_source: 'hamburger_menu_footer',
+                    external_url: 'https://differ.co.kr/about'
                   });
                 }
               }}
@@ -209,11 +211,12 @@ const HamburgerMenu = () => {
               target="_blank" 
               rel="noreferrer"
               onClick={() => {
-                if (typeof window !== 'undefined' && window.gtag) {
-                  window.gtag('event', 'click', {
-                    event_category: 'external_link',
-                    event_label: 'menu_desker',
-                    value: 1
+                if (typeof window !== 'undefined' && window.dataLayer) {
+                  window.dataLayer.push({
+                    event: 'menu_click',
+                    navigation_target: 'desker_main',
+                    navigation_source: 'hamburger_menu_footer',
+                    external_url: 'https://www.desker.co.kr/'
                   });
                 }
               }}

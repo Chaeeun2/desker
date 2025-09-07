@@ -9,12 +9,10 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
   const autoTooltipTimeoutRef = useRef(null);
 
   const handleIconClick = () => {
-    // Google Analytics 이벤트 전송
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'click', {
-        event_category: 'engagement',
-        event_label: 'survey_foating_button',
-        value: 1
+    // GTM 이벤트 전송
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        event: 'survey_button'
       });
     }
 

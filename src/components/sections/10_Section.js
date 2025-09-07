@@ -188,21 +188,22 @@ const Section10 = ({ onVisibilityChange }) => {
                         pointerEvents: itemStates[itemIndex]?.isExpanded ? 'auto' : 'none' 
                       }}
                       onClick={() => {
-                        // Google Analytics 이벤트 전송 (CTA 버튼 클릭)
-                        if (typeof window !== 'undefined' && window.gtag) {
+                        // GTM 이벤트 전송 (CTA 버튼 클릭)
+                        if (typeof window !== 'undefined' && window.dataLayer) {
                           const ctaLabels = {
-                            1: 'S10_lounge_hongdae',
-                            2: 'S10_lounge_daegu', 
-                            3: 'S10_basecamp',
-                            4: 'S10_differ'
+                            1: 'lounge_hongdae',
+                            2: 'lounge_daegu', 
+                            3: 'basecamp',
+                            4: 'differ'
                           };
                           
-                          window.gtag('event', 'click', {
-                            event_category: 'cta',
-                            event_label: ctaLabels[itemIndex] || `section10_cta_${itemIndex}`,
-                            custom_parameter_1: itemData?.title || `패널 ${itemIndex}`,
-                            custom_parameter_2: itemData?.buttonText || '버튼',
-                            value: 1
+                          window.dataLayer.push({
+                            event: 'S10_cta_button',
+                            section: 'section10_worklife',
+                            cta_target: ctaLabels[itemIndex] || `cta_${itemIndex}`,
+                            panel_title: itemData?.title || `패널 ${itemIndex}`,
+                            button_text: itemData?.buttonText || '버튼',
+                            panel_index: itemIndex
                           });
                         }
                       }}
