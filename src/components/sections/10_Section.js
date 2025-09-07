@@ -199,11 +199,7 @@ const Section10 = ({ onVisibilityChange }) => {
                           
                           window.dataLayer.push({
                             event: 'S10_cta_button',
-                            section: 'section10_worklife',
-                            cta_target: ctaLabels[itemIndex] || `cta_${itemIndex}`,
-                            panel_title: itemData?.title || `패널 ${itemIndex}`,
-                            button_text: itemData?.buttonText || '버튼',
-                            panel_index: itemIndex
+                            target: ctaLabels[itemIndex] || `cta_${itemIndex}`
                           });
                         }
                       }}

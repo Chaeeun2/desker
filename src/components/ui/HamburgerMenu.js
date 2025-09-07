@@ -48,15 +48,13 @@ const HamburgerMenu = () => {
       const menuLabels = {
         'main': 'intro',
         'story': 'workation_reason',
-        'series': 'workation_activities',
-        'news': 'worklife_news'
+        'series': 'activities_btn',
+        'news': 'worklife_modal'
       };
       
       window.dataLayer.push({
         event: 'menu_click',
-        navigation_target: menuLabels[tab] || tab,
-        navigation_source: 'hamburger_menu',
-        section_destination: tab
+        target: menuLabels[tab] || tab
       });
     }
 
@@ -196,9 +194,7 @@ const HamburgerMenu = () => {
                 if (typeof window !== 'undefined' && window.dataLayer) {
                   window.dataLayer.push({
                     event: 'menu_click',
-                    navigation_target: 'differ_about',
-                    navigation_source: 'hamburger_menu_footer',
-                    external_url: 'https://differ.co.kr/about'
+                    target: 'differ'
                   });
                 }
               }}
@@ -214,9 +210,7 @@ const HamburgerMenu = () => {
                 if (typeof window !== 'undefined' && window.dataLayer) {
                   window.dataLayer.push({
                     event: 'menu_click',
-                    navigation_target: 'desker_main',
-                    navigation_source: 'hamburger_menu_footer',
-                    external_url: 'https://www.desker.co.kr/'
+                    target: 'desker'
                   });
                 }
               }}
