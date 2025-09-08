@@ -738,8 +738,8 @@ const SurveyManager = () => {
                                   <html>
                                     <head>
                                       <meta charset="UTF-8">
-  <link rel="icon" href="https://cdn.imweb.me/thumbnail/20240416/98594bfb52660.png">
-  <title>데스커 워케이션 | WORK ON THE BEACH</title>
+                                      <link rel="icon" href="https://cdn.imweb.me/thumbnail/20240416/98594bfb52660.png">
+                                      <title>데스커 워케이션 | WORK ON THE BEACH</title>
                                       <style>
                                         body { 
                                           margin: 0; 
