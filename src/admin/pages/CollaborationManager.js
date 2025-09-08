@@ -543,19 +543,7 @@ const CollaborationManager = () => {
                           {step.title || '브랜드 협업 정보'}
                         </h3>
                         {step.questions
-                          .filter(question => {
-                            // 브랜드 협업 관련 질문만 필터링
-                            const collaborationFields = ['companyName', 'contactPerson', 'brandPhoneNumber', 'email', 'collaborationTitle', 'collaborationContent'];
-                            return collaborationFields.includes(question.id);
-                          })
-                          .filter(question => {
-                            // 응답 데이터에 해당 질문의 답변이 있는지 확인
-                            const value = getDynamicAnswerValue(selectedInquiry, question);
-                            if (value !== null && value !== undefined && value !== '') {
-                              return true;
-                            }
-                            return false;
-                          })
+                          // 3페이지(brand_collaboration)의 모든 질문을 동적으로 표시
                           .map((question) => 
                             renderDynamicQuestion(selectedInquiry, question, selectedInquirySchema)
                           )}
