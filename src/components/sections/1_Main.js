@@ -253,8 +253,7 @@ const Main = ({ onVisibilityChange }) => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0px',
-          color: 'white',
-            transform: 'translateX(-50%)',
+          color: 'white'
           }}>
           <p style={{ fontSize: '20px' }}>scroll</p>
         <svg 
@@ -332,8 +331,7 @@ const Main = ({ onVisibilityChange }) => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0px',
-          color: 'white',
-            transform: 'translateX(-50%)',
+          color: 'white'
           }}>
           <p style={{ fontSize: '18px' }}>scroll</p>
         <svg 

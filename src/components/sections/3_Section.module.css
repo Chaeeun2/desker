@@ -164,7 +164,6 @@
   position: absolute;
   bottom: 4.5rem;
   left: 50%;
-  transform: translateX(-50%);
   width: 50px;
   height: 50px;
   zindex: 2;
@@ -172,15 +171,15 @@
 
 @keyframes arrowdown {
   0% {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateX(-50%) translateY(-10px);
   }
 
   100% {
-    transform: translateY(0px);
+    transform: translateX(-50%) translateY(0px);
   }
 }
 

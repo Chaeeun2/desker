@@ -308,15 +308,15 @@
 
 @keyframes arrowdown {
   0% {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateX(-50%) translateY(-10px);
   }
 
   100% {
-    transform: translateY(0px);
+    transform: translateX(-50%) translateY(0px);
   }
 }
 
