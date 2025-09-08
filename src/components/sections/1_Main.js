@@ -69,7 +69,7 @@ const Main = ({ onVisibilityChange }) => {
   };
 
   // 자동재생 강제 시도 함수
-  const attemptAutoplay = () => {
+  const attemptAutoplay = async () => {
     // PC와 모바일 비디오 모두 시도
     const pcVideo = document.querySelector('[data-section="main"]');
     const mobileVideo = document.querySelector('[data-section="main-mobile"]');
@@ -77,50 +77,123 @@ const Main = ({ onVisibilityChange }) => {
     const videoElement = isMobile ? mobileVideo : pcVideo;
     
     if (videoElement) {
-      videoElement.play().then(() => {
-        updateVideoPlayState({ isPlaying: true });
-      }).catch((error) => {
+      try {
+        // 비디오 준비 상태 확인
+        if (videoElement.readyState < 3) {
+          await new Promise((resolve) => {
+            const handleCanPlay = () => {
+              videoElement.removeEventListener('canplay', handleCanPlay);
+              resolve();
+            };
+            videoElement.addEventListener('canplay', handleCanPlay);
+            videoElement.load(); // 강제 로드
+          });
+        }
+        
+        // 음소거 확인
+        videoElement.muted = true;
+        videoElement.volume = 0;
+        
+        // 재생 시도
+        await videoElement.play();
+        updateVideoPlayState({ isPlaying: true, hasError: false });
+        
+        // 재생 상태 지속적 모니터링
+        const playCheckInterval = setInterval(() => {
+          if (videoElement.paused || videoElement.ended) {
+            videoElement.play().catch(() => {
+              clearInterval(playCheckInterval);
+            });
+          }
+        }, 2000);
+        
+        // 5분 후 모니터링 중단
+        setTimeout(() => {
+          clearInterval(playCheckInterval);
+        }, 300000);
+        
+      } catch (error) {
+        console.warn('Video autoplay failed:', error);
         updateVideoPlayState({ hasError: true });
-      });
+      }
     }
   };
 
-  // 비디오 로드 완료 후 자동재생 시도
+  // 비디오 로드 완료 후 자동재생 시도 (강화된 버전)
   useEffect(() => {
     const handleVideoLoad = () => {
-      // 비디오가 로드된 후 자동재생 시도
-      setTimeout(() => {
-        attemptAutoplay();
-      }, 500); // 로딩 시간 단축
+      // 즉시 재생 시도
+      attemptAutoplay();
+      
+      // 연속 재시도 (총 3번)
+      setTimeout(() => attemptAutoplay(), 200);
+      setTimeout(() => attemptAutoplay(), 800);
+      setTimeout(() => attemptAutoplay(), 2000);
     };
 
     if (videosLoaded) {
       handleVideoLoad();
     }
   }, [videosLoaded]);
+  
+  // 페이지 로드 완료 후 추가 자동재생 시도
+  useEffect(() => {
+    const handlePageLoad = () => {
+      setTimeout(() => attemptAutoplay(), 100);
+      setTimeout(() => attemptAutoplay(), 1000);
+      setTimeout(() => attemptAutoplay(), 3000);
+    };
+    
+    if (document.readyState === 'complete') {
+      handlePageLoad();
+    } else {
+      window.addEventListener('load', handlePageLoad);
+      return () => window.removeEventListener('load', handlePageLoad);
+    }
+  }, []);
 
-  // 사용자 상호작용 후 자동재생 시도
+  // 사용자 상호작용 후 자동재생 시도 (강화된 버전)
   useEffect(() => {
     const handleUserInteraction = () => {
+      attemptAutoplay();
+      
+      // 추가 재시도 로직
       setTimeout(() => {
         attemptAutoplay();
-      }, 100);
+      }, 1000);
     };
 
-    // 클릭, 터치, 키보드 입력 등 사용자 상호작용 감지
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('touchstart', handleUserInteraction, { once: true, passive: true });
-    document.addEventListener('keydown', handleUserInteraction, { once: true });
-    document.addEventListener('scroll', handleUserInteraction, { once: true, passive: true });
-    // 페이지 포커스 시에도 자동재생 시도
-    window.addEventListener('focus', handleUserInteraction, { once: true });
+    // 다양한 상호작용 이벤트 감지
+    const events = [
+      'click', 'touchstart', 'touchend', 'keydown', 'scroll', 
+      'mousedown', 'pointerdown', 'gesturestart', 'contextmenu'
+    ];
+    
+    events.forEach(event => {
+      document.addEventListener(event, handleUserInteraction, { 
+        once: true, 
+        passive: event.includes('touch') || event === 'scroll' 
+      });
+    });
+    
+    // 페이지 가시성 변경 시에도 재생 시도
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        setTimeout(() => attemptAutoplay(), 500);
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleUserInteraction);
+    window.addEventListener('pageshow', handleUserInteraction);
 
     return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
+      events.forEach(event => {
+        document.removeEventListener(event, handleUserInteraction);
+      });
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleUserInteraction);
+      window.removeEventListener('pageshow', handleUserInteraction);
     };
   }, []);
 
@@ -163,8 +236,32 @@ const Main = ({ onVisibilityChange }) => {
       ref={ref}
       className={styles.mainSection}
     >
+
       {/* PC 배경 비디오 */}
       <div className={`${styles.backgroundContainer} ${styles.pcContainer}`}>
+
+                      {/* 하단 화살표 SVG */}
+        <svg 
+          className={styles.arrowDown}
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 20 20" 
+          fill="none" 
+          stroke="white" 
+          strokeWidth="0.8" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          style={{
+            position: 'absolute',
+            bottom: '4.5rem',
+            left: '50%',
+            width: '50px',
+            height: '50px',
+            zIndex: 2
+          }}
+        >
+          <path d="M5 7l5 5 5-5"/>
+        </svg>
+
         {!videoFallback ? (
           <video
             data-section="main"
@@ -182,6 +279,8 @@ const Main = ({ onVisibilityChange }) => {
             }}
             onCanPlay={() => {
               updateVideoPlayState({ hasStarted: true });
+              // canPlay 이벤트 시에도 재생 시도
+              setTimeout(() => attemptAutoplay(), 50);
             }}
             onPlay={() => {
               updateVideoPlayState({ isPlaying: true });
@@ -205,6 +304,28 @@ const Main = ({ onVisibilityChange }) => {
 
       {/* 모바일 배경 비디오 */}
       <div className={`${styles.backgroundContainer} ${styles.mobileContainer}`}>
+
+                              {/* 하단 화살표 SVG */}
+        <svg 
+          className={styles.arrowDown}
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 20 20" 
+          fill="none" 
+          stroke="white" 
+          strokeWidth="0.8" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          style={{
+            position: 'absolute',
+            bottom: '2.5rem',
+            left: '50%',
+            width: '50px',
+            height: '50px',
+            zIndex: 2
+          }}
+        >
+          <path d="M5 7l5 5 5-5"/>
+        </svg>
         {!videoFallback ? (
           <video
             data-section="main-mobile"
@@ -222,6 +343,8 @@ const Main = ({ onVisibilityChange }) => {
             }}
             onCanPlay={() => {
               updateVideoPlayState({ hasStarted: true });
+              // canPlay 이벤트 시에도 재생 시도
+              setTimeout(() => attemptAutoplay(), 50);
             }}
             onPlay={() => {
               updateVideoPlayState({ isPlaying: true });

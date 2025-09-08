@@ -681,16 +681,18 @@ const SurveyManager = () => {
         {loading ? (
           <div className="loading"></div>
         ) : (
-          <div className="admin-table-container">
-            <table className="admin-table">
+          <div className="admin-table-container" style={{ overflowX: 'auto', maxWidth: '100%', position: 'relative' }}>
+            <table className="admin-table" style={{ minWidth: '1200px' }}>
               <thead>
                 <tr>
                   <th>순번</th>
                   <th>이름</th>
                   <th>이메일</th>
-                  <th>전화번호</th>
-                  <th>제출 시간</th>
-                  <th>관리</th>
+                    <th>전화번호</th>
+                    <th>제출 시간</th>
+                  <th>워케이션 참여</th>
+                  <th>이미지 url</th>
+                  <th style={{ position: 'sticky', right: 0, backgroundColor: '#f8f9fa', boxShadow: '-2px 0 4px rgba(0,0,0,0.1)', zIndex: 10}}>관리</th>
                 </tr>
               </thead>
               <tbody>
@@ -700,7 +702,7 @@ const SurveyManager = () => {
                     <td>{survey.fullName}</td>
                     <td>{survey.email || survey.emailForPrizes || '-'}</td>
                     <td>{survey.phoneNumber || '-'}</td>
-                    <td>{(() => {
+                                        <td>{(() => {
                       const dateStr = survey.createdAt || survey.submittedAt;
                       if (!dateStr) return '';
                       
@@ -713,10 +715,114 @@ const SurveyManager = () => {
                       
                       return `${year}-${month}-${day} ${hours}:${minutes}`;
                     })()}</td>
-                    <td>
+                    <td>{survey.hasExperienced === 'yes' ? '네' : survey.hasExperienced === 'no' ? '아니오' : '-'}</td>
+                    <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {(() => {
+                        // 파일 타입 질문들에서 이미지 URL 찾기
+                        const imageFields = Object.keys(survey).filter(key => {
+                          const value = survey[key];
+                          return value && typeof value === 'string' && 
+                                 (value.startsWith('http') || value.startsWith('data:image/'));
+                        });
+                        
+                        if (imageFields.length > 0) {
+                          const imageUrl = survey[imageFields[0]];
+                          return (
+                            <button 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                // 새 창에서 이미지 뷰어와 다운로드 버튼 표시
+                                const imageWindow = window.open('', '_blank');
+                                imageWindow.document.write(`
+                                  <!DOCTYPE html>
+                                  <html>
+                                    <head>
+                                      <meta charset="UTF-8">
+  <link rel="icon" href="https://cdn.imweb.me/thumbnail/20240416/98594bfb52660.png">
+  <title>데스커 워케이션 | WORK ON THE BEACH</title>
+                                      <style>
+                                        body { 
+                                          margin: 0; 
+                                          background: black; 
+                                          display: flex; 
+                                          flex-direction: column;
+                                          align-items: center; 
+                                          min-height: 100vh;
+                                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                        }
+                                        .download-btn {
+                                          background: #white;
+                                          color: black;
+                                          border: none;
+                                          padding: 10px 20px;
+                                          border-radius: 5px;
+                                          cursor: pointer;
+                                          font-size: 16px;
+                                          transition: background 0.2s;
+                                          position: fixed;
+                                          top: 20px;
+                                          right: 20px;
+                                          z-index: 1000;
+                                        }
+                                        .image-container {
+                                          flex: 1;
+                                          display: flex;
+                                          justify-content: center;
+                                          align-items: center;
+                                          width: 100%;
+                                          max-width: 1200px;
+                                        }
+                                        img { 
+                                          max-width: 100%; 
+                                          max-height: 90vh; 
+                                          object-fit: contain; 
+                                          background: white;
+                                        }
+                                      </style>
+                                    </head>
+                                    <body>
+                                        <button class="download-btn" onclick="downloadImage()">다운로드</button>
+                                      <div class="image-container">
+                                        <img src="${imageUrl}" alt="설문 이미지" />
+                                      </div>
+                                      <script>
+                                        function downloadImage() {
+                                          const link = document.createElement('a');
+                                          link.href = '${imageUrl}';
+                                          link.download = 'survey-image-' + new Date().getTime() + '.jpg';
+                                          document.body.appendChild(link);
+                                          link.click();
+                                          document.body.removeChild(link);
+                                        }
+                                      </script>
+                                    </body>
+                                  </html>
+                                `);
+                                imageWindow.document.close();
+                              }}
+                              style={{ 
+                                color: '#007bff', 
+                                textDecoration: 'underline', 
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: 0,
+                                font: 'inherit'
+                              }}
+                              title={imageUrl}
+                            >
+                              {imageUrl.length > 30 ? `${imageUrl.substring(0, 30)}...` : imageUrl}
+                            </button>
+                          );
+                        }
+                        return '-';
+                      })()}
+                    </td>
+                    <td style={{ position: 'sticky', right: 0, backgroundColor: '#fff', boxShadow: '-2px 0 4px rgba(0,0,0,0.1)', zIndex: 10}}>
                       <button 
                         onClick={() => handleView(survey)} 
                         className="btn btn-sm btn-primary"
+                        style={{ marginRight: '5px' }}
                       >
                         상세
                       </button>
