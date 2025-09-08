@@ -300,6 +300,26 @@
   font-size: 8rem;
 }
 
+.arrowDownContainer {
+  animation-duration: 2s;
+  animation-name: arrowdown;
+  animation-iteration-count: infinite;
+}
+
+@keyframes arrowdown {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
 /* 반응형 디자인 */
 
 @media (max-width: 1200px) {

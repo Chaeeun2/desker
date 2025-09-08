@@ -194,18 +194,24 @@
 
 /* CTA 버튼  */
 .ctaButton {
-  background: transparent;
+  background: black;
   border: 1px solid black;
-  color: black;
+  color: white;
   padding: 1.2rem 2.5rem;
   font-size: 2rem;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.5s ease, transform 0.5s ease; /* all 대신 구체적인 속성만 */
+  transition: all 0.5s; /* all 대신 구체적인 속성만 */
   font-family: var(--font-pret);
   letter-spacing: var(--spacing-91);
   margin-top: 2.5rem;
   opacity: 0;
+}
+
+.ctaButton:hover {
+  background: transparent;
+  color: black;
+  border: 1px solid black;
 }
 
 .ctaButton.visible {
