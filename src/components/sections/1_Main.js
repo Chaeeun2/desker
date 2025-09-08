@@ -240,7 +240,23 @@ const Main = ({ onVisibilityChange }) => {
       {/* PC 배경 비디오 */}
       <div className={`${styles.backgroundContainer} ${styles.pcContainer}`}>
 
-                      {/* 하단 화살표 SVG */}
+{/* 하단 화살표 SVG */}
+        <div className={styles.arrowDownContainer} style={{
+            position: 'absolute',
+            bottom: '2.5rem',
+            left: '50%',
+            width: 'auto',
+            height: '80px',
+          zIndex: 2,
+          display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0px',
+          color: 'white',
+            transform: 'translateX(-50%)',
+          }}>
+          <p style={{ fontSize: '20px' }}>scroll</p>
         <svg 
           className={styles.arrowDown}
           xmlns="http://www.w3.org/2000/svg" 
@@ -249,18 +265,15 @@ const Main = ({ onVisibilityChange }) => {
           stroke="white" 
           strokeWidth="0.8" 
           strokeLinecap="round" 
-          strokeLinejoin="round"
-          style={{
-            position: 'absolute',
-            bottom: '4.5rem',
-            left: '50%',
-            width: '50px',
-            height: '50px',
-            zIndex: 2
-          }}
+            strokeLinejoin="round"
+            style={{
+              width: '30px',
+              height: '30px',
+            }}
         >
           <path d="M5 7l5 5 5-5"/>
-        </svg>
+          </svg>
+          </div>
 
         {!videoFallback ? (
           <video
@@ -305,7 +318,24 @@ const Main = ({ onVisibilityChange }) => {
       {/* 모바일 배경 비디오 */}
       <div className={`${styles.backgroundContainer} ${styles.mobileContainer}`}>
 
-                              {/* 하단 화살표 SVG */}
+
+{/* 하단 화살표 SVG */}
+        <div className={styles.arrowDownContainer} style={{
+            position: 'absolute',
+            bottom: '1.5rem',
+            left: '50%',
+            width: 'auto',
+            height: '80px',
+          zIndex: 2,
+          display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0px',
+          color: 'white',
+            transform: 'translateX(-50%)',
+          }}>
+          <p style={{ fontSize: '18px' }}>scroll</p>
         <svg 
           className={styles.arrowDown}
           xmlns="http://www.w3.org/2000/svg" 
@@ -314,18 +344,15 @@ const Main = ({ onVisibilityChange }) => {
           stroke="white" 
           strokeWidth="0.8" 
           strokeLinecap="round" 
-          strokeLinejoin="round"
-          style={{
-            position: 'absolute',
-            bottom: '2.5rem',
-            left: '50%',
-            width: '50px',
-            height: '50px',
-            zIndex: 2
-          }}
+            strokeLinejoin="round"
+            style={{
+              width: '30px',
+              height: '30px',
+            }}
         >
           <path d="M5 7l5 5 5-5"/>
-        </svg>
+          </svg>
+          </div>
         {!videoFallback ? (
           <video
             data-section="main-mobile"

@@ -1,6 +1,7 @@
 /* Main Section Styles */
 .mainSection {
   width: 100vw;
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
   background-color: var(--color-white);
@@ -14,6 +15,7 @@
   top: 0;
   left: 0;
   width: 100vw;
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
   display: flex;
@@ -41,6 +43,10 @@
   top: 0;
   left: 0;
   z-index: 1;
+}
+
+.backgroundVideo {
+  width: 100%;
 }
 
 /* 3분할 텍스트 오버레이 컨테이너 */
@@ -292,26 +298,6 @@
 
 .overlayText {
   font-size: 8rem;
-}
-
-.arrowDown {
-  animation-duration: 2s;
-  animation-name: arrowdown;
-  animation-iteration-count: infinite;
-}
-
-@keyframes arrowdown {
-  0% {
-    transform: translateX(-50%) translateY(0);
-  }
-
-  50% {
-    transform: translateX(-50%) translateY(-10px);
-  }
-
-  100% {
-    transform: translateX(-50%) translateY(0px);
-  }
 }
 
 /* 반응형 디자인 */
