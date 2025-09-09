@@ -330,6 +330,15 @@
   }
 }
 
+@keyframes fadeInUp2 {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   /* 모바일에서는 횡스크롤 비활성화, 상하 스크롤로 변경 */
   .section7 {
@@ -363,16 +372,22 @@
 
   /* 각 요소들이 개별적으로 fade-in */
   .description,
-  .videoThumbnail,
-  .sliderImageItem {
+  .videoThumbnail {
     opacity: 0;
     transform: translateY(30px);
   }
 
+  .sliderImageItem {
+    opacity: 0;
+  }
+
+  .sliderImageItem.visible {
+    animation: fadeInUp2 0.8s ease-out forwards;
+  }
+
   /* JavaScript에서 추가되는 visible 클래스 */
   .description.visible,
-  .videoThumbnail.visible,
-  .sliderImageItem.visible {
+  .videoThumbnail.visible {
     animation: fadeInUp 0.8s ease-out forwards;
   }
 
