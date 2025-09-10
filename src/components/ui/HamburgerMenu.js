@@ -131,21 +131,62 @@ const HamburgerMenu = () => {
         });
       }, 500); // fallback 타이머
       
-      // 완료 후 복원 (스크롤 시작 후 충분한 시간 후)
-      setTimeout(() => {
-        window.disableStickyScroll = false;
-        window.disableSection3Animation = false;
-        window.isMenuScrolling = false; // 메뉴 스크롤 완료
-        // window.section3AnimationComplete는 유지 (기존 리셋 로직에 의해서만 리셋)
-        document.body.classList.remove('disable-sticky-scroll');
-        
-        // 비디오 재생 재개
-        videos.forEach(video => {
-          if (video.dataset.section === tab || video.closest(`#${tab}`)) {
-            video.play();
+      // 스크롤 애니메이션 완료 감지
+      let lastScrollPosition = -1;
+      let scrollStableCount = 0;
+      
+      const checkScrollComplete = setInterval(() => {
+        if (appElement) {
+          const currentScrollPosition = appElement.scrollTop;
+          
+          // 스크롤 위치가 변하지 않으면 카운트 증가
+          if (Math.abs(currentScrollPosition - lastScrollPosition) < 1) {
+            scrollStableCount++;
+            
+            // 3번 연속으로 위치가 같으면 스크롤 완료로 판단
+            if (scrollStableCount >= 3) {
+              clearInterval(checkScrollComplete);
+              
+              // 스크롤 완료 후 100ms 지연 후 sticky 재활성화
+              setTimeout(() => {
+                window.disableStickyScroll = false;
+                window.disableSection3Animation = false;
+                window.isMenuScrolling = false; // 메뉴 스크롤 완료
+                // window.section3AnimationComplete는 유지 (기존 리셋 로직에 의해서만 리셋)
+                document.body.classList.remove('disable-sticky-scroll');
+                
+                // 비디오 재생 재개
+                videos.forEach(video => {
+                  if (video.dataset.section === tab || video.closest(`#${tab}`)) {
+                    video.play();
+                  }
+                });
+              }, 100); // 스크롤 완료 후 100ms 지연
+            }
+          } else {
+            scrollStableCount = 0; // 스크롤이 움직이면 카운트 리셋
           }
-        });
-      }, 2000); // 스크롤이 완료될 때까지 충분한 시간
+          
+          lastScrollPosition = currentScrollPosition;
+        }
+      }, 50); // 50ms마다 체크
+      
+      // 최대 3초 후에는 강제로 재활성화 (안전장치)
+      setTimeout(() => {
+        clearInterval(checkScrollComplete);
+        if (window.disableStickyScroll) {
+          window.disableStickyScroll = false;
+          window.disableSection3Animation = false;
+          window.isMenuScrolling = false;
+          document.body.classList.remove('disable-sticky-scroll');
+          
+          videos.forEach(video => {
+            if (video.dataset.section === tab || video.closest(`#${tab}`)) {
+              video.play();
+            }
+          });
+        }
+      }, 3000); // 3초 후 강제 복원
     }
   };
 
