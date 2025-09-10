@@ -236,12 +236,12 @@ const Section3 = () => {
           
           // 모든 상태 초기화
           setText1Opacity(0);
-                setText3Opacity(0);
+          setText3Opacity(0);
           setText4Opacity(0);
           setText5Opacity(0);
           setText6Opacity(0);
           setText1TranslateY(0);
-                setText3TranslateY(0);
+          setText3TranslateY(0);
           setText4TranslateY(0);
           setText5TranslateY(0);
           setText1Color('black');
@@ -294,7 +294,7 @@ const Section3 = () => {
           setOverlayOpacity(0);
           setText1Opacity(1);
           setSvg1Left(50);
-                setText3Opacity(0);
+          setText3Opacity(0);
           setText4Opacity(0);
           setText5Opacity(0);
           setText6Opacity(0);
@@ -428,15 +428,13 @@ const Section3 = () => {
           // 텍스트3: opacity 0 → 1 → 0 (사라질 때 translateY 30px 위로)
           // 텍스트4: opacity 0 → 1 → 0
           
-          if (newText3Opacity >= 1.0) {
-            // 텍스트3 완성 후 사라지는 애니메이션
-            const text3FadeOutStart = getScrollDistance(3500); // 3500px → 모바일에서는 1750px
-            if (scrollDiff >= text3FadeOutStart) {
-              const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000)); // 1000px에 걸쳐 사라짐
-              finalText3Opacity = text3FadeOut;
-            } else {
-              finalText3Opacity = 1.0; // 페이드아웃 시작 전에는 완전히 보임
-            }
+          // 텍스트3 opacity 처리를 더 명확하게
+          const text3FadeOutStart = getScrollDistance(3500);
+          
+          if (scrollDiff >= text3FadeOutStart && newText3Opacity >= 1.0) {
+            // 텍스트3 페이드아웃 중
+            const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000));
+            finalText3Opacity = text3FadeOut;
             setText3Opacity(finalText3Opacity);
             
             // 텍스트3이 사라질 때 translateY 30px 위로
@@ -446,6 +444,17 @@ const Section3 = () => {
             } else {
               setText3TranslateY(0);
             }
+          } else if (newText3Opacity > 0) {
+            // 텍스트3 페이드인 중 또는 완전히 보이는 상태
+            finalText3Opacity = newText3Opacity;
+            setText3Opacity(finalText3Opacity);
+            setText3TranslateY(0);
+          } else {
+            // newText3Opacity가 0일 때
+            finalText3Opacity = 0;
+            setText3Opacity(0);
+            setText3TranslateY(0);
+          }
             
             // 텍스트3이 완전히 사라진 후 텍스트4 시작
             if (finalText3Opacity <= 0) {
@@ -473,171 +482,169 @@ const Section3 = () => {
                 
                 // 텍스트4가 완전히 나타나면 새로운 애니메이션 시작
                 if (text4Start >= 1.0) {
-                    // 텍스트4 페이드아웃 (새로운 요소들이 나타나면서)
-                    const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(6500)) / getScrollDistance(1000)); // 6500px → 모바일에서는 3250px, 1000px → 모바일에서는 500px
-                    setText4Opacity(text4FadeOut);
+                  // 텍스트4 페이드아웃 (새로운 요소들이 나타나면서)
+                  const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(6500)) / getScrollDistance(1000)); // 6500px → 모바일에서는 3250px, 1000px → 모바일에서는 500px
+                  setText4Opacity(text4FadeOut);
                     
-                    // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
-                    if (text4FadeOut < 1.0) {
-                      const translateY = (1.0 - text4FadeOut) * 30;
-                      setText4TranslateY(translateY);
-                    } else {
-                      setText4TranslateY(0);
-                    }
+                  // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
+                  if (text4FadeOut < 1.0) {
+                    const translateY = (1.0 - text4FadeOut) * 30;
+                    setText4TranslateY(translateY);
+                  } else {
+                    setText4TranslateY(0);
+                  }
                     
 
                     
-                                        // svg1과 svg2 애니메이션 (6500px부터)
-                    const animationStartPoint = getScrollDistance(6500);
-                    if (scrollDiff >= animationStartPoint) {
-                      const animationProgress = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(500));
-                      const animationProgress2 = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(1000));
+                  // svg1과 svg2 애니메이션 (6500px부터)
+                  const animationStartPoint = getScrollDistance(6500);
+                  if (scrollDiff >= animationStartPoint) {
+                    const animationProgress = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(500));
+                    const animationProgress2 = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(1000));
                       
-                      // svg1 left를 50%로 이동
-                      const currentSvg1Left = 20 + (animationProgress2 * 30); // 20% → 50%
-                      setSvg1Left(currentSvg1Left);
+                    // svg1 left를 50%로 이동
+                    const currentSvg1Left = 20 + (animationProgress2 * 30); // 20% → 50%
+                    setSvg1Left(currentSvg1Left);
                       
-                      // svg2 아래로 이동
-                      setSvg2TranslateY(animationProgress * 300); // 0 → 200px
-                      const fastSvg2WidthAnimation = Math.min(1, animationProgress * 2);
-                      setSvg2Width(199 - (fastSvg2WidthAnimation * 199)); // 199 → 0px
-                      // stroke color는 검은색으로 고정
+                    // svg2 아래로 이동
+                    setSvg2TranslateY(animationProgress * 300); // 0 → 200px
+                    const fastSvg2WidthAnimation = Math.min(1, animationProgress * 2);
+                    setSvg2Width(199 - (fastSvg2WidthAnimation * 199)); // 199 → 0px
+                    // stroke color는 검은색으로 고정
+                  } else {
+                    // 스크롤이 시작점보다 위에 있으면 이전 상태 유지 (4500px 애니메이션 결과)
+                    setSvg2TranslateY(0);
+                    setSvg2Width(199);
+                  }
+                    
+                  // 최종 애니메이션 (새로운 SVG들과 텍스트5)
+                  const finalAnimation = Math.min(1, Math.max(0, (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1500))); // 7500px → 모바일에서는 3750px, 1500px → 모바일에서는 750px
+                    
+                  // overlay 배경색을 7500px-8000px 구간에서 점진적으로 변경
+                  const overlayColorStartPoint = getScrollDistance(7500);
+                  const overlayColorEndPoint = getScrollDistance(8000);
+                    
+                  if (scrollDiff >= overlayColorStartPoint) {
+                    if (scrollDiff >= overlayColorEndPoint) {
+                      // 8000px 이상에서는 완전히 파란색
+                      setOverlayColor('#336DFF');
+                      setText4Color('white');
+                      setText5Color('white');
+                      setText6Color('white');
                     } else {
-                      // 스크롤이 시작점보다 위에 있으면 이전 상태 유지 (4500px 애니메이션 결과)
-                      setSvg2TranslateY(0);
-                      setSvg2Width(199);
-                    }
-                    
-                    // 최종 애니메이션 (새로운 SVG들과 텍스트5)
-                    const finalAnimation = Math.min(1, Math.max(0, (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1500))); // 7500px → 모바일에서는 3750px, 1500px → 모바일에서는 750px
-                    
-                    // overlay 배경색을 7500px-8000px 구간에서 점진적으로 변경
-                    const overlayColorStartPoint = getScrollDistance(7500);
-                    const overlayColorEndPoint = getScrollDistance(8000);
-                    
-                    if (scrollDiff >= overlayColorStartPoint) {
-                      if (scrollDiff >= overlayColorEndPoint) {
-                        // 8000px 이상에서는 완전히 파란색
-                        setOverlayColor('#336DFF');
+                      // 7500px-8000px 구간에서 점진적 변경
+                      const colorProgress = (scrollDiff - overlayColorStartPoint) / (overlayColorEndPoint - overlayColorStartPoint);
+                      // RGB 보간을 통한 색상 전환
+                      const r = Math.round(255 - (255 - 51) * colorProgress); // 255 -> 51
+                      const g = Math.round(255 - (255 - 109) * colorProgress); // 255 -> 109
+                      const b = Math.round(255); // 255 유지
+                      setOverlayColor(`rgb(${r}, ${g}, ${b})`);
+                        
+                      // 텍스트 색상도 점진적으로 변경
+                      if (colorProgress > 0.5) {
                         setText4Color('white');
                         setText5Color('white');
                         setText6Color('white');
                       } else {
-                        // 7500px-8000px 구간에서 점진적 변경
-                        const colorProgress = (scrollDiff - overlayColorStartPoint) / (overlayColorEndPoint - overlayColorStartPoint);
-                        // RGB 보간을 통한 색상 전환
-                        const r = Math.round(255 - (255 - 51) * colorProgress); // 255 -> 51
-                        const g = Math.round(255 - (255 - 109) * colorProgress); // 255 -> 109
-                        const b = Math.round(255); // 255 유지
-                        setOverlayColor(`rgb(${r}, ${g}, ${b})`);
-                        
-                        // 텍스트 색상도 점진적으로 변경
-                        if (colorProgress > 0.5) {
-                          setText4Color('white');
-                          setText5Color('white');
-                          setText6Color('white');
-                        } else {
-                          setText4Color('black');
-                          setText5Color('black');
-                          setText6Color('white');
-                        }
+                        setText4Color('black');
+                        setText5Color('black');
+                        setText6Color('white');
                       }
-                    } else {
-                      // 7500px 이하에서는 흰색
-                      setOverlayColor('white');
-                      setText4Color('black');
-                      setText5Color('black');
-                      setText6Color('white');
                     }
+                  } else {
+                    // 7500px 이하에서는 흰색
+                    setOverlayColor('white');
+                    setText4Color('black');
+                    setText5Color('black');
+                    setText6Color('white');
+                  }
                     
-                    // 텍스트5 애니메이션 - 명확한 조건 처리
+                  // 텍스트5 애니메이션 - 명확한 조건 처리
                   if (scrollDiff >= getScrollDistance(7500)) {
                     setText5Opacity(finalAnimation);
                   } else {
                     setText5Opacity(0);  // 7500px 이전에는 항상 0
                   }
                       
-                      // 새로운 SVG들 애니메이션 (7500px에서 시작)
-                      const newSvgStartPoint = getScrollDistance(8500);
-                      if (scrollDiff >= newSvgStartPoint) {
-                        const newSvgAnimation = Math.min(1, (scrollDiff - newSvgStartPoint) / getScrollDistance(1500));
-                        setNewSvgScale(newSvgAnimation);
-                        setNewSvg2Scale(newSvgAnimation);
-                        setNewSvg3Scale(newSvgAnimation);
-                      } else {
-                        // 스크롤이 시작점보다 위에 있으면 초기값으로 리셋
-                        setNewSvgScale(0);
-                        setNewSvg2Scale(0);
-                        setNewSvg3Scale(0);
-                      }
+                  // 새로운 SVG들 애니메이션 (7500px에서 시작)
+                  const newSvgStartPoint = getScrollDistance(8500);
+                  if (scrollDiff >= newSvgStartPoint) {
+                    const newSvgAnimation = Math.min(1, (scrollDiff - newSvgStartPoint) / getScrollDistance(1500));
+                    setNewSvgScale(newSvgAnimation);
+                    setNewSvg2Scale(newSvgAnimation);
+                    setNewSvg3Scale(newSvgAnimation);
+                  } else {
+                    // 스크롤이 시작점보다 위에 있으면 초기값으로 리셋
+                    setNewSvgScale(0);
+                    setNewSvg2Scale(0);
+                    setNewSvg3Scale(0);
+                  }
                       
-                      // 라인 애니메이션 변수들 선언
-                      let lineTranslateYValue = 0;
+                  // 라인 애니메이션 변수들 선언
+                  let lineTranslateYValue = 0;
                       
-                      // SVG와 라인 애니메이션: 스크롤에 따라 점진적으로 변화
-                      if (finalAnimation > 0) {
-                        // svg1: 위치 유지
-                        setSvg1TranslateY(0); // 가운데 유지
+                  // SVG와 라인 애니메이션: 스크롤에 따라 점진적으로 변화
+                  if (finalAnimation > 0) {
+                    // svg1: 위치 유지
+                    setSvg1TranslateY(0); // 가운데 유지
                         
-                        // svg2는 이미 6500px에서 처리됨
+                    // svg2는 이미 6500px에서 처리됨
                         
-                        // line: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
-                        lineTranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
-                        // line padding 애니메이션
-                        const linePaddingValue = 30 - (finalAnimation * 30); // 50px → 0px
-                        setLineTranslateY(lineTranslateYValue);
-                        setLinePadding(linePaddingValue);
-                        // line stroke color는 검은색으로 고정
-                      } else {
-                        // finalAnimation이 0 이하일 때 초기값으로 리셋
-                        setLineTranslateY(0);
-                        setLinePadding(30);
-                      }
+                    // line: 스크롤에 따라 아래로 이동하고 width 줄이기 (더 빠르게)
+                    lineTranslateYValue = finalAnimation * 500; // 0 → 500px (더 멀리)
+                    // line padding 애니메이션
+                    const linePaddingValue = 30 - (finalAnimation * 30); // 50px → 0px
+                    setLineTranslateY(lineTranslateYValue);
+                    setLinePadding(linePaddingValue);
+                    // line stroke color는 검은색으로 고정
+                  } else {
+                    // finalAnimation이 0 이하일 때 초기값으로 리셋
+                    setLineTranslateY(0);
+                    setLinePadding(30);
+                  }
                       
 
                       
-                      // 텍스트5가 완료되면 텍스트6 시작 (10000px부터 1000px에 걸쳐)
-                      if (finalAnimation >= 1.0) {
-                        // 텍스트5 페이드아웃 (10000px부터 1000px에 걸쳐)
-                        const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(9000)) / getScrollDistance(1000)); // 9000px → 모바일에서는 4500px, 1000px → 모바일에서는 500px
-                        setText5Opacity(text5FadeOut);
+                  // 텍스트5가 완료되면 텍스트6 시작 (10000px부터 1000px에 걸쳐)
+                  if (finalAnimation >= 1.0) {
+                    // 텍스트5 페이드아웃 (10000px부터 1000px에 걸쳐)
+                    const text5FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(9000)) / getScrollDistance(1000)); // 9000px → 모바일에서는 4500px, 1000px → 모바일에서는 500px
+                    setText5Opacity(text5FadeOut);
                         
-                        // 텍스트5가 사라지면서 translateY 변화
-                        if (text5FadeOut < 1.0) {
-                          const translateY = (1.0 - text5FadeOut) * 30;
-                          setText5TranslateY(translateY);
-                        }
+                    // 텍스트5가 사라지면서 translateY 변화
+                    if (text5FadeOut < 1.0) {
+                      const translateY = (1.0 - text5FadeOut) * 30;
+                      setText5TranslateY(translateY);
+                    }
                         
-                        // 텍스트5가 완전히 사라진 후 텍스트6 시작
-                        const text6StartPoint = getScrollDistance(10000);
-                        let text6Animation = 0;
+                    // 텍스트5가 완전히 사라진 후 텍스트6 시작
+                    const text6StartPoint = getScrollDistance(10000);
+                    let text6Animation = 0;
                         
-                        if (text5FadeOut <= 0 && scrollDiff >= text6StartPoint) {
-                          text6Animation = Math.min(1, (scrollDiff - text6StartPoint) / getScrollDistance(1000));
-                          setText6Opacity(text6Animation);
-                        } else {
-                          setText6Opacity(0);  // 조건 미충족 시 항상 0
-                        }
+                    if (text5FadeOut <= 0 && scrollDiff >= text6StartPoint) {
+                      text6Animation = Math.min(1, (scrollDiff - text6StartPoint) / getScrollDistance(1000));
+                      setText6Opacity(text6Animation);
+                    } else {
+                      setText6Opacity(0);  // 조건 미충족 시 항상 0
+                    }
                         
-                        // 새로운 SVG들은 이미 7500px에서 처리됨
+                    // 새로운 SVG들은 이미 7500px에서 처리됨
                         
-                        // 애니메이션 완료 체크 (텍스트 6이 완성되면)
-                        if (text6Animation >= 1.0 && !isAnimationCompleteRef.current) {
-                            setIsAnimationComplete(true);
-                            isAnimationCompleteRef.current = true; // ref도 동시에 업데이트
+                    // 애니메이션 완료 체크 (텍스트 6이 완성되면)
+                    if (text6Animation >= 1.0 && !isAnimationCompleteRef.current) {
+                      setIsAnimationComplete(true);
+                      isAnimationCompleteRef.current = true; // ref도 동시에 업데이트
                             
-                            // 최종 상태 고정 (섹션 9처럼)
-                            fixFinalState();
-                          }
-                        }
-                      }
+                      // 최종 상태 고정 (섹션 9처럼)
+                      fixFinalState();
                     }
                   }
                 }
               }
-              
-
             }
+          }
+        }
+
         } else {
           // triggerPoint에 도달하지 않은 상태 - 모든 요소 초기 상태
           setText1Opacity(1);
