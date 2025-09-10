@@ -370,11 +370,15 @@ const Section7 = () => {
         
         // 휠 방향에 따라 패널 이동
         if (e.deltaY > 0) {
-          // 아래로 스크롤 - 다음 패널
-          if (currentPanel < 3) {
+          // 아래로 스크롤
+          if (currentPanel === 0) {
+            // 패널1에서 아래로 스크롤 시 다음 패널로 이동 (탈출 불가)
+            moveToPanel(1);
+          } else if (currentPanel < 3) {
+            // 패널2,3에서는 다음 패널로 이동
             moveToPanel(currentPanel + 1);
           } else {
-            // 마지막 패널에서 아래로 스크롤 시 섹션 7의 시작점으로 돌아가기
+            // 패널4에서 아래로 스크롤 시에만 탈출
             exitingSection.current = true; // 탈출 중 플래그 설정
             scrollLocked.current = false;
             setIsInSection(false);
@@ -401,7 +405,7 @@ const Section7 = () => {
         } else if (e.deltaY < 0) {
           // 위로 스크롤
           if (currentPanel === 0) {
-            // 패널1에서 위로 스크롤 시 무조건 섹션7 리셋
+            // 패널1에서 위로 스크롤 시에만 탈출
             // 먼저 리셋 실행
             resetSection7();
             
@@ -413,8 +417,11 @@ const Section7 = () => {
             if (appElement && lockPosition.current > 0) {
               appElement.scrollTop = lockPosition.current - 100;
             }
+          } else if (currentPanel === 3) {
+            // 패널4에서 위로 스크롤 시 이전 패널로 이동 (탈출 불가)
+            moveToPanel(2);
           } else {
-            // 패널2,3,4에서는 이전 패널로 이동 (패널4에서도 탈출 안됨)
+            // 패널2,3에서는 이전 패널로 이동
             moveToPanel(currentPanel - 1);
           }
         }
