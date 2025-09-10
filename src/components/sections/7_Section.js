@@ -250,8 +250,8 @@ const Section7 = () => {
       const isApproachingSection = scrollTop >= sectionVisibleThreshold && scrollTop < sectionTop + 50;
       
       // 섹션 7에 진입할 때 (접근 중이고, 잠기지 않았을 때만)
-      // 햄버거 메뉴로 이동 중일 때는 sticky 비활성화 (단, 메뉴 스크롤이 완료되었으면 다시 활성화)
-      if (isApproachingSection && !scrollLocked.current && !isAnimating.current && (!window.disableStickyScroll || window.isMenuScrollComplete)) {
+      // 햄버거 메뉴로 이동 중일 때는 sticky 비활성화
+      if (isApproachingSection && !scrollLocked.current && !isAnimating.current && !window.disableStickyScroll) {
         isAnimating.current = true;
         scrollLocked.current = true;
         setIsInSection(true);
@@ -430,6 +430,45 @@ const Section7 = () => {
     };
   }, [isInSection, currentPanel, isTransitioning, isMobile]);
 
+  // 섹션7 리셋 함수 (햄버거 메뉴에서 사용)
+  useEffect(() => {
+    window.resetSection7 = () => {
+      console.log('Resetting Section 7');
+      // 모든 상태 초기화
+      scrollLocked.current = false;
+      setIsInSection(false);
+      setCurrentPanel(0);
+      setPlayingVideos({});
+      exitingSection.current = false;
+      lockPosition.current = 0;
+      isAnimating.current = false;
+      
+      // fixed 스타일 제거
+      if (sectionRef.current) {
+        sectionRef.current.style.position = 'relative';
+        sectionRef.current.style.top = 'auto';
+        sectionRef.current.style.left = 'auto';
+        sectionRef.current.style.right = 'auto';
+        sectionRef.current.style.transition = '';
+      }
+      
+      // 패널 컨테이너 리셋
+      if (panelsContainerRef.current) {
+        panelsContainerRef.current.style.transform = 'translateX(0%)';
+      }
+      
+      // 비디오 일시정지
+      const videos = document.querySelectorAll('#series video');
+      videos.forEach(video => {
+        video.pause();
+        video.currentTime = 0;
+      });
+    };
+    
+    return () => {
+      delete window.resetSection7;
+    };
+  }, []);
 
   // 키보드 이벤트 처리
   useEffect(() => {

@@ -85,6 +85,11 @@ const HamburgerMenu = () => {
       window.isMenuScrolling = true; // 메뉴 스크롤 중 플래그
       document.body.classList.add('disable-sticky-scroll');
       
+      // 섹션7 강제 리셋
+      if (window.resetSection7) {
+        window.resetSection7();
+      }
+      
       // 섹션 3의 handleScroll을 강제로 트리거하여 상태를 즉시 업데이트
       const appElement = document.querySelector('.App');
       if (appElement) {
@@ -128,35 +133,11 @@ const HamburgerMenu = () => {
       
       // 완료 후 복원 (스크롤 시작 후 충분한 시간 후)
       setTimeout(() => {
-        window.isMenuScrollComplete = true; // 메뉴 스크롤 완료 플래그
         window.disableStickyScroll = false;
         window.disableSection3Animation = false;
         window.isMenuScrolling = false; // 메뉴 스크롤 완료
         // window.section3AnimationComplete는 유지 (기존 리셋 로직에 의해서만 리셋)
         document.body.classList.remove('disable-sticky-scroll');
-        
-        // 섹션7이 뷰포트에 있는지 확인하고 필요시 fixed 처리
-        const section7 = document.getElementById('series');
-        if (section7 && window.innerWidth > 768) { // 데스크톱에서만 (조건 수정)
-          const appElement = document.querySelector('.App');
-          if (appElement) {
-            const scrollTop = appElement.scrollTop;
-            const sectionTop = section7.offsetTop;
-            const viewportHeight = window.innerHeight;
-            
-            // 섹션7이 화면에 90% 이상 보이는 상태인지 확인
-            const sectionVisibleThreshold = sectionTop - viewportHeight * 0.2;
-            if (scrollTop >= sectionVisibleThreshold && scrollTop <= sectionTop + 50) {
-              // 섹션7의 handleScroll을 강제로 트리거하여 fixed 처리
-              appElement.dispatchEvent(new Event('scroll'));
-            }
-          }
-        }
-        
-        // 메뉴 스크롤 완료 플래그 리셋 (잠시 후)
-        setTimeout(() => {
-          window.isMenuScrollComplete = false;
-        }, 500);
         
         // 비디오 재생 재개
         videos.forEach(video => {
