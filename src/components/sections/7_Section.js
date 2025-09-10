@@ -8,6 +8,8 @@ const Section7 = () => {
   const sectionRef = useRef(null);
   const panelsContainerRef = useRef(null);
   const [currentPanel, setCurrentPanel] = useState(0);
+  const [exitedFromPanel4, setExitedFromPanel4] = useState(false); // 패널 4에서 아래로 탈출했는지 추적
+  const [exitedFromPanel1, setExitedFromPanel1] = useState(false); // 패널 1에서 위로 탈출했는지 추적
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // 초기값을 실제 화면 크기로 설정
   const [isInSection, setIsInSection] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -22,6 +24,7 @@ const Section7 = () => {
   const lastScrollTime = useRef(0);
   const scrollVelocity = useRef(0);
   const isAnimating = useRef(false);
+  const isExitAnimating = useRef(false); // 탈출 애니메이션 중 플래그
   
   // 모바일 감지
   useEffect(() => {
@@ -117,6 +120,9 @@ const Section7 = () => {
     // 모바일에서는 패널 이동 비활성화
     if (isMobile) return;
     
+    // 햄버거 메뉴로 이동 중이면 패널 이동 무시
+    if (window.disableStickyScroll) return;
+    
     if (panelIndex < 0 || panelIndex > 3 || isTransitioning) return;
     
     // 패널 전환 시 모든 비디오 일시정지
@@ -143,6 +149,7 @@ const Section7 = () => {
     setCurrentPanel(0);
     setPlayingVideos({});
     exitingSection.current = false;
+    setExitedFromPanel4(false); // 패널 4 탈출 플래그 리셋
     lockPosition.current = 0;
     
     if (sectionRef.current) {
@@ -165,20 +172,23 @@ const Section7 = () => {
       // 모바일에서는 스크롤 고정 비활성화
       if (isMobile) return;
       
-      // 햄버거 메뉴로 이동 중일 때는 완전히 비활성화
+      // 햄버거 메뉴로 이동 중일 때는 완전히 비활성화 (가장 우선순위 높게)
       if (window.disableStickyScroll) {
-        if (scrollLocked.current) {
-          scrollLocked.current = false;
-          setIsInSection(false);
-          exitingSection.current = false;
-          
-          // fixed 스타일 제거
-          if (sectionRef.current) {
-            sectionRef.current.style.position = 'relative';
-            sectionRef.current.style.top = 'auto';
-            sectionRef.current.style.left = 'auto';
-            sectionRef.current.style.right = 'auto';
-          }
+        // 무조건 해제 (scrollLocked 상태와 관계없이)
+        scrollLocked.current = false;
+        setIsInSection(false);
+        exitingSection.current = false;
+        setExitedFromPanel1(false);
+        setExitedFromPanel4(false);
+        isAnimating.current = false;
+        isExitAnimating.current = false;
+        
+        // fixed 스타일 제거
+        if (sectionRef.current) {
+          sectionRef.current.style.position = 'relative';
+          sectionRef.current.style.top = 'auto';
+          sectionRef.current.style.left = 'auto';
+          sectionRef.current.style.right = 'auto';
         }
         return;
       }
@@ -199,11 +209,13 @@ const Section7 = () => {
         actualSectionTop = lockPosition.current;
       }
       
-      // 섹션7이 화면 아래에 있을 때 무조건 리셋
+      // 섹션7보다 위로 올라가면 리셋 (아래로 내려갔을 때는 리셋하지 않음)
       const threshold = actualSectionTop - viewportHeight;
       
-      // 섹션7보다 위로 올라가면 무조건 리셋
-      if (scrollTop < threshold) {
+      // 섹션7보다 위로 올라갔을 때만 리셋
+      // 아래로 탈출한 경우(패널 4에서 탈출)에는 리셋하지 않음
+      // exitedFromPanel4가 true이면 리셋하지 않음
+      if (scrollTop < threshold && !exitingSection.current && !exitedFromPanel4) {
         
         // 강제로 모든 상태 초기화
         scrollLocked.current = false;
@@ -211,6 +223,7 @@ const Section7 = () => {
         setCurrentPanel(0);
         setPlayingVideos({});
         exitingSection.current = false;
+        setExitedFromPanel4(false);
         lockPosition.current = 0;
         
         if (sectionRef.current) {
@@ -228,13 +241,29 @@ const Section7 = () => {
         return;
       }
       
-      // 탈출 중일 때는 모든 처리 무시
+      // 섹션 7이 뷰포트에 90% 이상 들어왔을 때 자동으로 고정
+      const sectionVisibleThreshold = sectionTop - viewportHeight * 0.2;
+      
+      // 탈출 중일 때 처리
       if (exitingSection.current) {
-        // 섹션을 완전히 벗어났을 때만 플래그 리셋
-        if (scrollTop > sectionTop + viewportHeight + 100 || scrollTop < sectionTop - viewportHeight) {
+        // 패널 4에서 아래로 탈출한 경우
+        if (exitedFromPanel4) {
+          // 충분히 아래로 내려갔거나, 위로 올라와서 섹션 상단에 가까워지면 플래그 리셋
+          if (scrollTop > sectionTop + viewportHeight * 1.5 || scrollTop <= sectionTop) {
+            exitingSection.current = false;
+          } else {
+            return; // 아직 탈출 중
+          }
+        }
+        // 패널 1에서 위로 탈출한 경우 (일반적인 경우)
+        // 강제스크롤이 끝나면 바로 리셋 (스크롤 애니메이션이 끝나는 위치)
+        else if (scrollTop <= sectionTop - viewportHeight * 0.35) {
           exitingSection.current = false;
         }
-        return; // 탈출 중에는 다른 처리 하지 않음
+        // 탈출 중이지만 아직 조건을 만족하지 않으면 처리 무시
+        else {
+          return;
+        }
       }
       
       // 스크롤 속도 계산
@@ -244,21 +273,53 @@ const Section7 = () => {
         scrollVelocity.current = Math.abs(scrollTop - lockPosition.current) / timeDiff;
       }
       lastScrollTime.current = currentTime;
-      
-      // 섹션 7이 뷰포트에 90% 이상 들어왔을 때 자동으로 고정
-      const sectionVisibleThreshold = sectionTop - viewportHeight * 0.2;
       const isApproachingSection = scrollTop >= sectionVisibleThreshold && scrollTop < sectionTop + 50;
+      
+      // 패널 4에서 탈출 후 아래에서 위로 올라오는 경우를 위한 별도 조건
+      // 스크롤이 위로 올라와서 섹션 상단 근처에 도달했을 때만 진입
+      const isApproachingFromBelow = exitedFromPanel4 && 
+                                     scrollTop <= sectionTop + 50 && 
+                                     scrollTop >= sectionTop - viewportHeight * 0.2;
+      
+      // 패널 1에서 위로 탈출 후 다시 내려오는 경우를 위한 조건
+      // exitingSection이 false이고 스크롤이 섹션 범위에 있을 때
+      const isReturningFromAbove = exitedFromPanel1 && 
+                                   !exitingSection.current &&
+                                   scrollTop >= sectionTop - viewportHeight * 0.35 && 
+                                   scrollTop <= sectionTop + viewportHeight * 0.5;
       
       // 섹션 7에 진입할 때 (접근 중이고, 잠기지 않았을 때만)
       // 햄버거 메뉴로 이동 중일 때는 sticky 비활성화
-      if (isApproachingSection && !scrollLocked.current && !isAnimating.current && !window.disableStickyScroll) {
+      if ((isApproachingSection || isApproachingFromBelow || isReturningFromAbove) && !scrollLocked.current && !isAnimating.current && !window.disableStickyScroll) {
         isAnimating.current = true;
         scrollLocked.current = true;
         setIsInSection(true);
         lockPosition.current = sectionTop;
         
-        // 즉시 fixed로 변경
-        if (sectionRef.current) {
+        // 패널 4에서 탈출했었다면 패널 4로 복원
+        if (exitedFromPanel4) {
+          setCurrentPanel(3); // 패널 4로 설정
+          setExitedFromPanel4(false); // 플래그 리셋
+          
+          // 패널 컨테이너 위치 조정
+          if (panelsContainerRef.current) {
+            panelsContainerRef.current.style.transform = 'translateX(-75%)'; // 패널 4 위치
+          }
+        }
+        
+        // 패널 1에서 탈출했었다면 패널 1로 복원
+        if (exitedFromPanel1) {
+          setCurrentPanel(0); // 패널 1로 설정
+          setExitedFromPanel1(false); // 플래그 리셋
+          
+          // 패널 컨테이너 위치 조정
+          if (panelsContainerRef.current) {
+            panelsContainerRef.current.style.transform = 'translateX(0%)'; // 패널 1 위치
+          }
+        }
+        
+        // 즉시 fixed로 변경 (햄버거 메뉴로 이동 중이 아닐 때만)
+        if (sectionRef.current && !window.disableStickyScroll) {
           sectionRef.current.style.position = 'fixed';
           sectionRef.current.style.top = '0';
           sectionRef.current.style.left = '0';
@@ -315,13 +376,23 @@ const Section7 = () => {
         appElement.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [isMobile]); // isMobile 의존성 추가
+  }, [isMobile, exitedFromPanel4]); // isMobile, exitedFromPanel4 의존성 추가
   
   // 휠 이벤트 처리 (데스크톱에서만)
   useEffect(() => {
     const handleWheel = (e) => {
       // 모바일에서는 휠 이벤트 비활성화
       if (isMobile) return;
+      
+      // 햄버거 메뉴로 이동 중이면 휠 이벤트 무시
+      if (window.disableStickyScroll) return;
+      
+      // 탈출 애니메이션 중이면 스크롤 차단
+      if (isExitAnimating.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       
       const appElement = document.querySelector('.App');
       
@@ -380,9 +451,11 @@ const Section7 = () => {
           } else {
             // 패널4에서 아래로 스크롤 시에만 탈출
             exitingSection.current = true; // 탈출 중 플래그 설정
+            setExitedFromPanel4(true); // 패널 4에서 탈출했음을 표시
+            setExitedFromPanel1(false); // 패널 1 탈출 플래그 리셋
             scrollLocked.current = false;
             setIsInSection(false);
-            setCurrentPanel(0); // 첫 번째 패널로 리셋
+            // 패널은 3으로 유지 (패널 4)
             setPlayingVideos({}); // 모든 비디오 일시정지
             
             // 섹션 고정 해제 전에 정확한 위치 계산
@@ -397,25 +470,107 @@ const Section7 = () => {
               sectionRef.current.style.transition = '';
             }
             
-            // 섹션 7의 시작 위치로 이동 (PC에서만)
+            // 패널 4에서 탈출했으므로 패널 컨테이너는 패널 4 위치 유지 (-75%)
+            // panelsContainerRef는 그대로 두어 패널 4 상태 유지
+            
+            // 스크롤 위치를 자연스럽게 아래로 조정하여 탈출 (PC에서만)
             if (!isMobile) {
-              appElement.scrollTop = sectionTop;
+              // 탈출 애니메이션 시작
+              isExitAnimating.current = true;
+              
+              // 뷰포트 높이의 30% 만큼 아래로 부드럽게 이동
+              const viewportHeight = window.innerHeight;
+              const targetPosition = sectionTop + viewportHeight * 0.3;
+              const startPosition = appElement.scrollTop;
+              const distance = targetPosition - startPosition;
+              const duration = 300; // 0.3초 동안 애니메이션 (더 빠르게)
+              const startTime = performance.now();
+              
+              const easeOutQuad = (t) => {
+                return t * (2 - t);
+              };
+              
+              const animateScroll = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOutQuad(progress);
+                
+                appElement.scrollTop = startPosition + (distance * easedProgress);
+                
+                if (progress < 1) {
+                  requestAnimationFrame(animateScroll);
+                } else {
+                  // 애니메이션 완료
+                  isExitAnimating.current = false;
+                }
+              };
+              
+              requestAnimationFrame(animateScroll);
             }
           }
         } else if (e.deltaY < 0) {
           // 위로 스크롤
           if (currentPanel === 0) {
             // 패널1에서 위로 스크롤 시에만 탈출
-            // 먼저 리셋 실행
-            resetSection7();
-            
             // 탈출 플래그 설정
             exitingSection.current = true;
+            setExitedFromPanel1(true); // 패널 1 탈출 플래그 설정
+            setExitedFromPanel4(false); // 패널 4 탈출 플래그 리셋
+            scrollLocked.current = false;
+            setIsInSection(false);
+            setCurrentPanel(0);
+            setPlayingVideos({});
             
-            // 스크롤 위치 조정 (필요시)
+            // 섹션 고정 해제
+            if (sectionRef.current) {
+              sectionRef.current.style.position = 'relative';
+              sectionRef.current.style.top = 'auto';
+              sectionRef.current.style.left = 'auto';
+              sectionRef.current.style.right = 'auto';
+              sectionRef.current.style.transition = '';
+            }
+            
+            // 패널 컨테이너 리셋
+            if (panelsContainerRef.current) {
+              panelsContainerRef.current.style.transform = 'translateX(0%)';
+            }
+            
+            // 스크롤 위치를 자연스럽게 위로 조정하여 탈출
             const appElement = document.querySelector('.App');
             if (appElement && lockPosition.current > 0) {
-              appElement.scrollTop = lockPosition.current - 100;
+              // 탈출 애니메이션 시작
+              isExitAnimating.current = true;
+              
+              // 뷰포트 높이의 35% 만큼 위로 부드럽게 이동
+              const viewportHeight = window.innerHeight;
+              const targetPosition = lockPosition.current - viewportHeight * 0.35;
+              const startPosition = appElement.scrollTop;
+              const distance = targetPosition - startPosition;
+              const duration = 500; // 0.5초 동안 애니메이션
+              const startTime = performance.now();
+              
+              const easeOutQuad = (t) => {
+                return t * (2 - t);
+              };
+              
+              const animateScroll = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOutQuad(progress);
+                
+                appElement.scrollTop = startPosition + (distance * easedProgress);
+                
+                if (progress < 1) {
+                  requestAnimationFrame(animateScroll);
+                } else {
+                  // 애니메이션 완료
+                  isExitAnimating.current = false;
+                  // Panel 1 탈출 애니메이션이 완료되면 exitingSection도 리셋
+                  exitingSection.current = false;
+                }
+              };
+              
+              requestAnimationFrame(animateScroll);
             }
           } else if (currentPanel === 3) {
             // 패널4에서 위로 스크롤 시 이전 패널로 이동 (탈출 불가)
