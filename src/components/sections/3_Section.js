@@ -336,14 +336,17 @@ const Section3 = () => {
           const svg1Progress = Math.min(1, svg1ScrollDiff / getScrollDistance(1000)); // 1000px에 걸쳐 애니메이션
           const newSvg1Bottom = -20 + (svg1Progress * 25);
           setSvg1Bottom(newSvg1Bottom);
+        } else {
+          // 스크롤이 시작점보다 위에 있으면 초기값으로 리셋
+          setSvg1Bottom(-20);
         }
         
         // triggerPoint에 도달하면 애니메이션 시작
         if (scrollTop >= triggerPoint) {
           const scrollDiff = scrollTop - triggerPoint; // triggerPoint 기준으로 계산
           
-          // 텍스트1은 항상 표시
-          setText1Opacity(1);
+          // 텍스트1 opacity 계산 (오버레이와 반대로 동작)
+          // 오버레이가 0일 때 텍스트1은 1, 오버레이가 1일 때 텍스트1은 0
           
           // 오버레이 애니메이션 계산 (150px마다 0.1씩)
           const overlayStartPoint = getScrollDistance(1000); // 1000px → 모바일에서는 500px
@@ -357,13 +360,11 @@ const Section3 = () => {
             }
           }
           
-          // 오버레이가 한번 완료되면 계속 1.0으로 유지
-          const finalOverlayOpacity = Math.max(newOverlayOpacity, overlayOpacity);
+          // 스크롤 위치에 따라 직접 계산 (역방향 스크롤 시 감소)
+          const finalOverlayOpacity = newOverlayOpacity;
           
-          // 오버레이가 완료되면 텍스트1를 완전히 숨김
-          if (finalOverlayOpacity >= 1.0) {
-            setText1Opacity(0);
-          }
+          // 텍스트1 opacity는 오버레이와 반대로
+          setText1Opacity(Math.max(0, 1 - finalOverlayOpacity));
           
           // 오버레이가 완료된 후 텍스트3 애니메이션 시작 (100px마다 0.1씩)
           const text3StartPoint = getScrollDistance(2500); // 2500px → 모바일에서는 1250px (오버레이 완료 후)
@@ -404,6 +405,10 @@ const Section3 = () => {
             const svgAnimation = Math.min(1, svgScrollDiff / getScrollDistance(1000)); // 1000px에 걸쳐 애니메이션
             setSvg1Left(50 - (svgAnimation * 30)); // 50% → 10%
             setSvg2TranslateX(-20 + (svgAnimation * 40)); // -20vw → 20vw
+          } else {
+            // 스크롤이 시작점보다 위에 있으면 초기값으로 리셋
+            setSvg1Left(50);
+            setSvg2TranslateX(-20);
           }
           
           // svg1 stroke 색상: 7500px에서 흰색으로 변경 (전역적으로 처리)
@@ -451,6 +456,9 @@ const Section3 = () => {
                   const lineBottomAnimation = Math.min(1, lineBottomScrollDiff / getScrollDistance(500)); // 1000px에 걸쳐 애니메이션
                   const initialBottom = isMobile ? 5 : 12;
                   setLineBottom(initialBottom - (lineBottomAnimation * 15)); // 데스크톱: 110px → -40px, 모바일: 50px → -100px
+                } else {
+                  // 스크롤이 시작점보다 위에 있으면 초기값으로 리셋
+                  setLineBottom(isMobile ? 5 : 12);
                 }
                 
                 // 텍스트4가 완전히 나타나면 새로운 애니메이션 시작
@@ -484,44 +492,56 @@ const Section3 = () => {
                       const fastSvg2WidthAnimation = Math.min(1, animationProgress * 2);
                       setSvg2Width(199 - (fastSvg2WidthAnimation * 199)); // 199 → 0px
                       // stroke color는 검은색으로 고정
+                    } else {
+                      // 스크롤이 시작점보다 위에 있으면 이전 상태 유지 (4500px 애니메이션 결과)
+                      setSvg2TranslateY(0);
+                      setSvg2Width(199);
                     }
                     
-                    // 텍스트4가 완전히 사라진 후 텍스트5 시작 (8500px부터 1500px에 걸쳐)
-                    if (text4FadeOut <= 0) {
-                      // 최종 애니메이션 (새로운 SVG들)
-                      const finalAnimation = Math.min(1, (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1500)); // 7500px → 모바일에서는 3750px, 1500px → 모바일에서는 750px
-                      
-                      // overlay 배경색을 7500px-8000px 구간에서 점진적으로 변경
-                      const overlayColorStartPoint = getScrollDistance(7500);
-                      const overlayColorEndPoint = getScrollDistance(8000);
-                      
-                      if (scrollDiff >= overlayColorStartPoint) {
-                        if (scrollDiff >= overlayColorEndPoint) {
-                          // 8000px 이상에서는 완전히 파란색
-                          setOverlayColor('#336DFF');
-                          setText4Color('white');
-                        } else {
-                          // 7500px-8000px 구간에서 점진적 변경
-                          const colorProgress = (scrollDiff - overlayColorStartPoint) / (overlayColorEndPoint - overlayColorStartPoint);
-                          // RGB 보간을 통한 색상 전환
-                          const r = Math.round(255 - (255 - 51) * colorProgress); // 255 -> 51
-                          const g = Math.round(255 - (255 - 109) * colorProgress); // 255 -> 109
-                          const b = Math.round(255); // 255 유지
-                          setOverlayColor(`rgb(${r}, ${g}, ${b})`);
-                          
-                          // 텍스트4 색상도 점진적으로 변경
-                          if (colorProgress > 0.5) {
-                            setText4Color('white');
-                          }
-                        }
+                    // 최종 애니메이션 (새로운 SVG들과 텍스트5)
+                    const finalAnimation = Math.min(1, Math.max(0, (scrollDiff - getScrollDistance(7500)) / getScrollDistance(1500))); // 7500px → 모바일에서는 3750px, 1500px → 모바일에서는 750px
+                    
+                    // overlay 배경색을 7500px-8000px 구간에서 점진적으로 변경
+                    const overlayColorStartPoint = getScrollDistance(7500);
+                    const overlayColorEndPoint = getScrollDistance(8000);
+                    
+                    if (scrollDiff >= overlayColorStartPoint) {
+                      if (scrollDiff >= overlayColorEndPoint) {
+                        // 8000px 이상에서는 완전히 파란색
+                        setOverlayColor('#336DFF');
+                        setText4Color('white');
+                        setText5Color('white');
+                        setText6Color('white');
                       } else {
-                        // 7500px 이하에서는 흰색
-                        setOverlayColor('white');
-                        setText4Color('black');
+                        // 7500px-8000px 구간에서 점진적 변경
+                        const colorProgress = (scrollDiff - overlayColorStartPoint) / (overlayColorEndPoint - overlayColorStartPoint);
+                        // RGB 보간을 통한 색상 전환
+                        const r = Math.round(255 - (255 - 51) * colorProgress); // 255 -> 51
+                        const g = Math.round(255 - (255 - 109) * colorProgress); // 255 -> 109
+                        const b = Math.round(255); // 255 유지
+                        setOverlayColor(`rgb(${r}, ${g}, ${b})`);
+                        
+                        // 텍스트 색상도 점진적으로 변경
+                        if (colorProgress > 0.5) {
+                          setText4Color('white');
+                          setText5Color('white');
+                          setText6Color('white');
+                        } else {
+                          setText4Color('black');
+                          setText5Color('black');
+                          setText6Color('white');
+                        }
                       }
-                      
-                      // 텍스트5 애니메이션
-                      setText5Opacity(finalAnimation);
+                    } else {
+                      // 7500px 이하에서는 흰색
+                      setOverlayColor('white');
+                      setText4Color('black');
+                      setText5Color('black');
+                      setText6Color('white');
+                    }
+                    
+                    // 텍스트5 애니메이션
+                    setText5Opacity(finalAnimation);
                       
                       // 새로운 SVG들 애니메이션 (7500px에서 시작)
                       const newSvgStartPoint = getScrollDistance(8500);
@@ -530,6 +550,11 @@ const Section3 = () => {
                         setNewSvgScale(newSvgAnimation);
                         setNewSvg2Scale(newSvgAnimation);
                         setNewSvg3Scale(newSvgAnimation);
+                      } else {
+                        // 스크롤이 시작점보다 위에 있으면 초기값으로 리셋
+                        setNewSvgScale(0);
+                        setNewSvg2Scale(0);
+                        setNewSvg3Scale(0);
                       }
                       
                       // 라인 애니메이션 변수들 선언
@@ -549,6 +574,10 @@ const Section3 = () => {
                         setLineTranslateY(lineTranslateYValue);
                         setLinePadding(linePaddingValue);
                         // line stroke color는 검은색으로 고정
+                      } else {
+                        // finalAnimation이 0 이하일 때 초기값으로 리셋
+                        setLineTranslateY(0);
+                        setLinePadding(30);
                       }
                       
 
@@ -589,42 +618,19 @@ const Section3 = () => {
               
 
             }
-          } else {
-                          // 애니메이션이 완료된 후에는 리셋하지 않음
-              if (!isAnimationComplete) {
-                setText4Opacity(0);
-                // SVG 초기 상태 유지 (svg1Bottom은 리셋하지 않음 - 독립적으로 처리)
-                //setSvg2TranslateX(-10);
-                //setSvg1Left(50);
-                setSvg1TranslateY(0);
-                setSvg2TranslateY(0);
-                setSvg2Width(199);
-                setLineTranslateY(0);
-                setSvg1StrokeColor('black');
-                setSvg2StrokeColor('black');
-                setLineStrokeColor('black');
-                setLinePadding(30);
-                setLineWidth(0); // width도 0으로 리셋
-                setLineOpacity(0); // 라인 opacity도 0으로 리셋
-                setLineBottom(isMobile ? 5 : 12); // 라인 bottom도 리셋 (모바일: 50px, 데스크톱: 110px)
-                setText4TranslateY(0); // 텍스트4 translateY도 0으로 리셋
-                setText4Color('black'); // 텍스트4 색상도 black으로 리셋
-                setText5Opacity(0); // 텍스트5 opacity도 0으로 리셋
-                setText5TranslateY(0); // 텍스트5 translateY도 0으로 리셋
-                setText6Opacity(0); // 텍스트6 opacity도 0으로 리셋
-                setNewSvgScale(0); // 새로운 SVG scale도 0으로 리셋
-                setNewSvg2Scale(0); // 두 번째 새로운 SVG scale도 0으로 리셋
-                setNewSvg3Scale(0); // 세 번째 새로운 SVG scale도 0으로 리셋
-                setOverlayColor('white'); // overlay 배경색도 white로 리셋
-              } else {
-  
-              }
-          }
         } else {
-          // 텍스트3이 나타나는 중
+          // triggerPoint에 도달하지 않은 상태 - 모든 요소 초기 상태
+          setText1Opacity(1);
           setText3Opacity(0);
           setText3TranslateY(0);
           setText4Opacity(0);
+          setText4TranslateY(0);
+          setText4Color('black');
+          setText5Opacity(0);
+          setText5TranslateY(0);
+          setText6Opacity(0);
+          setOverlayOpacity(0);
+          setOverlayColor('white');
         }
         
 
