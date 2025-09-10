@@ -250,8 +250,8 @@ const Section7 = () => {
       const isApproachingSection = scrollTop >= sectionVisibleThreshold && scrollTop < sectionTop + 50;
       
       // 섹션 7에 진입할 때 (접근 중이고, 잠기지 않았을 때만)
-      // 햄버거 메뉴로 이동 중일 때는 sticky 비활성화
-      if (isApproachingSection && !scrollLocked.current && !isAnimating.current && !window.disableStickyScroll) {
+      // 햄버거 메뉴로 이동 중일 때는 sticky 비활성화 (단, 메뉴 스크롤이 완료되었으면 다시 활성화)
+      if (isApproachingSection && !scrollLocked.current && !isAnimating.current && (!window.disableStickyScroll || window.isMenuScrollComplete)) {
         isAnimating.current = true;
         scrollLocked.current = true;
         setIsInSection(true);
