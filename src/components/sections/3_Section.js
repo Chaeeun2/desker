@@ -380,12 +380,7 @@ const Section3 = () => {
           
           setOverlayOpacity(finalOverlayOpacity);
           
-          // 텍스트3 opacity 설정 - 조건에 따라 명확히 처리
-          if (scrollDiff < text3StartPoint) {
-            setText3Opacity(0);  // 시작점 이전에는 0
-          } else {
-            setText3Opacity(newText3Opacity);  // 계산된 값 사용
-          }
+          // 텍스트3 opacity는 아래에서 종합적으로 처리
           
           // 텍스트4 애니메이션 (텍스트3 완성 후)
           const text4StartPoint = getScrollDistance(3000); // 3000px → 모바일에서는 1500px
@@ -428,11 +423,17 @@ const Section3 = () => {
           // 텍스트3: opacity 0 → 1 → 0 (사라질 때 translateY 30px 위로)
           // 텍스트4: opacity 0 → 1 → 0
           
-          // 텍스트3 opacity 처리를 더 명확하게
+          // 텍스트3 opacity 처리 - 역방향 스크롤 시에도 정확히 0으로 리셋
           const text3FadeOutStart = getScrollDistance(3500);
           
-          if (scrollDiff >= text3FadeOutStart && newText3Opacity >= 1.0) {
-            // 텍스트3 페이드아웃 중
+          // scrollDiff가 text3StartPoint보다 작으면 무조건 0
+          if (scrollDiff < text3StartPoint) {
+            finalText3Opacity = 0;
+            setText3Opacity(0);
+            setText3TranslateY(0);
+          } 
+          // 페이드아웃 구간
+          else if (scrollDiff >= text3FadeOutStart) {
             const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000));
             finalText3Opacity = text3FadeOut;
             setText3Opacity(finalText3Opacity);
@@ -444,15 +445,11 @@ const Section3 = () => {
             } else {
               setText3TranslateY(0);
             }
-          } else if (newText3Opacity > 0) {
-            // 텍스트3 페이드인 중 또는 완전히 보이는 상태
+          } 
+          // 페이드인 구간 및 완전히 보이는 구간
+          else {
             finalText3Opacity = newText3Opacity;
             setText3Opacity(finalText3Opacity);
-            setText3TranslateY(0);
-          } else {
-            // newText3Opacity가 0일 때
-            finalText3Opacity = 0;
-            setText3Opacity(0);
             setText3TranslateY(0);
           }
             
@@ -643,7 +640,6 @@ const Section3 = () => {
               }
             }
           }
-        }
 
         } else {
           // triggerPoint에 도달하지 않은 상태 - 모든 요소 초기 상태
