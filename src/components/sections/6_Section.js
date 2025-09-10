@@ -73,7 +73,7 @@ const Section6 = ({ onVisibilityChange }) => {
   }, []);
 
   return (
-    <section id="series" ref={(el) => {
+    <section id="activity" ref={(el) => {
       sectionRef.current = el;
       intersectionRef.current = el;
     }} className={styles.section6}>

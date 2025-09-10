@@ -46,9 +46,9 @@ const HamburgerMenu = () => {
     // GTM 이벤트 전송 (메뉴 항목 클릭)
     if (typeof window !== 'undefined' && window.dataLayer) {
       const menuLabels = {
-        'main': 'intro',
-        'story': 'workation_reason',
-        'series': 'activities_btn',
+        'intro': 'intro',
+        'workation': 'workation_reason',
+        'activity': 'activities_btn',
         'news': 'worklife_modal'
       };
       
@@ -68,6 +68,8 @@ const HamburgerMenu = () => {
     // 메뉴 닫기
     setIsOpen(false);
     
+    // URL hash 업데이트
+    window.location.hash = `#${tab}`;
     
     // 해당 섹션으로 스크롤 이동
     const targetElement = document.getElementById(tab);
@@ -107,11 +109,11 @@ const HamburgerMenu = () => {
           // 레이아웃이 안정되기를 기다림
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              // 정확한 위치로 스크롤
-              targetElement.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-              });
+              // 즉시 이동 (애니메이션 없이)
+              const appEl = document.querySelector('.App');
+              if (appEl) {
+                appEl.scrollTop = targetElement.offsetTop;
+              }
             });
           });
         }
@@ -124,11 +126,11 @@ const HamburgerMenu = () => {
       setTimeout(() => {
         window.removeEventListener('section3SpacerChange', handleSpacerChange);
         
-        // 강제로 스크롤
-        targetElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
+        // 즉시 이동 (애니메이션 없이)
+        const appEl = document.querySelector('.App');
+        if (appEl) {
+          appEl.scrollTop = targetElement.offsetTop;
+        }
       }, 500); // fallback 타이머
       
       // 1초 후에 sticky 재활성화
@@ -145,7 +147,7 @@ const HamburgerMenu = () => {
             video.play();
           }
         });
-      }, 1000); // 1초 후 재활성화
+      }, 300); // 0.3초 후 재활성화
     }
   };
 
@@ -169,17 +171,17 @@ const HamburgerMenu = () => {
         <nav className={styles.navigation}>
           <ul className={styles.menuList}>
             <li className={styles.menuItem}>
-              <button onClick={() => handleMenuClick('main')}>
+              <button onClick={() => handleMenuClick('intro')}>
                 인트로
               </button>
             </li>
             <li className={styles.menuItem}>
-              <button onClick={() => handleMenuClick('story')}>
+              <button onClick={() => handleMenuClick('workation')}>
                 워케이션에 주목하게 된 이유
               </button>
             </li>
             <li className={styles.menuItem}>
-              <button onClick={() => handleMenuClick('series')}>
+              <button onClick={() => handleMenuClick('activity')}>
                 워케이션 활동
               </button>
             </li>

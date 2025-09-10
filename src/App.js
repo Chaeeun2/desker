@@ -33,6 +33,61 @@ function App() {
     }
   }, []);
 
+  // 첫 진입 시 섹션 비활성화
+  useEffect(() => {
+    // 섹션들 비활성화
+    window.disableStickyScroll = true;
+    window.disableSection3Animation = true;
+    window.section3AnimationComplete = true;
+    window.isMenuScrolling = true;
+    document.body.classList.add('disable-sticky-scroll');
+    
+    // 섹션7 리셋
+    if (window.resetSection7) {
+      window.resetSection7();
+    }
+    
+    // 0.3초 후 재활성화
+    setTimeout(() => {
+      window.disableStickyScroll = false;
+      window.disableSection3Animation = false;
+      window.isMenuScrolling = false;
+      document.body.classList.remove('disable-sticky-scroll');
+    }, 300);
+  }, []);
+
+  // URL hash 기반 섹션 이동 처리
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        const targetElement = document.getElementById(hash);
+        if (targetElement) {
+          // 즉시 이동 (애니메이션 없이)
+          const appElement = document.querySelector('.App');
+          if (appElement) {
+            // 딜레이를 두고 스크롤 (컴포넌트가 완전히 로드된 후)
+            setTimeout(() => {
+              appElement.scrollTop = targetElement.offsetTop;
+            }, 100);
+          }
+        }
+      }
+    };
+
+    // 페이지 로드 시 초기 hash 처리
+    if (window.location.hash) {
+      handleHashChange();
+    }
+
+    // hash 변경 이벤트 리스너 등록
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
   // 섹션11이 보일 때 설문조사 모달 표시 (최초 한 번만)
   useEffect(() => {
     if (isSection11Visible && !isSurveyModalOpen && !hasShownSurvey) {

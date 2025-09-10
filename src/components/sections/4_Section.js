@@ -166,7 +166,7 @@ const Section4 = () => {
   }, [hasIntersected, gifPlayed, isMobile]);
 
   return (
-    <section id="story" ref={ref} className={styles.section4}>
+    <section id="workation" ref={ref} className={styles.section4}>
       {/* 배경 비디오 또는 대체 이미지 */}
       <div className={styles.backgroundVideo}>
         {!showFallbackImage ? (

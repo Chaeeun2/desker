@@ -232,7 +232,7 @@ const Main = ({ onVisibilityChange }) => {
 
   return (
     <section 
-      id="main"
+      id="intro"
       ref={ref}
       className={styles.mainSection}
     >
