@@ -432,7 +432,7 @@ const Section3 = () => {
             setText3Opacity(0);
             setText3TranslateY(0);
           } 
-          // 페이드아웃 구간
+          // 페이드아웃 구간 (3500px 이상)
           else if (scrollDiff >= text3FadeOutStart) {
             const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000));
             finalText3Opacity = text3FadeOut;
@@ -446,9 +446,11 @@ const Section3 = () => {
               setText3TranslateY(0);
             }
           } 
-          // 페이드인 구간 및 완전히 보이는 구간
+          // 페이드인 구간 (2500px-3500px)
           else {
-            finalText3Opacity = newText3Opacity;
+            // newText3Opacity를 직접 사용하되, 역방향 스크롤을 위해 재계산
+            const text3Progress = (scrollDiff - text3StartPoint) / getScrollDistance(1000);
+            finalText3Opacity = Math.max(0, Math.min(1, text3Progress));
             setText3Opacity(finalText3Opacity);
             setText3TranslateY(0);
           }
