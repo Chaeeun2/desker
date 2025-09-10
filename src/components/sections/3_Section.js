@@ -379,7 +379,13 @@ const Section3 = () => {
           }
           
           setOverlayOpacity(finalOverlayOpacity);
-          setText3Opacity(newText3Opacity);
+          
+          // 텍스트3 opacity 설정 - 조건에 따라 명확히 처리
+          if (scrollDiff < text3StartPoint) {
+            setText3Opacity(0);  // 시작점 이전에는 0
+          } else {
+            setText3Opacity(newText3Opacity);  // 계산된 값 사용
+          }
           
           // 텍스트4 애니메이션 (텍스트3 완성 후)
           const text4StartPoint = getScrollDistance(3000); // 3000px → 모바일에서는 1500px
@@ -425,8 +431,12 @@ const Section3 = () => {
           if (newText3Opacity >= 1.0) {
             // 텍스트3 완성 후 사라지는 애니메이션
             const text3FadeOutStart = getScrollDistance(3500); // 3500px → 모바일에서는 1750px
-            const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000)); // 1000px에 걸쳐 사라짐 (모바일에서는 500px)
-            finalText3Opacity = text3FadeOut;
+            if (scrollDiff >= text3FadeOutStart) {
+              const text3FadeOut = Math.max(0, 1 - (scrollDiff - text3FadeOutStart) / getScrollDistance(1000)); // 1000px에 걸쳐 사라짐
+              finalText3Opacity = text3FadeOut;
+            } else {
+              finalText3Opacity = 1.0; // 페이드아웃 시작 전에는 완전히 보임
+            }
             setText3Opacity(finalText3Opacity);
             
             // 텍스트3이 사라질 때 translateY 30px 위로
@@ -540,8 +550,12 @@ const Section3 = () => {
                       setText6Color('white');
                     }
                     
-                    // 텍스트5 애니메이션
+                    // 텍스트5 애니메이션 - 명확한 조건 처리
+                  if (scrollDiff >= getScrollDistance(7500)) {
                     setText5Opacity(finalAnimation);
+                  } else {
+                    setText5Opacity(0);  // 7500px 이전에는 항상 0
+                  }
                       
                       // 새로운 SVG들 애니메이션 (7500px에서 시작)
                       const newSvgStartPoint = getScrollDistance(8500);
@@ -595,14 +609,20 @@ const Section3 = () => {
                         }
                         
                         // 텍스트5가 완전히 사라진 후 텍스트6 시작
-                        if (text5FadeOut <= 0) {
-                          const text6Animation = Math.min(1, (scrollDiff - getScrollDistance(10000)) / getScrollDistance(1000)); // 10000px → 모바일에서는 5000px, 1000px → 모바일에서는 500px
+                        const text6StartPoint = getScrollDistance(10000);
+                        let text6Animation = 0;
+                        
+                        if (text5FadeOut <= 0 && scrollDiff >= text6StartPoint) {
+                          text6Animation = Math.min(1, (scrollDiff - text6StartPoint) / getScrollDistance(1000));
                           setText6Opacity(text6Animation);
-                          
-                          // 새로운 SVG들은 이미 7500px에서 처리됨
-                          
-                          // 애니메이션 완료 체크 (텍스트 6이 완성되면)
-                          if (text6Animation >= 1.0 && !isAnimationCompleteRef.current) {
+                        } else {
+                          setText6Opacity(0);  // 조건 미충족 시 항상 0
+                        }
+                        
+                        // 새로운 SVG들은 이미 7500px에서 처리됨
+                        
+                        // 애니메이션 완료 체크 (텍스트 6이 완성되면)
+                        if (text6Animation >= 1.0 && !isAnimationCompleteRef.current) {
                             setIsAnimationComplete(true);
                             isAnimationCompleteRef.current = true; // ref도 동시에 업데이트
                             
