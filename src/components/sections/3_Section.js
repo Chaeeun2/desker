@@ -382,16 +382,19 @@ const Section3 = () => {
           
           // 텍스트3 opacity는 아래에서 종합적으로 처리
           
-          // 텍스트4 애니메이션 (텍스트3 완성 후)
-          const text4StartPoint = getScrollDistance(3000); // 3000px → 모바일에서는 1500px
+          // 텍스트4 애니메이션 (텍스트3이 사라진 후)
+          const text4StartPoint = getScrollDistance(4500); // 4500px → 모바일에서는 2250px (텍스트3 사라진 후)
+          const text4FadeOutStart = getScrollDistance(6500); // 페이드아웃 시작점
           let newText4Opacity = 0;
           
-          if (scrollDiff >= text4StartPoint) {
-            const text4ScrollDiff = scrollDiff - text4StartPoint; // 텍스트4 시작 후 스크롤 거리
-            if (text4ScrollDiff >= 0) { // 음수 방지
-              const text4Steps = Math.floor(text4ScrollDiff / (isMobile ? 12 : 25)); // 모바일에서는 더 빠르게
-              newText4Opacity = Math.max(0, Math.min(1, text4Steps * 0.05)); // 12px마다 0.05씩 증가 (모바일)
-            }
+          // 텍스트4 opacity 계산
+          if (scrollDiff >= text4FadeOutStart) {
+            // 페이드아웃 구간
+            newText4Opacity = Math.max(0, 1 - (scrollDiff - text4FadeOutStart) / getScrollDistance(1000));
+          } else if (scrollDiff >= text4StartPoint) {
+            // 페이드인 구간
+            const text4Progress = (scrollDiff - text4StartPoint) / getScrollDistance(1000);
+            newText4Opacity = Math.max(0, Math.min(1, text4Progress));
           }
           
           // 텍스트3과 텍스트4를 텍스트1-2와 같은 방식으로 처리
@@ -455,17 +458,25 @@ const Section3 = () => {
             setText3TranslateY(0);
           }
             
-            // 텍스트3이 완전히 사라진 후 텍스트4 시작
-            if (finalText3Opacity <= 0) {
-              const text4StartPoint = getScrollDistance(4500); // 4500px → 모바일에서는 2250px
-              const text4Start = Math.min(1, (scrollDiff - text4StartPoint) / getScrollDistance(1000)); // 1000px에 걸쳐 나타남 (모바일에서는 500px)
-              setText4Opacity(text4Start);
+            // 텍스트4 처리 (텍스트3이 사라진 후에만)
+            if (finalText3Opacity <= 0 && scrollDiff >= text4StartPoint) {
+              setText4Opacity(newText4Opacity);
               
-              // line width 애니메이션: 텍스트4와 함께 시작
-              if (text4Start > 0) {
-                const lineWidthAnimation = text4Start; // 텍스트4와 동일한 진행도
-                setLineWidth(lineWidthAnimation * 40); // 0 → 40vw
-                setLineOpacity(lineWidthAnimation); // opacity도 함께 증가
+              // 텍스트4가 사라질 때 translateY 처리
+              if (newText4Opacity < 1.0 && scrollDiff >= text4FadeOutStart) {
+                const translateY = (1.0 - newText4Opacity) * 30;
+                setText4TranslateY(translateY);
+              } else {
+                setText4TranslateY(0);
+              }
+              
+              // line 애니메이션은 텍스트4가 나타날 때 시작
+              if (newText4Opacity > 0) {
+              
+              // line width 애니메이션: 텍스트4와 함께
+              const lineWidthAnimation = Math.min(1, newText4Opacity); // 텍스트4와 동일한 진행도 (최대 1)
+              setLineWidth(lineWidthAnimation * 40); // 0 → 40vw
+              setLineOpacity(lineWidthAnimation); // opacity도 함께 증가
                 
                 // line bottom 애니메이션: 텍스트4보다 2000px 뒤에 시작 (기존 1000px + 추가 1000px)
                 const lineBottomStartPoint = getScrollDistance(6500); // 텍스트4(4500px) + 2000px = 6500px
@@ -479,23 +490,9 @@ const Section3 = () => {
                   setLineBottom(isMobile ? 5 : 12);
                 }
                 
-                // 텍스트4가 완전히 나타나면 새로운 애니메이션 시작
-                if (text4Start >= 1.0) {
-                  // 텍스트4 페이드아웃 (새로운 요소들이 나타나면서)
-                  const text4FadeOut = Math.max(0, 1 - (scrollDiff - getScrollDistance(6500)) / getScrollDistance(1000)); // 6500px → 모바일에서는 3250px, 1000px → 모바일에서는 500px
-                  setText4Opacity(text4FadeOut);
-                    
-                  // 텍스트4가 사라질 때 translateY 30px 위로 (텍스트3과 동일한 방식)
-                  if (text4FadeOut < 1.0) {
-                    const translateY = (1.0 - text4FadeOut) * 30;
-                    setText4TranslateY(translateY);
-                  } else {
-                    setText4TranslateY(0);
-                  }
-                    
-
-                    
-                  // svg1과 svg2 애니메이션 (6500px부터)
+              }
+              
+              // svg1과 svg2 애니메이션 (6500px부터)
                   const animationStartPoint = getScrollDistance(6500);
                   if (scrollDiff >= animationStartPoint) {
                     const animationProgress = Math.min(1, (scrollDiff - animationStartPoint) / getScrollDistance(500));
@@ -640,8 +637,6 @@ const Section3 = () => {
                   }
                 }
               }
-            }
-          }
 
         } else {
           // triggerPoint에 도달하지 않은 상태 - 모든 요소 초기 상태
