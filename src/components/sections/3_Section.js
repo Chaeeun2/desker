@@ -458,8 +458,9 @@ const Section3 = () => {
             setText3TranslateY(0);
           }
             
-            // 텍스트4 처리 (텍스트3이 사라진 후에만)
+            // 텍스트4 처리
             if (finalText3Opacity <= 0 && scrollDiff >= text4StartPoint) {
+              // 텍스트3이 사라지고 텍스트4 시작점에 도달한 경우
               setText4Opacity(newText4Opacity);
               
               // 텍스트4가 사라질 때 translateY 처리
@@ -491,6 +492,14 @@ const Section3 = () => {
                 }
                 
               }
+            } else {
+              // 텍스트3이 아직 보이거나 텍스트4 시작점에 도달하지 않은 경우
+              setText4Opacity(0);
+              setText4TranslateY(0);
+              setLineWidth(0);
+              setLineOpacity(0);
+              setLineBottom(isMobile ? 5 : 12);
+            }
               
               // svg1과 svg2 애니메이션 (6500px부터)
                   const animationStartPoint = getScrollDistance(6500);
@@ -636,7 +645,6 @@ const Section3 = () => {
                     }
                   }
                 }
-              }
 
         } else {
           // triggerPoint에 도달하지 않은 상태 - 모든 요소 초기 상태
