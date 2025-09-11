@@ -69,67 +69,67 @@ const SurveyModal = ({ isOpen, onClose }) => {
       const currentHash = window.location.hash.replace('#', '');
       if (!currentHash.includes('survey')) {
         window.history.pushState(null, '', '#survey');
+      }
       
-        // 모바일에서 키보드가 올라올 때 viewport 높이 변경 방지
-        const handleViewportChange = () => {
-          if (window.innerWidth <= 768) {
-            // 모바일에서 키보드가 올라올 때 모달 위치 고정
-            const modalContent = document.querySelector(`.${styles.modalContent}`);
-            if (modalContent) {
-              // dvh 값을 유지하면서 위치 고정
-              modalContent.style.position = 'fixed';
-              modalContent.style.top = '0';
-              modalContent.style.left = '0';
-              modalContent.style.right = '0';
-              modalContent.style.bottom = '0';
-              modalContent.style.height = '100dvh';
-              modalContent.style.transform = 'translateZ(0)';
-            
-              // 스크롤 위치 고정
-              if (modalContent.scrollTop > 0) {
-                modalContent.scrollTop = 0;
-              }
+      // 모바일에서 키보드가 올라올 때 viewport 높이 변경 방지
+      const handleViewportChange = () => {
+        if (window.innerWidth <= 768) {
+          // 모바일에서 키보드가 올라올 때 모달 위치 고정
+          const modalContent = document.querySelector(`.${styles.modalContent}`);
+          if (modalContent) {
+            // dvh 값을 유지하면서 위치 고정
+            modalContent.style.position = 'fixed';
+            modalContent.style.top = '0';
+            modalContent.style.left = '0';
+            modalContent.style.right = '0';
+            modalContent.style.bottom = '0';
+            modalContent.style.height = '100dvh';
+            modalContent.style.transform = 'translateZ(0)';
+          
+            // 스크롤 위치 고정
+            if (modalContent.scrollTop > 0) {
+              modalContent.scrollTop = 0;
             }
           }
-        };
-
-        // viewport 높이 변경 감지
-        window.addEventListener('resize', handleViewportChange);
-        window.addEventListener('orientationchange', handleViewportChange);
-      
-        // 모바일에서 키보드 표시/숨김 감지
-        const handleVisualViewportChange = () => {
-          if (window.visualViewport && window.innerWidth <= 768) {
-            const modalContent = document.querySelector(`.${styles.modalContent}`);
-            if (modalContent) {
-              // visualViewport 변경 시 모달 위치 조정
-              const currentHeight = window.visualViewport.height;
-              modalContent.style.height = `${currentHeight}px`;
-            }
-          }
-        };
-      
-        if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', handleVisualViewportChange);
         }
-      
-        return () => {
-          document.body.style.overflow = 'unset';
-          window.removeEventListener('resize', handleViewportChange);
-          window.removeEventListener('orientationchange', handleViewportChange);
-          if (window.visualViewport) {
-            window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+      };
+
+      // viewport 높이 변경 감지
+      window.addEventListener('resize', handleViewportChange);
+      window.addEventListener('orientationchange', handleViewportChange);
+    
+      // 모바일에서 키보드 표시/숨김 감지
+      const handleVisualViewportChange = () => {
+        if (window.visualViewport && window.innerWidth <= 768) {
+          const modalContent = document.querySelector(`.${styles.modalContent}`);
+          if (modalContent) {
+            // visualViewport 변경 시 모달 위치 조정
+            const currentHeight = window.visualViewport.height;
+            modalContent.style.height = `${currentHeight}px`;
           }
-        };
-      } else {
+        }
+      };
+    
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+      }
+    
+      return () => {
         document.body.style.overflow = 'unset';
-      
-        // 모달이 실제로 열렸다가 닫힐 때만 survey 슬러그 제거
-        if (hasOpenedRef.current) {
-          const currentHash = window.location.hash.replace('#', '');
-          if (currentHash === 'survey') {
-            window.history.pushState(null, '', window.location.pathname);
-          }
+        window.removeEventListener('resize', handleViewportChange);
+        window.removeEventListener('orientationchange', handleViewportChange);
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+        }
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+    
+      // 모달이 실제로 열렸다가 닫힐 때만 survey 슬러그 제거
+      if (hasOpenedRef.current) {
+        const currentHash = window.location.hash.replace('#', '');
+        if (currentHash === 'survey') {
+          window.history.pushState(null, '', window.location.pathname);
         }
       }
     }
