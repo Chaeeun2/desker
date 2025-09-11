@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from './SurveyModal.module.css';
 import { saveSurveyResponse } from '../../services/surveyService';
 import { imageService } from '../../admin/services/imageService';
@@ -6,6 +6,7 @@ import { sendSurveyConfirmationEmail, sendAdminNotificationEmail } from '../../s
 import { getActiveSurveySchema } from '../../services/surveySchemaService';
 
 const SurveyModal = ({ isOpen, onClose }) => {
+  const hasOpenedRef = useRef(false); // 모달이 실제로 열렸는지 추적
   const [currentStep, setCurrentStep] = useState(0); // 0: 인트로, 1-5: 설문 단계
   const [indicatorStep, setIndicatorStep] = useState(0);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -58,64 +59,79 @@ const SurveyModal = ({ isOpen, onClose }) => {
     setSchemaLoading(false);
   };
 
-  // 모달이 열려있을 때 body 스크롤 방지
+  // 모달이 열려있을 때 body 스크롤 방지 및 URL 슬러그 추가
   useEffect(() => {
     if (isOpen) {
+      hasOpenedRef.current = true; // 모달이 열렸음을 기록
       document.body.style.overflow = 'hidden';
       
-      // 모바일에서 키보드가 올라올 때 viewport 높이 변경 방지
-      const handleViewportChange = () => {
-        if (window.innerWidth <= 768) {
-          // 모바일에서 키보드가 올라올 때 모달 위치 고정
-          const modalContent = document.querySelector(`.${styles.modalContent}`);
-          if (modalContent) {
-            // dvh 값을 유지하면서 위치 고정
-            modalContent.style.position = 'fixed';
-            modalContent.style.top = '0';
-            modalContent.style.left = '0';
-            modalContent.style.right = '0';
-            modalContent.style.bottom = '0';
-            modalContent.style.height = '100dvh';
-            modalContent.style.transform = 'translateZ(0)';
+      // URL에 survey 슬러그 추가
+      const currentHash = window.location.hash.replace('#', '');
+      if (!currentHash.includes('survey')) {
+        window.history.pushState(null, '', '#survey');
+      
+        // 모바일에서 키보드가 올라올 때 viewport 높이 변경 방지
+        const handleViewportChange = () => {
+          if (window.innerWidth <= 768) {
+            // 모바일에서 키보드가 올라올 때 모달 위치 고정
+            const modalContent = document.querySelector(`.${styles.modalContent}`);
+            if (modalContent) {
+              // dvh 값을 유지하면서 위치 고정
+              modalContent.style.position = 'fixed';
+              modalContent.style.top = '0';
+              modalContent.style.left = '0';
+              modalContent.style.right = '0';
+              modalContent.style.bottom = '0';
+              modalContent.style.height = '100dvh';
+              modalContent.style.transform = 'translateZ(0)';
             
-            // 스크롤 위치 고정
-            if (modalContent.scrollTop > 0) {
-              modalContent.scrollTop = 0;
+              // 스크롤 위치 고정
+              if (modalContent.scrollTop > 0) {
+                modalContent.scrollTop = 0;
+              }
             }
           }
-        }
-      };
+        };
 
-      // viewport 높이 변경 감지
-      window.addEventListener('resize', handleViewportChange);
-      window.addEventListener('orientationchange', handleViewportChange);
+        // viewport 높이 변경 감지
+        window.addEventListener('resize', handleViewportChange);
+        window.addEventListener('orientationchange', handleViewportChange);
       
-      // 모바일에서 키보드 표시/숨김 감지
-      const handleVisualViewportChange = () => {
-        if (window.visualViewport && window.innerWidth <= 768) {
-          const modalContent = document.querySelector(`.${styles.modalContent}`);
-          if (modalContent) {
-            // visualViewport 변경 시 모달 위치 조정
-            const currentHeight = window.visualViewport.height;
-            modalContent.style.height = `${currentHeight}px`;
+        // 모바일에서 키보드 표시/숨김 감지
+        const handleVisualViewportChange = () => {
+          if (window.visualViewport && window.innerWidth <= 768) {
+            const modalContent = document.querySelector(`.${styles.modalContent}`);
+            if (modalContent) {
+              // visualViewport 변경 시 모달 위치 조정
+              const currentHeight = window.visualViewport.height;
+              modalContent.style.height = `${currentHeight}px`;
+            }
+          }
+        };
+      
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+        }
+      
+        return () => {
+          document.body.style.overflow = 'unset';
+          window.removeEventListener('resize', handleViewportChange);
+          window.removeEventListener('orientationchange', handleViewportChange);
+          if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+          }
+        };
+      } else {
+        document.body.style.overflow = 'unset';
+      
+        // 모달이 실제로 열렸다가 닫힐 때만 survey 슬러그 제거
+        if (hasOpenedRef.current) {
+          const currentHash = window.location.hash.replace('#', '');
+          if (currentHash === 'survey') {
+            window.history.pushState(null, '', window.location.pathname);
           }
         }
-      };
-      
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', handleVisualViewportChange);
       }
-      
-      return () => {
-        document.body.style.overflow = 'unset';
-        window.removeEventListener('resize', handleViewportChange);
-        window.removeEventListener('orientationchange', handleViewportChange);
-        if (window.visualViewport) {
-          window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
-        }
-      };
-    } else {
-      document.body.style.overflow = 'unset';
     }
   }, [isOpen]);
 
@@ -1069,6 +1085,12 @@ const SurveyModal = ({ isOpen, onClose }) => {
       if (!confirmClose) {
         return; // 사용자가 취소한 경우 모달 닫지 않음
       }
+    }
+    
+    // URL에서 survey 슬러그 제거
+    const currentHash = window.location.hash.replace('#', '');
+    if (currentHash === 'survey') {
+      window.history.pushState(null, '', window.location.pathname);
     }
     
     // 모달 닫기

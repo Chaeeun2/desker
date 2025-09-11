@@ -61,6 +61,12 @@ function App() {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
       if (hash) {
+        // survey 해시인 경우 모달 열기
+        if (hash === 'survey') {
+          setIsSurveyModalOpen(true);
+          return;
+        }
+        
         const targetElement = document.getElementById(hash);
         if (targetElement) {
           // 즉시 이동 (애니메이션 없이)
