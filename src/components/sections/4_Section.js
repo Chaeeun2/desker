@@ -177,9 +177,20 @@ const Section4 = () => {
             muted
             loop
             playsInline
+            webkit-playsinline="true"
+            x5-playsinline="true"
+            x5-video-player-type="h5"
+            x5-video-player-fullscreen="false"
             preload="auto"
             controls={false}
-            style={{ pointerEvents: 'none' }}
+            controlsList="nodownload nofullscreen noremoteplayback"
+            disablePictureInPicture={true}
+            disableRemotePlayback={true}
+            style={{ 
+              pointerEvents: 'none',
+              WebkitMediaControls: 'none',
+              WebkitMediaControlsPanel: 'none'
+            }}
             onError={() => {
               setVideoPlayState(prev => ({ ...prev, hasError: true }));
             }}

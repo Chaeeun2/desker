@@ -282,11 +282,25 @@ const Main = ({ onVisibilityChange }) => {
             muted
             loop
             playsInline
+            webkit-playsinline="true"
+            x5-playsinline="true"
+            x5-video-player-type="h5"
+            x5-video-player-fullscreen="false"
             preload="metadata"
             loading="lazy"
             poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
             controls={false}
-            style={{ pointerEvents: 'none', width: '100%', height: '100%', objectFit: 'cover' }}
+            controlsList="nodownload nofullscreen noremoteplayback"
+            disablePictureInPicture={true}
+            disableRemotePlayback={true}
+            style={{ 
+              pointerEvents: 'none', 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover',
+              WebkitMediaControls: 'none',
+              WebkitMediaControlsPanel: 'none'
+            }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
             }}
@@ -360,11 +374,25 @@ const Main = ({ onVisibilityChange }) => {
             muted
             loop
             playsInline
+            webkit-playsinline="true"
+            x5-playsinline="true"
+            x5-video-player-type="h5"
+            x5-video-player-fullscreen="false"
             preload="metadata"
             loading="lazy"
             poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
             controls={false}
-            style={{ pointerEvents: 'none', width: '100%', height: '100%', objectFit: 'cover' }}
+            controlsList="nodownload nofullscreen noremoteplayback"
+            disablePictureInPicture={true}
+            disableRemotePlayback={true}
+            style={{ 
+              pointerEvents: 'none', 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover',
+              WebkitMediaControls: 'none',
+              WebkitMediaControlsPanel: 'none'
+            }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
             }}

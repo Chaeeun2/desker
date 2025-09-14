@@ -49,21 +49,73 @@
   user-select: none !important;
 }
 
-/* 비디오 컨트롤 완전 숨기기 */
+/* 비디오 컨트롤 완전 숨기기 - 초기부터 적용 */
 .backgroundVideo::-webkit-media-controls {
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 .backgroundVideo::-webkit-media-controls-play-button {
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .backgroundVideo::-webkit-media-controls-start-playback-button {
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .backgroundVideo::-webkit-media-controls-panel {
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* iOS Safari 특별 처리 */
+.backgroundVideo::-webkit-media-controls-container {
+  display: none !important;
+}
+
+.backgroundVideo::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+/* 모바일 브라우저 재생 버튼 숨기기 */
+.backgroundVideo::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 비디오 초기 상태 설정 */
+.backgroundVideo {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-media-controls: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* 모바일 컨테이너 비디오 특별 처리 */
+.mobileContainer .backgroundVideo {
+  -webkit-media-controls: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* 저전력 모드 대응 */
+@media (prefers-reduced-motion: reduce) {
+  .backgroundVideo::-webkit-media-controls,
+  .backgroundVideo::-webkit-media-controls-play-button,
+  .backgroundVideo::-webkit-media-controls-start-playback-button,
+  .backgroundVideo::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
 }
 
 .backgroundVideo {
