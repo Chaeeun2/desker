@@ -285,6 +285,7 @@ const Main = ({ onVisibilityChange }) => {
             preload="metadata"
             loading="lazy"
             poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
+            controls={false}
             style={{ pointerEvents: 'none', width: '100%', height: '100%', objectFit: 'cover' }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
@@ -362,6 +363,7 @@ const Main = ({ onVisibilityChange }) => {
             preload="metadata"
             loading="lazy"
             poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
+            controls={false}
             style={{ pointerEvents: 'none', width: '100%', height: '100%', objectFit: 'cover' }}
             onError={() => {
               updateVideoPlayState({ hasError: true });

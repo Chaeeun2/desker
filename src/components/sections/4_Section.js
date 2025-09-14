@@ -178,6 +178,8 @@ const Section4 = () => {
             loop
             playsInline
             preload="auto"
+            controls={false}
+            style={{ pointerEvents: 'none' }}
             onError={() => {
               setVideoPlayState(prev => ({ ...prev, hasError: true }));
             }}
