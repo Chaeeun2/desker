@@ -72,7 +72,10 @@ const Section4 = () => {
     const videoElement = document.querySelector('[data-section="section4"]');
     if (videoElement) {
       videoElement.play().then(() => {
-        setVideoPlayState(prev => ({ ...prev, isPlaying: true }));
+        setVideoPlayState(prev => ({ 
+          ...prev, 
+          isPlaying: true
+        }));
       }).catch((error) => {
         setVideoPlayState(prev => ({ ...prev, hasError: true }));
       });

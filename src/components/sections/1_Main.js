@@ -96,7 +96,10 @@ const Main = ({ onVisibilityChange }) => {
         
         // 재생 시도
         await videoElement.play();
-        updateVideoPlayState({ isPlaying: true, hasError: false });
+        updateVideoPlayState({ 
+          isPlaying: true, 
+          hasError: false
+        });
         
         // 재생 상태 지속적 모니터링
         const playCheckInterval = setInterval(() => {
