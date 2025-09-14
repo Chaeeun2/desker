@@ -289,9 +289,7 @@ const Main = ({ onVisibilityChange }) => {
             x5-playsinline="true"
             x5-video-player-type="h5"
             x5-video-player-fullscreen="false"
-            preload="metadata"
-            loading="lazy"
-            poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
+            preload="auto"
             controls={false}
             controlsList="nodownload nofullscreen noremoteplayback"
             disablePictureInPicture={true}
@@ -381,9 +379,7 @@ const Main = ({ onVisibilityChange }) => {
             x5-playsinline="true"
             x5-video-player-type="h5"
             x5-video-player-fullscreen="false"
-            preload="metadata"
-            loading="lazy"
-            poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
+            preload="auto"
             controls={false}
             controlsList="nodownload nofullscreen noremoteplayback"
             disablePictureInPicture={true}
