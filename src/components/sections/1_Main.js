@@ -278,6 +278,7 @@ const Main = ({ onVisibilityChange }) => {
           </div>
 
         {!videoFallback ? (
+          <>
           <video
             data-section="main"
             className={styles.backgroundVideo}
@@ -301,7 +302,11 @@ const Main = ({ onVisibilityChange }) => {
               height: '100%', 
               objectFit: 'cover',
               WebkitMediaControls: 'none',
-              WebkitMediaControlsPanel: 'none'
+              WebkitMediaControlsPanel: 'none',
+              // 재생버튼 즉시 숨김을 위한 인라인 스타일
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none'
             }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
@@ -320,6 +325,20 @@ const Main = ({ onVisibilityChange }) => {
           >
             <source src={videoSources.pc} type="video/mp4" />
           </video>
+          {/* 비디오 위에 투명 오버레이로 재생버튼 차단 */}
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 3,
+              pointerEvents: 'none',
+              background: 'transparent'
+            }}
+          />
+          </>
         ) : (
           <div className={styles.fallbackImage}>
             <img 
@@ -369,6 +388,7 @@ const Main = ({ onVisibilityChange }) => {
           </svg>
           </div>
         {!videoFallback ? (
+          <>
           <video
             data-section="main-mobile"
             className={styles.backgroundVideo}
@@ -392,7 +412,11 @@ const Main = ({ onVisibilityChange }) => {
               height: '100%', 
               objectFit: 'cover',
               WebkitMediaControls: 'none',
-              WebkitMediaControlsPanel: 'none'
+              WebkitMediaControlsPanel: 'none',
+              // 재생버튼 즉시 숨김을 위한 인라인 스타일
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none'
             }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
@@ -411,6 +435,20 @@ const Main = ({ onVisibilityChange }) => {
           >
             <source src={videoSources.mobile} type="video/mp4" />
           </video>
+          {/* 비디오 위에 투명 오버레이로 재생버튼 차단 */}
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 3,
+              pointerEvents: 'none',
+              background: 'transparent'
+            }}
+          />
+          </>
         ) : (
           <div className={styles.fallbackImage}>
             <img 
