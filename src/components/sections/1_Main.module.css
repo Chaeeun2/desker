@@ -98,6 +98,29 @@
   -webkit-touch-callout: none !important;
   -webkit-media-controls: none !important;
   -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* 비디오 재생 버튼 강제 숨김 - 모든 가능한 선택자 */
+.backgroundVideo[poster]::-webkit-media-overlay-play-button {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+video.backgroundVideo::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 포스터 이미지가 있는 비디오의 컨트롤 숨김 */
+.backgroundVideo[poster]::-webkit-media-controls {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* 모바일 컨테이너 비디오 특별 처리 */
