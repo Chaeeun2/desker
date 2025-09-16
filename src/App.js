@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 import Section0 from './components/sections/0_Intro';
 import Section1 from './components/sections/1_Main';
@@ -16,7 +17,8 @@ import RightBottomIcon from './components/ui/RightBottomIcon';
 import SurveyModal from './components/ui/SurveyModal';
 import HamburgerMenu from './components/ui/HamburgerMenu';
 
-function App() {
+function App({ section }) {
+  const navigate = useNavigate();
   const [isSection1Visible, setIsSection1Visible] = useState(false);
   const [isSection2Visible, setIsSection2Visible] = useState(false);
   const [isSection6Visible, setIsSection6Visible] = useState(false);
@@ -56,68 +58,47 @@ function App() {
     }, 300);
   }, []);
 
-  // URL hash 기반 섹션 이동 처리
+  // Path 기반 섹션 이동 처리
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash) {
-        // survey 해시인 경우 모달 열기
-        if (hash === 'survey') {
-          setIsSurveyModalOpen(true);
-          return;
+    if (section) {
+      const targetElement = document.getElementById(section);
+      if (targetElement) {
+        // 섹션 비활성화 (첫 진입 시와 동일하게)
+        window.disableStickyScroll = true;
+        window.disableSection3Animation = true;
+        window.section3AnimationComplete = true;
+        window.isMenuScrolling = true;
+        document.body.classList.add('disable-sticky-scroll');
+        
+        // 섹션7 리셋
+        if (window.resetSection7) {
+          window.resetSection7();
         }
         
-        const targetElement = document.getElementById(hash);
-        if (targetElement) {
-          // 섹션 비활성화 (첫 진입 시와 동일하게)
-          window.disableStickyScroll = true;
-          window.disableSection3Animation = true;
-          window.section3AnimationComplete = true;
-          window.isMenuScrolling = true;
-          document.body.classList.add('disable-sticky-scroll');
-          
-          // 섹션7 리셋
-          if (window.resetSection7) {
-            window.resetSection7();
-          }
-          
-          // 즉시 이동 (애니메이션 없이)
-          const appElement = document.querySelector('.App');
-          if (appElement) {
-            // 딜레이를 두고 스크롤 (컴포넌트가 완전히 로드된 후)
-            setTimeout(() => {
-              // scrollIntoView를 사용하여 모든 디바이스에서 정확한 위치로 이동
-              targetElement.scrollIntoView({ 
-                behavior: 'instant', 
-                block: 'start',
-                inline: 'nearest'
-              });
-            }, 300); // 섹션 비활성화와 동일한 타이밍
-          }
-          
-          // 0.3초 후 재활성화
+        // 즉시 이동 (애니메이션 없이)
+        const appElement = document.querySelector('.App');
+        if (appElement) {
+          // 딜레이를 두고 스크롤 (컴포넌트가 완전히 로드된 후)
           setTimeout(() => {
-            window.disableStickyScroll = false;
-            window.disableSection3Animation = false;
-            window.isMenuScrolling = false;
-            document.body.classList.remove('disable-sticky-scroll');
-          }, 300);
+            // scrollIntoView를 사용하여 모든 디바이스에서 정확한 위치로 이동
+            targetElement.scrollIntoView({ 
+              behavior: 'instant', 
+              block: 'start',
+              inline: 'nearest'
+            });
+          }, 300); // 섹션 비활성화와 동일한 타이밍
         }
+        
+        // 0.3초 후 재활성화
+        setTimeout(() => {
+          window.disableStickyScroll = false;
+          window.disableSection3Animation = false;
+          window.isMenuScrolling = false;
+          document.body.classList.remove('disable-sticky-scroll');
+        }, 300);
       }
-    };
-
-    // 페이지 로드 시 초기 hash 처리
-    if (window.location.hash) {
-      handleHashChange();
     }
-
-    // hash 변경 이벤트 리스너 등록
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
+  }, [section]);
 
   // 섹션11이 보일 때 설문조사 모달 표시 (최초 한 번만)
   useEffect(() => {

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './HamburgerMenu.module.css';
 import SurveyModal from './SurveyModal';
 
 const HamburgerMenu = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -68,8 +70,12 @@ const HamburgerMenu = () => {
     // 메뉴 닫기
     setIsOpen(false);
     
-    // URL hash 업데이트
-    window.location.hash = `#${tab}`;
+    // 페이지 이동
+    if (tab === 'intro') {
+      navigate('/');
+    } else {
+      navigate(`/${tab}`);
+    }
     
     // 해당 섹션으로 스크롤 이동
     const targetElement = document.getElementById(tab);
