@@ -112,13 +112,12 @@ const HamburgerMenu = () => {
               // 즉시 이동 (애니메이션 없이)
               const appEl = document.querySelector('.App');
               if (appEl) {
-                // 모바일에서는 섹션의 시작 위치로 정확히 이동
-                const isMobile = window.innerWidth <= 1080;
-                if (isMobile) {
-                  targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-                } else {
-                  appEl.scrollTop = targetElement.offsetTop;
-                }
+                // scrollIntoView를 사용하여 모든 디바이스에서 정확한 위치로 이동
+                targetElement.scrollIntoView({ 
+                  behavior: 'instant', 
+                  block: 'start',
+                  inline: 'nearest'
+                });
               }
             });
           });
@@ -135,13 +134,12 @@ const HamburgerMenu = () => {
         // 즉시 이동 (애니메이션 없이)
               const appEl = document.querySelector('.App');
               if (appEl) {
-                // 모바일에서는 섹션의 시작 위치로 정확히 이동
-                const isMobile = window.innerWidth <= 1080;
-                if (isMobile) {
-                  targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-                } else {
-                  appEl.scrollTop = targetElement.offsetTop;
-                }
+                // scrollIntoView를 사용하여 모든 디바이스에서 정확한 위치로 이동
+                targetElement.scrollIntoView({ 
+                  behavior: 'instant', 
+                  block: 'start',
+                  inline: 'nearest'
+                });
               }
       }, 500); // fallback 타이머
       

@@ -86,14 +86,13 @@ function App() {
           if (appElement) {
             // 딜레이를 두고 스크롤 (컴포넌트가 완전히 로드된 후)
             setTimeout(() => {
-              // 모바일에서는 섹션의 시작 위치로 정확히 이동
-              const isMobile = window.innerWidth <= 1080;
-              if (isMobile) {
-                targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-              } else {
-                appElement.scrollTop = targetElement.offsetTop;
-              }
-            }, 100);
+              // scrollIntoView를 사용하여 모든 디바이스에서 정확한 위치로 이동
+              targetElement.scrollIntoView({ 
+                behavior: 'instant', 
+                block: 'start',
+                inline: 'nearest'
+              });
+            }, 300); // 섹션 비활성화와 동일한 타이밍
           }
           
           // 0.3초 후 재활성화
