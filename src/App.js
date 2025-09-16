@@ -69,6 +69,18 @@ function App() {
         
         const targetElement = document.getElementById(hash);
         if (targetElement) {
+          // 섹션 비활성화 (첫 진입 시와 동일하게)
+          window.disableStickyScroll = true;
+          window.disableSection3Animation = true;
+          window.section3AnimationComplete = true;
+          window.isMenuScrolling = true;
+          document.body.classList.add('disable-sticky-scroll');
+          
+          // 섹션7 리셋
+          if (window.resetSection7) {
+            window.resetSection7();
+          }
+          
           // 즉시 이동 (애니메이션 없이)
           const appElement = document.querySelector('.App');
           if (appElement) {
@@ -83,6 +95,14 @@ function App() {
               }
             }, 100);
           }
+          
+          // 0.3초 후 재활성화
+          setTimeout(() => {
+            window.disableStickyScroll = false;
+            window.disableSection3Animation = false;
+            window.isMenuScrolling = false;
+            document.body.classList.remove('disable-sticky-scroll');
+          }, 300);
         }
       }
     };
