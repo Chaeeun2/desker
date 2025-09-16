@@ -74,7 +74,13 @@ function App() {
           if (appElement) {
             // 딜레이를 두고 스크롤 (컴포넌트가 완전히 로드된 후)
             setTimeout(() => {
-              appElement.scrollTop = targetElement.offsetTop;
+              // 모바일에서는 섹션의 시작 위치로 정확히 이동
+              const isMobile = window.innerWidth <= 1080;
+              if (isMobile) {
+                targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+              } else {
+                appElement.scrollTop = targetElement.offsetTop;
+              }
             }, 100);
           }
         }

@@ -112,7 +112,13 @@ const HamburgerMenu = () => {
               // 즉시 이동 (애니메이션 없이)
               const appEl = document.querySelector('.App');
               if (appEl) {
-                appEl.scrollTop = targetElement.offsetTop;
+                // 모바일에서는 섹션의 시작 위치로 정확히 이동
+                const isMobile = window.innerWidth <= 1080;
+                if (isMobile) {
+                  targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+                } else {
+                  appEl.scrollTop = targetElement.offsetTop;
+                }
               }
             });
           });
@@ -127,10 +133,16 @@ const HamburgerMenu = () => {
         window.removeEventListener('section3SpacerChange', handleSpacerChange);
         
         // 즉시 이동 (애니메이션 없이)
-        const appEl = document.querySelector('.App');
-        if (appEl) {
-          appEl.scrollTop = targetElement.offsetTop;
-        }
+              const appEl = document.querySelector('.App');
+              if (appEl) {
+                // 모바일에서는 섹션의 시작 위치로 정확히 이동
+                const isMobile = window.innerWidth <= 1080;
+                if (isMobile) {
+                  targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+                } else {
+                  appEl.scrollTop = targetElement.offsetTop;
+                }
+              }
       }, 500); // fallback 타이머
       
       // 1초 후에 sticky 재활성화
