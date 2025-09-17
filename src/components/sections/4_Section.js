@@ -16,6 +16,9 @@ const Section4 = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showFallbackImage, setShowFallbackImage] = useState(false);
   
+  // 포스터 이미지 표시 상태 추가
+  const [showPoster, setShowPoster] = useState(true);
+  
   // 비디오 재생 상태 모니터링
   const [videoPlayState, setVideoPlayState] = useState({
     isPlaying: false,
@@ -76,6 +79,9 @@ const Section4 = () => {
           ...prev, 
           isPlaying: true
         }));
+        // 재생 성공 시 포스터 숨기고 비디오 표시
+        setShowPoster(false);
+        videoElement.style.visibility = 'visible';
       }).catch((error) => {
         setVideoPlayState(prev => ({ ...prev, hasError: true }));
       });
@@ -173,6 +179,23 @@ const Section4 = () => {
       {/* 배경 비디오 또는 대체 이미지 */}
       <div className={styles.backgroundVideo}>
         {!showFallbackImage ? (
+          <>
+          {/* 포스터 이미지 - 비디오가 재생되기 전까지 표시 */}
+          {showPoster && (
+            <img 
+              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S4.jpg"
+              alt="Section 4 Background"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 1
+              }}
+            />
+          )}
           <video
             data-section="section4"
             className={styles.backgroundVideoElement}
@@ -192,7 +215,13 @@ const Section4 = () => {
             style={{ 
               pointerEvents: 'none',
               WebkitMediaControls: 'none',
-              WebkitMediaControlsPanel: 'none'
+              WebkitMediaControlsPanel: 'none',
+              // 재생버튼 즉시 숨김을 위한 인라인 스타일
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
+              // 비디오 초기에 숨김
+              visibility: 'hidden'
             }}
             onError={() => {
               setVideoPlayState(prev => ({ ...prev, hasError: true }));
@@ -202,6 +231,10 @@ const Section4 = () => {
             }}
             onPlay={() => {
               setVideoPlayState(prev => ({ ...prev, isPlaying: true }));
+              // 재생 시작 시 포스터 숨기고 비디오 표시
+              setShowPoster(false);
+              const video = document.querySelector('[data-section="section4"]');
+              if (video) video.style.visibility = 'visible';
             }}
             onPause={() => {
               setVideoPlayState(prev => ({ ...prev, isPlaying: false }));
@@ -212,6 +245,7 @@ const Section4 = () => {
           >
             <source src={videoSource} type="video/mp4" />
           </video>
+          </>
         ) : (
           <img 
             src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S4.jpg" 

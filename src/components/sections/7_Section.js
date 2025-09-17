@@ -595,7 +595,6 @@ const Section7 = () => {
   // 섹션7 리셋 함수 (햄버거 메뉴에서 사용)
   useEffect(() => {
     window.resetSection7 = () => {
-      console.log('Resetting Section 7');
       // 모든 상태 초기화
       scrollLocked.current = false;
       setIsInSection(false);

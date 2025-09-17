@@ -66,9 +66,9 @@ const SurveyModal = ({ isOpen, onClose }) => {
       document.body.style.overflow = 'hidden';
       
       // URL에 survey 슬러그 추가
-      const currentHash = window.location.hash.replace('#', '');
-      if (!currentHash.includes('survey')) {
-        window.history.pushState(null, '', '#survey');
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('survey')) {
+        window.history.pushState(null, '', '/survey');
       }
       
       // 모바일에서 키보드가 올라올 때 viewport 높이 변경 방지

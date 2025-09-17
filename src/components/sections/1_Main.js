@@ -14,6 +14,10 @@ const Main = ({ onVisibilityChange }) => {
   const [videosLoaded, setVideosLoaded] = useState(false);
   const [videoFallback, setVideoFallback] = useState(false);
   
+  // 포스터 이미지 표시 상태 추가
+  const [showPosterPC, setShowPosterPC] = useState(true);
+  const [showPosterMobile, setShowPosterMobile] = useState(true);
+  
   // 디바이스 감지
   useEffect(() => {
     const checkMobile = () => {
@@ -100,6 +104,14 @@ const Main = ({ onVisibilityChange }) => {
           isPlaying: true, 
           hasError: false
         });
+        
+        // 재생 성공 시 포스터 이미지 숨기고 비디오 표시
+        if (isMobile) {
+          setShowPosterMobile(false);
+        } else {
+          setShowPosterPC(false);
+        }
+        videoElement.style.visibility = 'visible';
         
         // 재생 상태 지속적 모니터링
         const playCheckInterval = setInterval(() => {
@@ -250,7 +262,7 @@ const Main = ({ onVisibilityChange }) => {
             left: '50%',
             width: 'auto',
             height: '80px',
-          zIndex: 2,
+          zIndex: 20,
           display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -279,6 +291,22 @@ const Main = ({ onVisibilityChange }) => {
 
         {!videoFallback ? (
           <>
+          {/* 포스터 이미지 - 비디오가 재생되기 전까지 표시 */}
+          {showPosterPC && (
+            <img 
+              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
+              alt="Main Section Background"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 2
+              }}
+            />
+          )}
           <video
             data-section="main"
             className={styles.backgroundVideo}
@@ -291,7 +319,6 @@ const Main = ({ onVisibilityChange }) => {
             x5-video-player-type="h5"
             x5-video-player-fullscreen="false"
             preload="auto"
-            poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1.jpg"
             controls={false}
             controlsList="nodownload nofullscreen noremoteplayback"
             disablePictureInPicture={true}
@@ -306,7 +333,9 @@ const Main = ({ onVisibilityChange }) => {
               // 재생버튼 즉시 숨김을 위한 인라인 스타일
               WebkitAppearance: 'none',
               MozAppearance: 'none',
-              appearance: 'none'
+              appearance: 'none',
+              // 비디오 초기에 숨김
+              visibility: 'hidden'
             }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
@@ -318,6 +347,10 @@ const Main = ({ onVisibilityChange }) => {
             }}
             onPlay={() => {
               updateVideoPlayState({ isPlaying: true });
+              // 재생 시작 시 포스터 숨기고 비디오 표시
+              setShowPosterPC(false);
+              const video = document.querySelector('[data-section="main"]');
+              if (video) video.style.visibility = 'visible';
             }}
             onPause={() => {
               updateVideoPlayState({ isPlaying: false });
@@ -325,19 +358,6 @@ const Main = ({ onVisibilityChange }) => {
           >
             <source src={videoSources.pc} type="video/mp4" />
           </video>
-          {/* 비디오 위에 투명 오버레이로 재생버튼 차단 */}
-          <div 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: 3,
-              pointerEvents: 'none',
-              background: 'transparent'
-            }}
-          />
           </>
         ) : (
           <div className={styles.fallbackImage}>
@@ -361,7 +381,7 @@ const Main = ({ onVisibilityChange }) => {
             left: '50%',
             width: 'auto',
             height: '80px',
-          zIndex: 2,
+          zIndex: 20,
           display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -389,6 +409,22 @@ const Main = ({ onVisibilityChange }) => {
           </div>
         {!videoFallback ? (
           <>
+          {/* 포스터 이미지 - 비디오가 재생되기 전까지 표시 */}
+          {showPosterMobile && (
+            <img 
+              src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
+              alt="Main Section Background"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 2
+              }}
+            />
+          )}
           <video
             data-section="main-mobile"
             className={styles.backgroundVideo}
@@ -401,7 +437,6 @@ const Main = ({ onVisibilityChange }) => {
             x5-video-player-type="h5"
             x5-video-player-fullscreen="false"
             preload="auto"
-            poster="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S1_mo.jpg"
             controls={false}
             controlsList="nodownload nofullscreen noremoteplayback"
             disablePictureInPicture={true}
@@ -416,7 +451,9 @@ const Main = ({ onVisibilityChange }) => {
               // 재생버튼 즉시 숨김을 위한 인라인 스타일
               WebkitAppearance: 'none',
               MozAppearance: 'none',
-              appearance: 'none'
+              appearance: 'none',
+              // 비디오 초기에 숨김
+              visibility: 'hidden'
             }}
             onError={() => {
               updateVideoPlayState({ hasError: true });
@@ -428,6 +465,10 @@ const Main = ({ onVisibilityChange }) => {
             }}
             onPlay={() => {
               updateVideoPlayState({ isPlaying: true });
+              // 재생 시작 시 포스터 숨기고 비디오 표시
+              setShowPosterMobile(false);
+              const video = document.querySelector('[data-section="main-mobile"]');
+              if (video) video.style.visibility = 'visible';
             }}
             onPause={() => {
               updateVideoPlayState({ isPlaying: false });
@@ -435,19 +476,6 @@ const Main = ({ onVisibilityChange }) => {
           >
             <source src={videoSources.mobile} type="video/mp4" />
           </video>
-          {/* 비디오 위에 투명 오버레이로 재생버튼 차단 */}
-          <div 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: 3,
-              pointerEvents: 'none',
-              background: 'transparent'
-            }}
-          />
           </>
         ) : (
           <div className={styles.fallbackImage}>

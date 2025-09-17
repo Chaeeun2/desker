@@ -17,6 +17,7 @@ import RightBottomIcon from './components/ui/RightBottomIcon';
 import SurveyModal from './components/ui/SurveyModal';
 import HamburgerMenu from './components/ui/HamburgerMenu';
 
+
 function App({ section }) {
   const navigate = useNavigate();
   const [isSection1Visible, setIsSection1Visible] = useState(false);
@@ -60,7 +61,10 @@ function App({ section }) {
 
   // Path 기반 섹션 이동 처리
   useEffect(() => {
-    if (section) {
+    if (section === 'survey') {
+      // survey 섹션인 경우 모달만 열기
+      setIsSurveyModalOpen(true);
+    } else if (section) {
       const targetElement = document.getElementById(section);
       if (targetElement) {
         // 섹션 비활성화 (첫 진입 시와 동일하게)
