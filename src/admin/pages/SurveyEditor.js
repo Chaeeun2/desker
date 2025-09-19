@@ -434,6 +434,20 @@ const SurveyEditor = () => {
                       </div>
                     )}
 
+                    {question.type === 'file' && (
+                      <div className="admin-form-group" style={{ marginBottom: '0px' }}>
+                        <label className="workation-yes">
+                          <input
+                            type="checkbox"
+                            checked={question.multiple !== false}
+                            onChange={(e) => updateQuestion(stepIndex, questionIndex, 'multiple', e.target.checked)}
+                            style={{ marginRight: '8px' }}
+                          />
+                          여러 파일 업로드 허용
+                        </label>
+                      </div>
+                    )}
+
                     {(question.type === 'radio' || question.type === 'checkbox') && (
                       <div className="options-editor">
                         <label>선택지<br/><span style={{ fontSize: '1.5rem', color: '#999' }}>* value는 답변 저장에 필요한 값이므로 다른 선택지와 겹치지 않게 작성하세요.<br/>* label은 설문지에서 사용자에게 보여지는 텍스트입니다.</span></label>

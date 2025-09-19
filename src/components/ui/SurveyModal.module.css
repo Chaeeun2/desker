@@ -363,10 +363,17 @@
   font-family: var(--font-pret);
 }
 
+.photoPreviewContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
 .photoPreview {
   position: relative;
-  margin-top: 20px;
-  max-width: 75%;
+  width: calc(33.333% - 10px);
+  min-width: 150px;
 }
 
 .photoPreview img {

@@ -10,7 +10,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0); // 0: 인트로, 1-5: 설문 단계
   const [indicatorStep, setIndicatorStep] = useState(0);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [photoPreview, setPhotoPreview] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState([]); // 여러 이미지 미리보기를 위한 배열로 변경
   const [emailError, setEmailError] = useState(''); // 이메일 에러 메시지
   const [emailForPrizesError, setEmailForPrizesError] = useState(''); // 경품용 이메일 에러
   const [surveySchema, setSurveySchema] = useState(null);
@@ -18,7 +18,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
   const [surveyAnswers, setSurveyAnswers] = useState({
     hasExperienced: '', // 양양 워케이션 경험 여부
     goodPoints: '', // 좋았던 점
-    photoUrl: '', // 업로드된 사진 URL
+    photoUrls: [], // 업로드된 사진 URL들 (배열로 변경)
     siteDiscovery: [], // 사이트를 어떤 경로로 알게 되셨나요
     siteDiscoverySearch: '', // 검색 선택 시 검색어
     siteDiscoveryOther: '', // 기타 선택 시 내용
@@ -140,14 +140,14 @@ const SurveyModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       setCurrentStep(0);
       setIndicatorStep(0);
-      setPhotoPreview(null);
+      setPhotoPreview([]);
       setUploadingPhoto(false);
       setEmailError('');
       setEmailForPrizesError('');
       setSurveyAnswers({
         hasExperienced: '',
         goodPoints: '',
-        photoUrl: '',
+        photoUrls: [],
         siteDiscovery: [],
         visitPurpose: [],
         siteDiscoverySearch: '',
@@ -267,36 +267,103 @@ const SurveyModal = ({ isOpen, onClose }) => {
     });
   };
 
-  const handleFileUpload = async (event, fieldName = 'photoUrl') => {
-    const file = event.target.files[0];
-    if (file) {
-      setUploadingPhoto(true);
+  const handleFileUpload = async (event, fieldName = 'photoUrls', question = {}) => {
+    const files = Array.from(event.target.files);
+    if (files.length > 0) {
+      // 파일 검증 (고정값 사용)
+      const maxSize = 10 * 1024 * 1024; // 10MB 고정
+      const acceptedFormats = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.hwp', '.docx', '.webp', '.xlsx'];
       
-      // 미리보기 생성
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // 파일 형식 및 크기 검증
+      const invalidFiles = [];
+      const validFiles = [];
       
-      // imageService를 사용하여 업로드 (WorkLifeManager와 동일한 방식)
-      const uploadResult = await imageService.uploadFile(file, { 
-        source: 'survey',
-        prefix: 'survey-photos'
+      files.forEach(file => {
+        const fileName = file.name.toLowerCase();
+        const fileExt = '.' + fileName.split('.').pop();
+        
+        if (!acceptedFormats.includes(fileExt)) {
+          invalidFiles.push(`${file.name} - 지원하지 않는 파일 형식`);
+        } else if (file.size > maxSize) {
+          invalidFiles.push(`${file.name} - 파일 크기 초과 (최대 10MB)`);
+        } else {
+          validFiles.push(file);
+        }
       });
       
-      if (uploadResult.success) {
-        setSurveyAnswers(prev => ({
-          ...prev,
-          [fieldName]: uploadResult.fileUrl
-        }));
-      } else {
-        alert(uploadResult.error || '이미지 업로드에 실패했습니다.');
-        setPhotoPreview(null);
+      if (invalidFiles.length > 0) {
+        alert('다음 파일을 업로드할 수 없습니다:' + invalidFiles.join(''));
+      }
+      
+      if (validFiles.length === 0) {
+        return;
+      }
+      
+      setUploadingPhoto(true);
+      
+      try {
+        // 각 파일에 대해 미리보기 생성 및 업로드
+        const uploadPromises = validFiles.map(async (file) => {
+          // 미리보기 생성
+          const previewPromise = new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve(reader.result);
+            };
+            reader.readAsDataURL(file);
+          });
+          
+          // 파일 업로드
+          const uploadResult = await imageService.uploadFile(file, { 
+            source: 'survey',
+            prefix: 'survey-photos'
+          });
+          
+          const preview = await previewPromise;
+          
+          return {
+            preview,
+            url: uploadResult.success ? uploadResult.fileUrl : null,
+            error: uploadResult.success ? null : uploadResult.error
+          };
+        });
+        
+        const results = await Promise.all(uploadPromises);
+        
+        // 성공적으로 업로드된 이미지들 처리
+        const successfulUploads = results.filter(r => r.url !== null);
+        const failedUploads = results.filter(r => r.url === null);
+        
+        if (successfulUploads.length > 0) {
+          // 미리보기 추가
+          setPhotoPreview(prev => [...prev, ...successfulUploads.map(u => u.preview)]);
+          
+          // URL 추가
+          setSurveyAnswers(prev => ({
+            ...prev,
+            [fieldName]: [...(prev[fieldName] || []), ...successfulUploads.map(u => u.url)]
+          }));
+        }
+        
+        if (failedUploads.length > 0) {
+          alert(`${failedUploads.length}개의 이미지 업로드에 실패했습니다.`);
+        }
+      } catch (error) {
+        console.error('File upload error:', error);
+        alert('이미지 업로드 중 오류가 발생했습니다.');
       }
       
       setUploadingPhoto(false);
     }
+  };
+  
+  // 개별 이미지 삭제 함수 추가
+  const removeImage = (index) => {
+    setPhotoPreview(prev => prev.filter((_, i) => i !== index));
+    setSurveyAnswers(prev => ({
+      ...prev,
+      photoUrls: prev.photoUrls.filter((_, i) => i !== index)
+    }));
   };
 
   // 설문 제출 및 이메일 발송 함수
@@ -509,10 +576,11 @@ const SurveyModal = ({ isOpen, onClose }) => {
             <label className={styles.fileUploadButton}>
               <input
                 type="file"
-                accept={question.accept || '*'}
-                onChange={(e) => handleFileUpload(e, fieldName)}
+                multiple={question.multiple !== false}
+                accept=".jpg,.jpeg,.png,.gif,.pdf,.hwp,.docx,.webp,.xlsx"
+                onChange={(e) => handleFileUpload(e, fieldName, question)}
                 style={{ display: 'none' }}
-                key={photoPreview ? 'has-photo' : 'no-photo'}
+                key={photoPreview.length > 0 ? 'has-photo' : 'no-photo'}
               />
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000" className={styles.uploadIcon}>
                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -539,19 +607,20 @@ const SurveyModal = ({ isOpen, onClose }) => {
               <p className={styles.uploadStatus}>이미지 업로드 중...</p>
             )}
             
-            {photoPreview && !uploadingPhoto && (
-              <div className={styles.photoPreview}>
-                <img src={photoPreview} alt="업로드된 사진" />
-                <button 
-                  type="button"
-                  className={styles.removePhoto}
-                  onClick={() => {
-                    setPhotoPreview(null);
-                    setSurveyAnswers(prev => ({ ...prev, photoUrl: '' }));
-                  }}
-                >
-                  ✕
-                </button>
+            {photoPreview.length > 0 && !uploadingPhoto && (
+              <div className={styles.photoPreviewContainer}>
+                {photoPreview.map((preview, index) => (
+                  <div key={index} className={styles.photoPreview}>
+                    <img src={preview} alt={`업로드된 사진 ${index + 1}`} />
+                    <button 
+                      type="button"
+                      className={styles.removePhoto}
+                      onClick={() => removeImage(index)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>

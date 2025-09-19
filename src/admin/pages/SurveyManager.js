@@ -166,7 +166,34 @@ const SurveyManager = () => {
 
   // 동적 응답 값 가져오기 (스키마에 따라)
   const getDynamicAnswerValue = (survey, question) => {
-    const value = survey[question.id];
+    // 먼저 dynamicAnswers에서 찾기
+    let value = survey.dynamicAnswers?.[question.id];
+    
+    // dynamicAnswers에 없으면 직접 필드에서 찾기
+    if (value === undefined || value === null) {
+      value = survey[question.id];
+    }
+    
+    // 특별한 이미지 필드 처리 (file 타입)
+    if (question.type === 'file') {
+      // photoUrls (새 형식 - 배열)
+      if (!value && survey.photoUrls) {
+        value = survey.photoUrls;
+      }
+      // photoUrl (구 형식 - 문자열)
+      if (!value && survey.photoUrl) {
+        value = survey.photoUrl;
+      }
+      // dynamicAnswers에서 file 타입 찾기
+      if (!value && survey.dynamicAnswers) {
+        const fileKeys = Object.keys(survey.dynamicAnswers).filter(key => 
+          key.includes('file') || key.includes('photo') || key.includes('image')
+        );
+        if (fileKeys.length > 0) {
+          value = survey.dynamicAnswers[fileKeys[0]];
+        }
+      }
+    }
     
     // 특별 처리가 필요한 필드들
     if (question.id === 'phoneNumber') {
@@ -251,97 +278,144 @@ const SurveyManager = () => {
         )}
         {question.type === 'file' && value ? (
           <div className="admin-photo-preview" style={{ marginTop: '10px' }}>
-            {value.startsWith('data:') ? (
-              <>
-                <img 
-                  src={value} 
-                  alt="업로드된 사진" 
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '400px', 
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    display: 'block',
-                    marginBottom: '10px'
-                  }}
-                />
-                <button 
-                  className="btn btn-sm btn-secondary"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = value;
-                    link.download = `survey-photo-${survey.id}.jpg`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                >
-                  다운로드
-                </button>
-              </>
-            ) : (
-              <>
-                <img 
-                  src={value} 
-                  alt="업로드된 사진" 
-                  style={{ 
-                    maxWidth: '75%', 
-                    maxHeight: '400px', 
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    display: 'block',
-                    marginBottom: '10px'
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.textContent = '이미지를 불러올 수 없습니다.';
-                  }}
-                />
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {/* Handle both array (new) and string (legacy) formats */}
+            {Array.isArray(value) ? (
+              // Multiple images
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                {value.map((imageUrl, idx) => (
+                  <div key={idx} style={{ width: 'calc(33.333% - 20px)', minWidth: '150px' }}>
+                    <img 
+                      src={imageUrl} 
+                      alt={`업로드된 사진 ${idx + 1}`} 
+                      style={{ 
+                        width: '100%',
+                        height: 'auto',
+                        borderRadius: '8px',
+                        border: '1px solid #e0e0e0',
+                        display: 'block',
+                        marginBottom: '5px'
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.textContent = '이미지를 불러올 수 없습니다.';
+                      }}
+                    />
+                    <button 
+                      className="btn btn-sm btn-secondary"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(imageUrl, { mode: 'cors' });
+                          if (response.ok) {
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `survey-photo-${survey.id}-${idx + 1}.jpg`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(url);
+                          } else {
+                            throw new Error('Fetch failed');
+                          }
+                        } catch (error) {
+                          window.open(imageUrl, '_blank');
+                        }
+                      }}
+                    >
+                      다운로드
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : typeof value === 'string' ? (
+              // Single image (legacy)
+              value.startsWith('data:') ? (
+                <>
+                  <img 
+                    src={value} 
+                    alt="업로드된 사진" 
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '400px', 
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      display: 'block',
+                      marginBottom: '10px'
+                    }}
+                  />
                   <button 
                     className="btn btn-sm btn-secondary"
-                    onClick={async () => {
-                      try {
-                        // fetch 방식으로 이미지 다운로드 시도
-                        const response = await fetch(value, { 
-                          mode: 'cors'
-                        });
-                        
-                        if (response.ok) {
-                          const blob = await response.blob();
-                          const url = window.URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = url;
-                          link.download = `survey-photo-${survey.id}.jpg`;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                          window.URL.revokeObjectURL(url);
-                        } else {
-                          throw new Error('Fetch failed');
-                        }
-                      } catch (error) {
-                        // fetch 실패시 직접 링크 방식으로 fallback
-                        try {
-                          const link = document.createElement('a');
-                          link.href = value;
-                          link.download = `survey-photo-${survey.id}.jpg`;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                        } catch (linkError) {
-                          // 모든 다운로드 방식 실패시만 새 창으로 열기
-                          console.error('All download methods failed:', linkError);
-                          window.open(value, '_blank');
-                        }
-                      }
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = value;
+                      link.download = `survey-photo-${survey.id}.jpg`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
                     }}
                   >
                     다운로드
                   </button>
-                </div>
-              </>
-            )}
+                </>
+              ) : (
+                <>
+                  <img 
+                    src={value} 
+                    alt="업로드된 사진" 
+                    style={{ 
+                      maxWidth: '75%', 
+                      maxHeight: '400px', 
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      display: 'block',
+                      marginBottom: '10px'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.textContent = '이미지를 불러올 수 없습니다.';
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button 
+                      className="btn btn-sm btn-secondary"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(value, { mode: 'cors' });
+                          if (response.ok) {
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `survey-photo-${survey.id}.jpg`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(url);
+                          } else {
+                            throw new Error('Fetch failed');
+                          }
+                        } catch (error) {
+                          try {
+                            const link = document.createElement('a');
+                            link.href = value;
+                            link.download = `survey-photo-${survey.id}.jpg`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          } catch (linkError) {
+                            console.error('All download methods failed:', linkError);
+                            window.open(value, '_blank');
+                          }
+                        }
+                      }}
+                    >
+                      다운로드
+                    </button>
+                  </div>
+                </>
+              )
+            ) : null}
           </div>
         ) : (
           <p>{value || '-'}</p>
@@ -524,7 +598,22 @@ const SurveyManager = () => {
             
             // Excel용으로 값 정리 (안전한 문자열 처리)
             if (questionInfo.type === 'file' && value) {
-              if (typeof value === 'string' && value.startsWith('data:')) {
+              // 배열인 경우 (여러 이미지)
+              if (Array.isArray(value)) {
+                // 여러 URL을 줄바꿈으로 구분하여 한 셀에 표시
+                const urls = value.map((url, idx) => {
+                  if (typeof url === 'string' && url.startsWith('data:')) {
+                    return `[이미지 데이터 ${idx + 1}]`;
+                  } else if (typeof url === 'string' && url.startsWith('http')) {
+                    return url;
+                  } else {
+                    return String(url || '');
+                  }
+                }).join('\n'); // Excel에서 Alt+Enter로 표시됨
+                row.push(urls);
+              }
+              // 문자열인 경우 (레거시 단일 이미지)
+              else if (typeof value === 'string' && value.startsWith('data:')) {
                 row.push('[이미지 데이터]');
               } else if (typeof value === 'string' && value.startsWith('http')) {
                 row.push(value);
@@ -564,6 +653,24 @@ const SurveyManager = () => {
         // 워크시트 생성
         const worksheetData = [headers, ...rows];
         const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+        
+        // 셀 내 줄바꿈을 위한 wrap text 설정
+        if (!worksheet['!rows']) worksheet['!rows'] = [];
+        for (let i = 0; i < rows.length + 1; i++) {
+          worksheet['!rows'][i] = { hpt: 15 }; // 행 높이 설정
+        }
+        
+        // 이미지 URL이 있는 열에 대해 wrap text 스타일 적용
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+          for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+            if (worksheet[cell_address]) {
+              if (!worksheet[cell_address].s) worksheet[cell_address].s = {};
+              worksheet[cell_address].s.alignment = { wrapText: true, vertical: 'top' };
+            }
+          }
+        }
         
         // 열 너비 자동 조정
         const colWidths = headers.map((header, i) => {
@@ -718,10 +825,113 @@ const SurveyManager = () => {
                     <td>{survey.hasExperienced === 'yes' ? '네' : survey.hasExperienced === 'no' ? '아니오' : '-'}</td>
                     <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {(() => {
-                        // 파일 타입 질문들에서 이미지 URL 찾기
+                        // 디버깅: 전체 survey 객체 확인
+                        console.log('Full survey object:', survey);
+                        console.log('Survey data keys:', Object.keys(survey));
+                        
+                        // 모든 필드 값 확인
+                        Object.keys(survey).forEach(key => {
+                          const value = survey[key];
+                          if (value && (Array.isArray(value) || 
+                              (typeof value === 'string' && (value.includes('http') || value.includes('data:image'))))) {
+                            console.log(`Potential image field found - ${key}:`, value);
+                          }
+                        });
+                        // 동적 질문 답변에서 이미지 찾기
+                        let imageData = null;
+                        
+                        // 모든 필드에서 이미지 URL 찾기
+                        Object.keys(survey).forEach(key => {
+                          const value = survey[key];
+                          
+                          // 배열 형태의 이미지 URL들
+                          if (!imageData && value && Array.isArray(value)) {
+                            // URL 배열인지 확인
+                            const hasUrls = value.some(item => 
+                              typeof item === 'string' && 
+                              (item.startsWith('http') || item.startsWith('data:image'))
+                            );
+                            if (hasUrls) {
+                              console.log(`Found image array in field '${key}':`, value);
+                              imageData = value;
+                            }
+                          }
+                          
+                          // 문자열 형태의 이미지 URL
+                          if (!imageData && value && typeof value === 'string') {
+                            if (value.startsWith('http') || value.startsWith('data:image')) {
+                              console.log(`Found image string in field '${key}':`, value);
+                              imageData = value;
+                            }
+                          }
+                          
+                          // dynamicAnswers 안에서 찾기
+                          if (!imageData && key === 'dynamicAnswers' && value && typeof value === 'object') {
+                            Object.keys(value).forEach(subKey => {
+                              const subValue = value[subKey];
+                              if (!imageData && subValue) {
+                                if (Array.isArray(subValue) && subValue.some(item => 
+                                  typeof item === 'string' && (item.startsWith('http') || item.startsWith('data:image'))
+                                )) {
+                                  console.log(`Found image in dynamicAnswers.${subKey}:`, subValue);
+                                  imageData = subValue;
+                                } else if (typeof subValue === 'string' && 
+                                  (subValue.startsWith('http') || subValue.startsWith('data:image'))) {
+                                  console.log(`Found image in dynamicAnswers.${subKey}:`, subValue);
+                                  imageData = subValue;
+                                }
+                              }
+                            });
+                          }
+                        });
+                        
+                        // photoUrls 배열 확인 (새 형식)
+                        if (imageData && Array.isArray(imageData) && imageData.length > 0) {
+                          return (
+                            <div style={{ fontSize: '18px', lineHeight: '1.4' }}>
+                              {imageData.map((url, idx) => (
+                                <div key={idx} style={{ 
+                                  overflow: 'hidden', 
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  <a 
+                                    href={url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    style={{ color: '#007bff', textDecoration: 'underline' }}
+                                    title={url}
+                                  >
+                                    {url.length > 30 ? `${url.substring(0, 30)}...` : url}
+                                  </a>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        }
+                        
+                        // photoUrl 필드 확인 (구 형식 - 단일 이미지)
+                        else if (imageData && typeof imageData === 'string') {
+                          const imageUrl = imageData;
+                          return (
+                            <a 
+                              href={imageUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: '#007bff', textDecoration: 'underline' }}
+                              title={imageUrl}
+                            >
+                              {imageUrl.length > 30 ? `${imageUrl.substring(0, 30)}...` : imageUrl}
+                            </a>
+                          );
+                        }
+                        
+                        // 파일 타입 질문들에서 이미지 URL 찾기 (레거시 단일 이미지)
                         const imageFields = Object.keys(survey).filter(key => {
                           const value = survey[key];
-                          return value && typeof value === 'string' && 
+                          // photoUrl과 photoUrls는 이미 위에서 체크했으므로 제외
+                          return key !== 'photoUrl' && key !== 'photoUrls' && 
+                                 value && typeof value === 'string' && 
                                  (value.startsWith('http') || value.startsWith('data:image/'));
                         });
                         
