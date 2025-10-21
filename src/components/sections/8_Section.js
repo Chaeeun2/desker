@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import styles from './8_Section.module.css';
 
-const Section8 = () => {
+const Section8 = ({ onVisibilityChange }) => {
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
     threshold: 0.3,
     rootMargin: '-50px'
@@ -27,6 +27,13 @@ const Section8 = () => {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // 섹션 가시성 변경 시 부모에 알림
+  useEffect(() => {
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
 
   // 모바일용과 데스크톱용 본문 텍스트
   const getMobileTexts = () => ({
