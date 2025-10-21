@@ -2,11 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './RightBottomIcon.module.css';
 import SurveyModal from './SurveyModal';
 
-const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visible, isSection10Visible }) => {
+const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection5Visible, isSection6Visible, isSection8Visible, isSection10Visible }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAutoTooltipVisible, setIsAutoTooltipVisible] = useState(false);
+  const [tooltipMessage, setTooltipMessage] = useState('');
   const autoTooltipTimeoutRef = useRef(null);
+
+  // 섹션별 툴팁 메시지 정의
+  const tooltipMessages = {
+    section2: '더 나은 WORK-LIFE에 대한\n여러분의 이야기를 들려주세요!',
+    section5: '워케이션에 대한\n여러분의 생각을 나눠주세요!',
+    section6: '설문에 참여하고\n소중한 의견을 공유해주세요!',
+    section8: '여러분의 경험을\n들려주세요!'
+  };
 
   const handleIconClick = () => {
     // GTM 이벤트 전송
@@ -30,27 +39,38 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
     setIsModalOpen(false);
   };
 
-  // Section2, 6, 10 진입 시 자동 툴팁 노출
+  // Section2, 5, 6, 8 진입 시 자동 툴팁 노출
   useEffect(() => {
+    let message = '';
     
-    // 섹션2, 6, 10 중 하나라도 보이면 툴팁 표시
-    if (isSection2Visible || isSection6Visible) {
-      
-      // 이전 타이머가 있다면 취소 (새로 진입할 때만)
+    // 우선순위: Section 2 > 5 > 6 > 8
+    if (isSection2Visible) {
+      message = tooltipMessages.section2;
+    } else if (isSection5Visible) {
+      message = tooltipMessages.section5;
+    } else if (isSection6Visible) {
+      message = tooltipMessages.section6;
+    } else if (isSection8Visible) {
+      message = tooltipMessages.section8;
+    }
+    
+    // 메시지가 있으면 툴팁 표시
+    if (message) {
+      // 이전 타이머가 있다면 취소
       if (autoTooltipTimeoutRef.current) {
         clearTimeout(autoTooltipTimeoutRef.current);
       }
       
-      // 자동 툴팁 표시
+      // 툴팁 메시지 설정 및 표시
+      setTooltipMessage(message);
       setIsAutoTooltipVisible(true);
       
-      // 5초 후 자동으로 숨김
+      // 3초 후 자동으로 숨김
       autoTooltipTimeoutRef.current = setTimeout(() => {
         setIsAutoTooltipVisible(false);
       }, 3000);
     }
-    // 섹션을 벗어나도 타이머는 유지 (5초간 툴팁 표시 지속)
-  }, [isSection2Visible, isSection6Visible]);
+  }, [isSection2Visible, isSection5Visible, isSection6Visible, isSection8Visible]);
 
   // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
@@ -76,9 +96,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
     setIsHovered(false);
   };
 
-  // 디버깅용 로그
-  useEffect(() => {
-  }, [isSection2Visible, isAutoTooltipVisible, isHovered]);
+
 
   return (
     <>
@@ -94,9 +112,17 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection6Visib
           
           {/* 호버 시 말풍선 또는 자동 툴팁 */}
           <div className={`${styles.tooltip} ${(isHovered || isAutoTooltipVisible) ? styles.visible : ''}`}>
-            <span>더 나은 WORK-LIFE에 대한 
-<br/>여러분의 이야기를 들려주세요!
-</span>
+            <span>
+              {isAutoTooltipVisible && tooltipMessage
+                ? tooltipMessage.split('\n').map((line, i) => (
+                    <React.Fragment key={i}>
+                      {line}
+                      {i < tooltipMessage.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))
+                : <>더 나은 WORK-LIFE에 대한<br />여러분의 이야기를 들려주세요!</>
+              }
+            </span>
           </div>
         </div>
       </div>
