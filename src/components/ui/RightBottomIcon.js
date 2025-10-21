@@ -41,47 +41,54 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection5Visib
 
   // Section2, 5, 6, 8 진입 시 자동 툴팁 노출
   useEffect(() => {
-    console.log('🔍 Tooltip Debug:', {
-      isSection2Visible,
-      isSection5Visible,
-      isSection6Visible,
-      isSection8Visible
-    });
-
     let message = '';
 
     // 우선순위: Section 2 > 5 > 6 > 8
     if (isSection2Visible) {
       message = tooltipMessages.section2;
-      console.log('✅ Section 2 tooltip activated');
     } else if (isSection5Visible) {
       message = tooltipMessages.section5;
-      console.log('✅ Section 5 tooltip activated');
     } else if (isSection6Visible) {
       message = tooltipMessages.section6;
-      console.log('✅ Section 6 tooltip activated');
     } else if (isSection8Visible) {
       message = tooltipMessages.section8;
-      console.log('✅ Section 8 tooltip activated');
     }
-    
+
     // 메시지가 있으면 툴팁 표시
     if (message) {
       // 이전 타이머가 있다면 취소
       if (autoTooltipTimeoutRef.current) {
         clearTimeout(autoTooltipTimeoutRef.current);
       }
-      
-      // 툴팁 메시지 설정 및 표시
-      setTooltipMessage(message);
-      setIsAutoTooltipVisible(true);
-      
-      // 3초 후 자동으로 숨김
-      autoTooltipTimeoutRef.current = setTimeout(() => {
+
+      // 메시지가 변경되었는지 확인
+      const isMessageChanged = tooltipMessage && tooltipMessage !== message;
+
+      if (isMessageChanged) {
+        // 메시지가 변경된 경우: 먼저 닫고 → 잠시 대기 → 새 메시지로 열기
         setIsAutoTooltipVisible(false);
-      }, 3000);
+
+        setTimeout(() => {
+          setTooltipMessage(message);
+          setIsAutoTooltipVisible(true);
+
+          // 3초 후 자동으로 숨김
+          autoTooltipTimeoutRef.current = setTimeout(() => {
+            setIsAutoTooltipVisible(false);
+          }, 3000);
+        }, 300); // 300ms 대기 후 다시 열기
+      } else {
+        // 새로운 메시지인 경우: 바로 표시
+        setTooltipMessage(message);
+        setIsAutoTooltipVisible(true);
+
+        // 3초 후 자동으로 숨김
+        autoTooltipTimeoutRef.current = setTimeout(() => {
+          setIsAutoTooltipVisible(false);
+        }, 3000);
+      }
     }
-  }, [isSection2Visible, isSection5Visible, isSection6Visible, isSection8Visible]);
+  }, [isSection2Visible, isSection5Visible, isSection6Visible, isSection8Visible, tooltipMessage]);
 
   // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
