@@ -65,18 +65,23 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection5Visib
       const isMessageChanged = tooltipMessage && tooltipMessage !== message;
 
       if (isMessageChanged) {
-        // 메시지가 변경된 경우: 먼저 닫고 → 잠시 대기 → 새 메시지로 열기
+        // 메시지가 변경된 경우: 먼저 닫고 → 메시지 변경 → 다시 열기
         setIsAutoTooltipVisible(false);
 
         setTimeout(() => {
+          // 닫힌 후에 메시지 변경
           setTooltipMessage(message);
-          setIsAutoTooltipVisible(true);
 
-          // 3초 후 자동으로 숨김
-          autoTooltipTimeoutRef.current = setTimeout(() => {
-            setIsAutoTooltipVisible(false);
-          }, 3000);
-        }, 300); // 300ms 대기 후 다시 열기
+          // 메시지 변경 후 다시 열기
+          setTimeout(() => {
+            setIsAutoTooltipVisible(true);
+
+            // 3초 후 자동으로 숨김
+            autoTooltipTimeoutRef.current = setTimeout(() => {
+              setIsAutoTooltipVisible(false);
+            }, 3000);
+          }, 50); // 메시지 변경 후 50ms 후 열기
+        }, 300); // 닫힌 후 300ms 대기
       } else {
         // 새로운 메시지인 경우: 바로 표시
         setTooltipMessage(message);
