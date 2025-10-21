@@ -118,8 +118,12 @@ const Section5 = ({ onVisibilityChange }) => {
   
   // 섹션 가시성 변경 시 부모에 알림
   useEffect(() => {
+    console.log('📍 Section 5 - isIntersecting:', isIntersecting);
     if (onVisibilityChange) {
+      console.log('📍 Section 5 - Calling onVisibilityChange with:', isIntersecting);
       onVisibilityChange(isIntersecting);
+    } else {
+      console.log('⚠️ Section 5 - onVisibilityChange is undefined!');
     }
   }, [isIntersecting, onVisibilityChange]);
   
