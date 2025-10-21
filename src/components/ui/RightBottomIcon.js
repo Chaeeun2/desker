@@ -41,17 +41,28 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection5Visib
 
   // Section2, 5, 6, 8 진입 시 자동 툴팁 노출
   useEffect(() => {
+    console.log('🔍 Tooltip Debug:', {
+      isSection2Visible,
+      isSection5Visible,
+      isSection6Visible,
+      isSection8Visible
+    });
+
     let message = '';
-    
+
     // 우선순위: Section 2 > 5 > 6 > 8
     if (isSection2Visible) {
       message = tooltipMessages.section2;
+      console.log('✅ Section 2 tooltip activated');
     } else if (isSection5Visible) {
       message = tooltipMessages.section5;
+      console.log('✅ Section 5 tooltip activated');
     } else if (isSection6Visible) {
       message = tooltipMessages.section6;
+      console.log('✅ Section 6 tooltip activated');
     } else if (isSection8Visible) {
       message = tooltipMessages.section8;
+      console.log('✅ Section 8 tooltip activated');
     }
     
     // 메시지가 있으면 툴팁 표시
