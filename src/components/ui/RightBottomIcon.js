@@ -12,11 +12,10 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
 
   // 스크롤 위치별 툴팁 메시지 정의
   const tooltipMessages = {
-    text1: <>데스커 워케이션에 방문해 보셨나요?<br />여러분의 워케이션 방문기를 들려주세요.</>, // 섹션 2-4
-    text2: <>'일하기 좋은 환경'은 어떤 환경일까요?
-<br/>의견을 남겨주시면 데스커 쿠폰북이 제공됩니다!</>, // 섹션 5
+    text1: <>데스커 워케이션에 방문해 보셨나요?</>, // 섹션 2-4
+    text2: <>'일하기 좋은 환경'은 어떤 환경일까요?</>, // 섹션 5
     text3: <>더 나은 WORK-LIFE에 대한<br/>여러분의 이야기를 들려주세요.</>, // 섹션 6-7
-    text4: <>지금 설문에 참여하고<br/>나만의 워케이션을 준비해 보세요!</> // 섹션 8~
+    text4: <>나만의 워케이션,<br/>데스커와 함께 준비해요!</> // 섹션 8~
   };
 
   const handleIconClick = () => {
@@ -145,7 +144,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
 
         {/* 버튼 하단 텍스트 */}
         <div className={styles.bottomText}>
-          WORK-LIFE<br/>설문 이벤트
+          설문 이벤트<br/>참여하기
         </div>
       </div>
 
