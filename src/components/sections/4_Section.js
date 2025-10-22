@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import styles from './4_Section.module.css';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 
-const Section4 = () => {
+const Section4 = ({ onVisibilityChange }) => {
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
     threshold: 0.3,
     rootMargin: '-50px'
@@ -26,6 +26,13 @@ const Section4 = () => {
     hasStarted: false,
     retryCount: 0
   });
+
+  // 섹션 visibility 추적
+  useEffect(() => {
+    if (onVisibilityChange) {
+      onVisibilityChange(isIntersecting);
+    }
+  }, [isIntersecting, onVisibilityChange]);
 
   // 비디오 재생 상태 체크 및 재시도 로직
   useEffect(() => {

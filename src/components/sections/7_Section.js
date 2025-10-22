@@ -4,7 +4,7 @@ import Glide from '@glidejs/glide';
 import '@glidejs/glide/dist/css/glide.core.min.css';
 import '@glidejs/glide/dist/css/glide.theme.min.css';
 
-const Section7 = () => {
+const Section7 = ({ onVisibilityChange }) => {
   const sectionRef = useRef(null);
   const panelsContainerRef = useRef(null);
   const [currentPanel, setCurrentPanel] = useState(0);
@@ -26,6 +26,21 @@ const Section7 = () => {
   const isAnimating = useRef(false);
   const isExitAnimating = useRef(false); // 탈출 애니메이션 중 플래그
   
+  // 섹션 visibility 추적
+  useEffect(() => {
+    if (!sectionRef.current || !onVisibilityChange) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        onVisibilityChange(entry.isIntersecting);
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [onVisibilityChange]);
+
   // 모바일 감지
   useEffect(() => {
     const checkMobile = () => {

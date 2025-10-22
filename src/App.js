@@ -22,8 +22,11 @@ function App({ section }) {
   const navigate = useNavigate();
   const [isSection1Visible, setIsSection1Visible] = useState(false);
   const [isSection2Visible, setIsSection2Visible] = useState(false);
+  const [isSection3Visible, setIsSection3Visible] = useState(false);
+  const [isSection4Visible, setIsSection4Visible] = useState(false);
   const [isSection5Visible, setIsSection5Visible] = useState(false);
   const [isSection6Visible, setIsSection6Visible] = useState(false);
+  const [isSection7Visible, setIsSection7Visible] = useState(false);
   const [isSection8Visible, setIsSection8Visible] = useState(false);
   const [isSection10Visible, setIsSection10Visible] = useState(false);
   const [isSection11Visible, setIsSection11Visible] = useState(false);
@@ -119,13 +122,11 @@ function App({ section }) {
       <Section0 />
       <Section1 onVisibilityChange={setIsSection1Visible} />
       <Section2 onVisibilityChange={setIsSection2Visible} />
-      <Section3 />
-      <Section4 />
+      <Section3 onVisibilityChange={setIsSection3Visible} />
+      <Section4 onVisibilityChange={setIsSection4Visible} />
       <Section5 onVisibilityChange={setIsSection5Visible} />
-      <Section6 onVisibilityChange={(visible) => {
-        setIsSection6Visible(visible);
-      }} />
-      <Section7 />
+      <Section6 onVisibilityChange={setIsSection6Visible} />
+      <Section7 onVisibilityChange={setIsSection7Visible} />
       <Section8 onVisibilityChange={setIsSection8Visible} />
       <Section9 />
       <Section10 onVisibilityChange={(visible) => {
@@ -141,8 +142,11 @@ function App({ section }) {
       <RightBottomIcon 
         isSection1Visible={isSection1Visible} 
         isSection2Visible={isSection2Visible}
+        isSection3Visible={isSection3Visible}
+        isSection4Visible={isSection4Visible}
         isSection5Visible={isSection5Visible}
         isSection6Visible={isSection6Visible}
+        isSection7Visible={isSection7Visible}
         isSection8Visible={isSection8Visible}
         isSection10Visible={isSection10Visible}
       />

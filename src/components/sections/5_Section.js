@@ -111,11 +111,12 @@ const Section5 = ({ onVisibilityChange }) => {
     }
   };
 
+  // useIntersectionObserver 훅 사용 (섹션 8과 동일한 방식)
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver({
     threshold: 0.3,
     rootMargin: '-50px'
   });
-  
+
   // 섹션 가시성 변경 시 부모에 알림
   useEffect(() => {
     if (onVisibilityChange) {

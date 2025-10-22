@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './3_Section.module.css';
 
-const Section3 = () => {
+const Section3 = ({ onVisibilityChange }) => {
   const sectionRef = useRef(null);
   const [currentTextIndex] = useState(0);
   const currentTextIndexRef = useRef(0);
@@ -56,6 +56,7 @@ const Section3 = () => {
     setSvg2TranslateY(300);
     setSvg2Width(0);
     setSvg2StrokeColor('black');
+    setSvg2Opacity(1);
     setLineTranslateY(500);
     setLineWidth(0);
     setLineStrokeColor('black');
@@ -116,7 +117,8 @@ const Section3 = () => {
   const [text5TranslateY, setText5TranslateY] = useState(0); // 텍스트5 translateY
   const [text6Opacity, setText6Opacity] = useState(0); // 텍스트6 opacity
   const [overlayColor, setOverlayColor] = useState('white'); // overlay 배경색 (white → primary)
-  
+  const [svg2Opacity, setSvg2Opacity] = useState(0); // svg2(야자수) opacity (0 → 1)
+
 
   // texts 배열을 동적으로 생성하여 색상 변경 가능하게 함
   const getTexts = (text4Color) => [
@@ -138,6 +140,21 @@ const Section3 = () => {
 
   // 화면 크기에 따라 텍스트 선택
   // isMobile은 이미 위에서 선언됨
+
+  // 섹션 visibility 추적
+  useEffect(() => {
+    if (!sectionRef.current || !onVisibilityChange) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        onVisibilityChange(entry.isIntersecting);
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [onVisibilityChange]);
 
   // 모바일 감지 (768px 이하)
   useEffect(() => {
@@ -256,6 +273,7 @@ const Section3 = () => {
           setSvg1TranslateY(0);
           setSvg2TranslateY(0);
           setSvg2Width(199);
+          setSvg2Opacity(0);
           setLineTranslateY(0);
           setSvg1StrokeColor('black');
           setSvg2StrokeColor('black');
@@ -305,6 +323,7 @@ const Section3 = () => {
           setSvg2TranslateY(0);
           setSvg2Width(199);
           setSvg2StrokeColor('black');
+          setSvg2Opacity(0);
           setLineTranslateY(0);
           setLineWidth(0);
           setLineOpacity(0);
@@ -344,7 +363,10 @@ const Section3 = () => {
         // triggerPoint에 도달하면 애니메이션 시작
         if (scrollTop >= triggerPoint) {
           const scrollDiff = scrollTop - triggerPoint; // triggerPoint 기준으로 계산
-          
+
+          // 야자수 SVG 보이기
+          setSvg2Opacity(1);
+
           // 텍스트1 opacity 계산 (오버레이와 반대로 동작)
           // 오버레이가 0일 때 텍스트1은 1, 오버레이가 1일 때 텍스트1은 0
           
@@ -659,6 +681,7 @@ const Section3 = () => {
           setText6Opacity(0);
           setOverlayOpacity(0);
           setOverlayColor('white');
+          setSvg2Opacity(0);
         }
         
 
@@ -971,18 +994,19 @@ const Section3 = () => {
           </div>
         
         {/* svg2: 야자나무 2개 - 컨테이너 밖에 위치 */}
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
           width="199"
-          height="146" 
+          height="146"
           fill="none"
           style={{
             transform: `translate(50%, ${svg2TranslateY}px)`,
-            transition: 'right 0.3s ease-out, transform 0.3s ease-out, width 0.3s ease-out',
+            transition: 'right 0.3s ease-out, transform 0.3s ease-out, width 0.3s ease-out, opacity 0.3s ease-out',
             position: 'absolute',
             bottom: '5dvh',
             right: `${svg2TranslateX}%`,
-            zIndex: 11
+            zIndex: 11,
+            opacity: svg2Opacity
           }}
         >
             <path stroke={svg2StrokeColor} strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M45.191 81v63.358M88.687 86.057H67.154c-6.959-5.452-16.232-5.739-21.828-.4a10.27 10.27 0 0 0-.113-1.3v-.041c-.009-.043-.009-.072-.026-.114.409-2.764 1.76-5.314 3.796-7.48 2.364-2.538 5.684-4.54 9.559-5.731 2.566-.804 5.372-1.237 8.326-1.237 12.046 0 21.82 7.304 21.82 16.308v-.005Z"/>
