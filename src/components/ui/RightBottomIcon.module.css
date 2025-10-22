@@ -55,7 +55,8 @@
   bottom: 100%;
   right: 0;
   margin-bottom: 20px;
-  background: white;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
   color: black;
   padding: 12px 20px;
   border-radius: 12px;
@@ -81,9 +82,9 @@
   content: "";
   position: absolute;
   top: 100%;
-  right: 25px;
+  right: 24px;
   border: 8px solid transparent;
-  border-top-color: white;
+  border-top-color: rgba(255, 255, 255, 0.6);
 }
 
 /* 버튼 하단 텍스트 */

@@ -12,10 +12,11 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
 
   // 스크롤 위치별 툴팁 메시지 정의
   const tooltipMessages = {
-    text1: <>더 나은 WORK-LIFE에 대한<br />여러분의 이야기를 들려주세요!</>, // 섹션 2-4
-    text2: <>워케이션에 대한<br />여러분의 생각을 나눠주세요!</>, // 섹션 5
-    text3: <>설문에 참여하고<br />소중한 의견을 공유해주세요!</>, // 섹션 6-7
-    text4: <>여러분의 경험을<br />들려주세요!</> // 섹션 8~
+    text1: <>데스커 워케이션에 방문해 보셨나요?<br />여러분의 워케이션 방문기를 들려주세요.</>, // 섹션 2-4
+    text2: <>'일하기 좋은 환경'은 어떤 환경일까요?
+<br/>의견을 남겨주시면 데스커 쿠폰북이 제공됩니다!</>, // 섹션 5
+    text3: <>더 나은 WORK-LIFE에 대한<br/>여러분의 이야기를 들려주세요.</>, // 섹션 6-7
+    text4: <>지금 설문에 참여하고<br/>나만의 워케이션을 준비해 보세요!</> // 섹션 8~
   };
 
   const handleIconClick = () => {
@@ -96,7 +97,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
       // 5초 후 자동으로 숨김
       autoTooltipTimeoutRef.current = setTimeout(() => {
         setShowAutoTooltip(false);
-      }, 5000);
+      }, 7000);
     }
   }, [isSection2Visible, isSection3Visible, isSection4Visible, isSection5Visible, isSection6Visible, isSection7Visible, isSection8Visible]);
 
@@ -144,7 +145,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
 
         {/* 버튼 하단 텍스트 */}
         <div className={styles.bottomText}>
-          워크라이프<br/>설문 참여하기
+          WORK-LIFE<br/>설문 이벤트
         </div>
       </div>
 
