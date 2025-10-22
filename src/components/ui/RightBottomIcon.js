@@ -125,7 +125,7 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
   return (
     <>
       <div className={`${styles.rightBottomIcon} ${isSection1Visible ? styles.hidden : ''}`}>
-        <div 
+        <div
           className={styles.iconContainer}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -133,13 +133,18 @@ const RightBottomIcon = ({ isSection1Visible, isSection2Visible, isSection3Visib
         >
           <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/icon.png" alt="Character Icon" className={styles.characterIcon} />
           <span className={styles.notificationBadge}>1</span>
-          
+
           {/* 호버 시 말풍선 또는 자동 툴팁 */}
           <div className={`${styles.tooltip} ${(isHovered || showAutoTooltip) ? styles.visible : ''}`}>
             <span>
               {tooltipMessage || <>더 나은 WORK-LIFE에 대한<br />여러분의 이야기를 들려주세요!</>}
             </span>
           </div>
+        </div>
+
+        {/* 버튼 하단 텍스트 */}
+        <div className={styles.bottomText}>
+          워크라이프<br/>설문 참여하기
         </div>
       </div>
 
