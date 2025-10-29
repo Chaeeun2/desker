@@ -26,6 +26,42 @@ const Section7 = ({ onVisibilityChange }) => {
   const isAnimating = useRef(false);
   const isExitAnimating = useRef(false); // 탈출 애니메이션 중 플래그
   
+  // Background image rotation state
+  const [panel1BgIndex, setPanel1BgIndex] = useState(0);
+  const [panel2BgIndex, setPanel2BgIndex] = useState(0);
+  const [panel3BgIndex, setPanel3BgIndex] = useState(0);
+  const [panel4BgIndex, setPanel4BgIndex] = useState(0);
+  
+  // Background image arrays for each panel
+  const panel1BgImages = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-1-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-1-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-1-3.jpg'
+  ];
+
+  const panel2BgImages = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-2-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-2-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-2-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-2-4.jpg'
+  ];
+
+  const panel3BgImages = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-3-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-3-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-3-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-3-4.jpg'
+  ];
+
+  const panel4BgImages = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-4-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-4-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-4-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-4-4.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-4-5.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/7-4-6.jpg'
+  ];
+  
   // 섹션 visibility 추적
   useEffect(() => {
     if (!sectionRef.current || !onVisibilityChange) return;
@@ -787,6 +823,47 @@ const Section7 = ({ onVisibilityChange }) => {
     };
   }, [isMobile]);
 
+  // Preload background images
+  useEffect(() => {
+    const allImages = [
+      ...panel1BgImages,
+      ...panel2BgImages,
+      ...panel3BgImages,
+      ...panel4BgImages
+    ];
+
+    allImages.forEach((imgSrc) => {
+      const img = new Image();
+      img.src = imgSrc;
+    });
+  }, []);
+
+  // Auto-rotate background images every 3 seconds
+  useEffect(() => {
+    const interval1 = setInterval(() => {
+      setPanel1BgIndex((prev) => (prev + 1) % panel1BgImages.length);
+    }, 5000);
+
+    const interval2 = setInterval(() => {
+      setPanel2BgIndex((prev) => (prev + 1) % panel2BgImages.length);
+    }, 5000);
+
+    const interval3 = setInterval(() => {
+      setPanel3BgIndex((prev) => (prev + 1) % panel3BgImages.length);
+    }, 5000);
+
+    const interval4 = setInterval(() => {
+      setPanel4BgIndex((prev) => (prev + 1) % panel4BgImages.length);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval1);
+      clearInterval(interval2);
+      clearInterval(interval3);
+      clearInterval(interval4);
+    };
+  }, []);
+
   return (
     <>
       <section ref={sectionRef} className={styles.section7}>
@@ -796,10 +873,14 @@ const Section7 = ({ onVisibilityChange }) => {
             <div className={styles.panelContent}>
               {/* 왼쪽: 배경 이미지와 텍스트 오버레이 */}
               <div className={styles.leftSide}>
-                <div 
-                  className={styles.backgroundImage}
-                  style={{ backgroundImage: 'url("https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S7-1.jpg")' }}
-                >
+                <div className={styles.backgroundImageContainer}>
+                  {panel1BgImages.map((imgSrc, idx) => (
+                    <div
+                      key={idx}
+                      className={`${styles.backgroundImage} ${panel1BgIndex === idx ? styles.bgVisible : styles.bgHidden}`}
+                      style={{ backgroundImage: `url("${imgSrc}")` }}
+                    />
+                  ))}
                   <div className={styles.textOverlay}>
                     <h2 className={styles.panelTitle}>I AM. SURFER</h2>
                     <p className={styles.panelSubtitle}>서퍼의 여행은 파도를 따른다</p>
@@ -841,10 +922,14 @@ const Section7 = ({ onVisibilityChange }) => {
             <div className={styles.panelContent}>
               {/* 왼쪽: 배경 이미지와 텍스트 오버레이 */}
               <div className={styles.leftSide}>
-                <div 
-                  className={styles.backgroundImage}
-                  style={{ backgroundImage: 'url("https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S7-2.jpg")' }}
-                >
+                <div className={styles.backgroundImageContainer}>
+                  {panel2BgImages.map((imgSrc, idx) => (
+                    <div
+                      key={idx}
+                      className={`${styles.backgroundImage} ${panel2BgIndex === idx ? styles.bgVisible : styles.bgHidden}`}
+                      style={{ backgroundImage: `url("${imgSrc}")` }}
+                    />
+                  ))}
                   <div className={styles.textOverlay}>
                     <h2 className={styles.panelTitle} style={{ lineHeight: '1.2', fontSize: '7rem' }}>
                       <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 201.png" style={{width: "350px"}} alt="logo" /><br/>환기의 정원
@@ -888,10 +973,14 @@ const Section7 = ({ onVisibilityChange }) => {
             <div className={styles.panelContent}>
               {/* 왼쪽: 배경 이미지와 텍스트 오버레이 */}
               <div className={styles.leftSide}>
-                <div 
-                  className={styles.backgroundImage}
-                  style={{ backgroundImage: 'url("https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S7-3.jpg")' }}
-                >
+                <div className={styles.backgroundImageContainer}>
+                  {panel3BgImages.map((imgSrc, idx) => (
+                    <div
+                      key={idx}
+                      className={`${styles.backgroundImage} ${panel3BgIndex === idx ? styles.bgVisible : styles.bgHidden}`}
+                      style={{ backgroundImage: `url("${imgSrc}")` }}
+                    />
+                  ))}
                   <div className={styles.textOverlay}>
                     <h2 className={styles.panelTitle}>WORKATION<br/>START-UP DAY</h2>
                     <p className={styles.panelSubtitle}>도전하는 이들을 위한 시간,<br/>디캠프 D'DAY & 스타트업 위크</p>
@@ -933,10 +1022,14 @@ const Section7 = ({ onVisibilityChange }) => {
             <div className={styles.panelContent}>
               {/* 왼쪽: 배경 이미지와 텍스트 오버레이 */}
               <div className={styles.leftSide}>
-                <div 
-                  className={styles.backgroundImage}
-                  style={{ backgroundImage: 'url("https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/S7-4.jpg")' }}
-                >
+                <div className={styles.backgroundImageContainer}>
+                  {panel4BgImages.map((imgSrc, idx) => (
+                    <div
+                      key={idx}
+                      className={`${styles.backgroundImage} ${panel4BgIndex === idx ? styles.bgVisible : styles.bgHidden}`}
+                      style={{ backgroundImage: `url("${imgSrc}")` }}
+                    />
+                  ))}
                   <div className={styles.textOverlay}>
                     <h2 className={styles.panelTitle} style={{ lineHeight: '1.2', fontSize: '7rem' }}>워케이션 공간 속<br/>즐거움을 더하다</h2>
                     <p className={styles.panelSubtitle}>더욱 특별한 워케이션 경험을 위한 협업</p>
