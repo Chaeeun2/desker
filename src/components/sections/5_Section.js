@@ -11,10 +11,10 @@ const Section5 = ({ onVisibilityChange }) => {
 
   // 패널 2 썸네일 이미지 배열
   const panel2Images = [
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-1.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-2.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-3.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-4.jpg'
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-4.jpg'
   ];
 
   // 패널 3 썸네일 이미지 배열
@@ -27,10 +27,10 @@ const Section5 = ({ onVisibilityChange }) => {
 
   // 패널 4 썸네일 이미지 배열
   const panel4Images = [
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-3.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-2.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-1.jpg',
-    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-4.jpg'
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-4.jpg'
   ];
 
   useEffect(() => {
