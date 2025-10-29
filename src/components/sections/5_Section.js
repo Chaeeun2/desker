@@ -5,16 +5,51 @@ import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 const Section5 = ({ onVisibilityChange }) => {
   const panelRefs = useRef([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [panel2Image, setPanel2Image] = useState('https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-1.jpg');
+  const [panel3Image, setPanel3Image] = useState('https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-3-1.jpg');
+  const [panel4Image, setPanel4Image] = useState('https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-1.jpg');
+
+  // 패널 2 썸네일 이미지 배열
+  const panel2Images = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4-4.jpg'
+  ];
+
+  // 패널 3 썸네일 이미지 배열
+  const panel3Images = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-3-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-3-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-3-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-3-4.jpg'
+  ];
+
+  // 패널 4 썸네일 이미지 배열
+  const panel4Images = [
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-3.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-2.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-1.jpg',
+    'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2-4.jpg'
+  ];
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 패널 2, 3, 4 이미지들 preload
+  useEffect(() => {
+    [...panel2Images, ...panel3Images, ...panel4Images].forEach((imgSrc) => {
+      const img = new Image();
+      img.src = imgSrc;
+    });
   }, []);
 
   // 모바일용 텍스트 배열 (본문만)
@@ -151,30 +186,72 @@ const Section5 = ({ onVisibilityChange }) => {
               </div>
             </div>
 
-            {/* 패널 2: 발코니 뷰 (이미지) */}
+            {/* 패널 2: 발코니 뷰 (이미지 + 썸네일) */}
             <div className={styles.panel} ref={addPanelRef}>
               <div className={styles.panelContent} data-panel-content>
                 <h3>일이 아닌,<br/><span className={styles.highlight}>나를 위한 시간</span>이 되려면?</h3>
                 <p dangerouslySetInnerHTML={{ __html: currentTexts[1].p }} />
               </div>
-              <div className={styles.panelImage} data-panel-image>
-                <div className={styles.imageContainer}>
-                  <img 
-                    src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-2.jpg" 
-                    className={styles.image}
-                  />
+              <div className={styles.panelImageWithThumbs} data-panel-image>
+                <div className={styles.mainImageWrapper}>
+                  <div className={styles.imageContainer}>
+                    {/* 모든 이미지를 DOM에 렌더링하여 강제 preload */}
+                    {panel2Images.map((imgSrc, idx) => (
+                      <img
+                        key={idx}
+                        src={imgSrc}
+                        className={`${styles.image} ${panel2Image === imgSrc ? styles.imageVisible : styles.imageHidden}`}
+                        alt={`이미지 ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.thumbnailsWrapper}>
+                  {panel2Images.map((imgSrc, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.thumbnail} ${panel2Image === imgSrc ? styles.thumbnailActive : ''}`}
+                      onMouseEnter={() => setPanel2Image(imgSrc)}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={`썸네일 ${index + 1}`}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* 패널 3: 깔끔한 데스크 (이미지) */}
+            {/* 패널 3: 깔끔한 데스크 (이미지 + 썸네일 왼쪽) */}
             <div className={styles.panel} ref={addPanelRef}>
-              <div className={styles.panelImage} data-panel-image>
-                <div className={styles.imageContainer}>
-                  <img 
-                    src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-3.jpg" 
-                    className={styles.image}
-                  />
+              <div className={`${styles.panelImageWithThumbs} ${styles.panelImageWithThumbsLeft}`} data-panel-image>
+                <div className={styles.thumbnailsWrapper}>
+                  {panel3Images.map((imgSrc, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.thumbnail} ${panel3Image === imgSrc ? styles.thumbnailActive : ''}`}
+                      onMouseEnter={() => setPanel3Image(imgSrc)}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={`썸네일 ${index + 1}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.mainImageWrapper}>
+                  <div className={styles.imageContainer}>
+                    {/* 모든 이미지를 DOM에 렌더링하여 강제 preload */}
+                    {panel3Images.map((imgSrc, idx) => (
+                      <img
+                        key={idx}
+                        src={imgSrc}
+                        className={`${styles.image} ${panel3Image === imgSrc ? styles.imageVisible : styles.imageHidden}`}
+                        alt={`이미지 ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className={styles.panelContent} data-panel-content>
@@ -183,18 +260,39 @@ const Section5 = ({ onVisibilityChange }) => {
               </div>
             </div>
 
-            {/* 패널 4: 요가/운동 (이미지) */}
+            {/* 패널 4: 요가/운동 (이미지 + 썸네일) */}
             <div className={styles.panel} ref={addPanelRef}>
               <div className={styles.panelContent} data-panel-content>
                 <h3><span className={styles.highlight}>일만 하다 돌아가는</span><br/>워케이션이 되지 않으려면?</h3>
                 <p dangerouslySetInnerHTML={{ __html: currentTexts[3].p }} />
               </div>
-              <div className={styles.panelImage} data-panel-image>
-                <div className={styles.imageContainer}>
-                  <img 
-                    src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/5-4.jpg" 
-                    className={styles.image}
-                  />
+              <div className={styles.panelImageWithThumbs} data-panel-image>
+                <div className={styles.mainImageWrapper}>
+                  <div className={styles.imageContainer}>
+                    {/* 모든 이미지를 DOM에 렌더링하여 강제 preload */}
+                    {panel4Images.map((imgSrc, idx) => (
+                      <img
+                        key={idx}
+                        src={imgSrc}
+                        className={`${styles.image} ${panel4Image === imgSrc ? styles.imageVisible : styles.imageHidden}`}
+                        alt={`이미지 ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.thumbnailsWrapper}>
+                  {panel4Images.map((imgSrc, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.thumbnail} ${panel4Image === imgSrc ? styles.thumbnailActive : ''}`}
+                      onMouseEnter={() => setPanel4Image(imgSrc)}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={`썸네일 ${index + 1}`}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
