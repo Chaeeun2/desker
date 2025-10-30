@@ -15,6 +15,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
   const [emailForPrizesError, setEmailForPrizesError] = useState(''); // 경품용 이메일 에러
   const [surveySchema, setSurveySchema] = useState(null);
   const [schemaLoading, setSchemaLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [surveyAnswers, setSurveyAnswers] = useState({
     hasExperienced: '', // 양양 워케이션 경험 여부
     goodPoints: '', // 좋았던 점
@@ -58,6 +59,16 @@ const SurveyModal = ({ isOpen, onClose }) => {
     setSurveySchema(schema);
     setSchemaLoading(false);
   };
+
+  // 모바일 감지
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 모달이 열려있을 때 body 스크롤 방지 및 URL 슬러그 추가
   useEffect(() => {
@@ -700,7 +711,13 @@ const SurveyModal = ({ isOpen, onClose }) => {
         return (
           <>
             <div className={styles.modalBodyImg}>
-              <img src="https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/coupons.png" alt="데스커" />
+              <img
+                src={isMobile
+                  ? "https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 293.png"
+                  : "https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 292.png"
+                }
+                alt="데스커"
+              />
             </div>
             
             <div className={styles.modalBody}>
@@ -1174,7 +1191,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
 
   return (
     <div className={styles.modalOverlay} onClick={handleCloseModal}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+      <div className={`${styles.modalContent} ${currentStep === 0 ? styles.firstPage : ''}`} onClick={(e) => e.stopPropagation()}>
         {/* Modal Header - 상단 고정 */}
         <div className={styles.modalHeader}>
           {currentStep > 0 && renderProgressIndicator()}
@@ -1183,7 +1200,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
             <span className={styles.closeLine2}></span>
           </button>
         </div>
-        
+
         {/* Modal Body - 스크롤 가능한 콘텐츠 */}
         <div className={styles.modalBodyContainer}>
           {renderSurveyStep()}

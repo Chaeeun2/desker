@@ -39,6 +39,10 @@
   flex-shrink: 0;
 }
 
+.firstPage .modalHeader {
+  background: none;
+}
+
 /* Modal Body Container - 스크롤 가능한 콘텐츠 */
 .modalBodyContainer {
   flex: 1;
@@ -46,8 +50,25 @@
   padding: 15px 40px;
 }
 
+.firstPage .modalBodyContainer {
+  padding: 0 0 25px 0;
+  margin: 0;
+  width: 100%;
+}
+
+.firstPage .modalHeader {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
 .modalBodyContainer:has(img) {
   padding: 0px 40px 15px 40px;
+}
+
+/* 첫 번째 페이지 구분용 클래스 */
+.firstPage {
+  /* 첫 페이지만의 스타일을 여기에 추가할 수 있습니다 */
 }
 
 /* Modal Footer - 하단 고정 */
@@ -95,12 +116,14 @@
 .modalBodyImg {
   width: 100%;
   text-align: center;
-  margin-bottom: 35px;
+  margin-bottom: 50px;
+  background: #f0f0f0;
 }
 
 .modalBodyImg img {
   width: 100%;
-  max-width: 350px;
+  max-width: 540px;
+  padding: 35px 0 30px 20px;
 }
 
 .title {
@@ -704,6 +727,32 @@
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
+  .firstPage {
+    padding: 0 !important;
+  }
+
+  .firstPage .modalFooter {
+    padding: 0 25px 25px 25px;
+  }
+
+  .firstPage .closeButton {
+    top: 30px;
+    right: 30px;
+  }
+
+  .firstPage .title,
+  .firstPage .description {
+    padding: 0px 25px;
+  }
+
+  .modalBodyImg {
+    padding: 0px 35px 0px 30px;
+  }
+
+  .modalBodyImg img {
+    max-width: 300px;
+  }
+
   .modalBodyContainer:has(img) {
     padding: 10px 0px;
   }
@@ -837,11 +886,5 @@
 
   .photoPreview {
     max-width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .modalBodyImg img {
-    max-width: 280px;
   }
 }
