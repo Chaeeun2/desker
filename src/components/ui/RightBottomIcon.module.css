@@ -104,7 +104,7 @@
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .rightBottomIcon {
-    bottom: 1.5rem;
+    bottom: 5rem;
     right: 2rem;
   }
 
@@ -122,11 +122,13 @@
   }
 
   .tooltip {
-    font-size: 1.4rem;
-    padding: 12px 18px;
+    font-size: 1.3rem;
+    padding: 10px 15px;
     margin-bottom: 15px;
+    max-width: 128px;
     width: 100vw;
-    max-width: 205px;
+    white-space: normal;
+    word-break: keep-all;
   }
 
   .tooltip::after {
@@ -146,7 +148,6 @@
   }
 
   .bottomText {
-    font-size: 1rem;
-    margin-top: 6px;
+    font-size: 1.2rem;
   }
 }
