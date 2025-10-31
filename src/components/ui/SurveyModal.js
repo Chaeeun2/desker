@@ -60,11 +60,22 @@ const SurveyModal = ({ isOpen, onClose }) => {
     setSchemaLoading(false);
   };
 
-  // 모바일 감지
+  // 모바일 감지 및 이미지 preload
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
+
+    // 설문 모달 이미지 preload
+    const preloadImages = [
+      'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 292.png',
+      'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 292-mobile.png'
+    ];
+
+    preloadImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
