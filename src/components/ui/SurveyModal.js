@@ -69,7 +69,7 @@ const SurveyModal = ({ isOpen, onClose }) => {
     // 설문 모달 이미지 preload
     const preloadImages = [
       'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 292.png',
-      'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 292-mobile.png'
+      'https://pub-d4c8ae88017d4b4b9b44bb7f19c5472a.r2.dev/Group 293.png'
     ];
 
     preloadImages.forEach((src) => {
